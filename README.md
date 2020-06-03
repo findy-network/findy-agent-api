@@ -1,6 +1,6 @@
 # findy-agent API
 
-This documentation describes the API of how findy-agent clients i.e. edge agents communicate with findy-agent over the network.
+This documentation describes the API of how [findy-agent](https://github.com/findy-network/findy-agent) clients i.e. edge agents communicate with findy-agent over the network.
 
 **Note! This is the initial beta version of the API and it is likely to change with no backward compatibility in the coming findy-agent versions.**
 
