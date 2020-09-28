@@ -1,0 +1,72 @@
+# GraphQL schema example
+#
+# https://gqlgen.com/getting-started/
+
+type PageInfo {
+  endCursor: String
+  hasNextPage: Boolean!
+  hasPreviousPage: Boolean!
+  startCursor: String
+}
+
+interface Object {
+  createdMs: String!
+  approvedMs: String!
+  initiatedByUs: Boolean!
+}
+
+type Pairwise implements Object {
+  id: ID!
+  ourDid: String!
+  theirDid: String!
+  theirEndpoint: String!
+  theirLabel: String!
+
+  createdMs: String!
+  approvedMs: String!
+  initiatedByUs: Boolean!
+}
+
+type PairwiseEdge {
+  cursor: String!
+  node: Pairwise!
+}
+
+type PairwiseConnection {
+  edges: [PairwiseEdge]
+  nodes: [Pairwise]
+  pageInfo: PageInfo!
+  totalCount: Int!
+}
+
+type Todo {
+  id: ID!
+  text: String!
+  done: Boolean!
+  user: User!
+}
+
+type User {
+  id: ID!
+  name: String!
+}
+
+type Query {
+  todos: [Todo!]!
+  connections(
+    after: String
+    before: String
+    first: Int
+    last: Int
+  ): PairwiseConnection!
+  connection(id: String!): Pairwise
+}
+
+input NewTodo {
+  text: String!
+  userId: String!
+}
+
+type Mutation {
+  createTodo(input: NewTodo!): Todo!
+}
