@@ -9,13 +9,7 @@ type PageInfo {
   startCursor: String
 }
 
-interface Object {
-  createdMs: String!
-  approvedMs: String!
-  initiatedByUs: Boolean!
-}
-
-type Pairwise implements Object {
+type Pairwise {
   id: ID!
   ourDid: String!
   theirDid: String!
@@ -39,34 +33,63 @@ type PairwiseConnection {
   totalCount: Int!
 }
 
-type Todo {
+type Event {
   id: ID!
-  text: String!
-  done: Boolean!
-  user: User!
+  description: String!
+  connection: Pairwise
 }
 
-type User {
-  id: ID!
-  name: String!
+type EventEdge {
+  cursor: String!
+  node: Event!
+}
+
+type EventConnection {
+  edges: [EventEdge]
+  nodes: [Event]
+  pageInfo: PageInfo!
+  totalCount: Int!
 }
 
 type Query {
-  todos: [Todo!]!
   connections(
     after: String
     before: String
     first: Int
     last: Int
   ): PairwiseConnection!
-  connection(id: String!): Pairwise
+  connection(id: ID!): Pairwise
+
+  events(after: String, before: String, first: Int, last: Int): EventConnection!
+  event(id: ID!): Event
 }
 
-input NewTodo {
-  text: String!
-  userId: String!
+input Invitation {
+  payload: String!
+}
+
+input Offer {
+  id: ID!
+  accept: Boolean!
+}
+
+input Request {
+  id: ID!
+  accept: Boolean!
+}
+
+type Response {
+  ok: Boolean!
 }
 
 type Mutation {
-  createTodo(input: NewTodo!): Todo!
+  invite: Response!
+  connect(input: Invitation!): Response!
+  sendMessage: Response!
+  acceptOffer(input: Offer!): Response!
+  acceptRequest(input: Request!): Response!
+}
+
+type Subscription {
+  eventAdded(eventID: ID!): Event
 }

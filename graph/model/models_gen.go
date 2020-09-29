@@ -2,13 +2,31 @@
 
 package model
 
-type Object interface {
-	IsObject()
+type Event struct {
+	ID          string    `json:"id"`
+	Description string    `json:"description"`
+	Connection  *Pairwise `json:"connection"`
 }
 
-type NewTodo struct {
-	Text   string `json:"text"`
-	UserID string `json:"userId"`
+type EventConnection struct {
+	Edges      []*EventEdge `json:"edges"`
+	Nodes      []*Event     `json:"nodes"`
+	PageInfo   *PageInfo    `json:"pageInfo"`
+	TotalCount int          `json:"totalCount"`
+}
+
+type EventEdge struct {
+	Cursor string `json:"cursor"`
+	Node   *Event `json:"node"`
+}
+
+type Invitation struct {
+	Payload string `json:"payload"`
+}
+
+type Offer struct {
+	ID     string `json:"id"`
+	Accept bool   `json:"accept"`
 }
 
 type PageInfo struct {
@@ -29,8 +47,6 @@ type Pairwise struct {
 	InitiatedByUs bool   `json:"initiatedByUs"`
 }
 
-func (Pairwise) IsObject() {}
-
 type PairwiseConnection struct {
 	Edges      []*PairwiseEdge `json:"edges"`
 	Nodes      []*Pairwise     `json:"nodes"`
@@ -43,14 +59,11 @@ type PairwiseEdge struct {
 	Node   *Pairwise `json:"node"`
 }
 
-type Todo struct {
-	ID   string `json:"id"`
-	Text string `json:"text"`
-	Done bool   `json:"done"`
-	User *User  `json:"user"`
+type Request struct {
+	ID     string `json:"id"`
+	Accept bool   `json:"accept"`
 }
 
-type User struct {
-	ID   string `json:"id"`
-	Name string `json:"name"`
+type Response struct {
+	Ok bool `json:"ok"`
 }
