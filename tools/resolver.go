@@ -1,4 +1,4 @@
-package server
+package tools
 
 import (
 	"context"
@@ -12,10 +12,10 @@ import (
 
 	"github.com/findy-network/findy-agent-api/graph/generated"
 	"github.com/findy-network/findy-agent-api/graph/model"
-	"github.com/findy-network/findy-agent-api/tools"
+	"github.com/findy-network/findy-agent-api/resolver"
 )
 
-var connections = []tools.InternalPairwise{
+var Connections = []InternalPairwise{
 	{"4b7565eb-062b-4286-9115-c0584fa486bf", "wHELJGmdZnWZKSttXfrTlNadR", "gvZZqQTEsyijwXEBaLyHyKKfi", "http://www.BvYYcKn.com/", "Ms. Vivian Dibbert", true, 190080541, 274877981},
 	{"2de0c34e-3d97-4cba-95a6-99d2f675e2b7", "iGlpntctWWocPKVMNkeYNsRbZ", "DWXRRNVCDcSEDVrcNtDvTJsje", "http://nUrkwXD.com/QiOfbAg.html", "Miss Angie Volkman", true, 972509823, 1225650817},
 	{"01fbf139-9ef6-44b5-a8ed-355d737442d7", "GCdvuVODIqrmnjLwtpYZueqnp", "qirbjDmmNwuHVYebuEswnGItS", "https://www.JCawACK.com/VALjSMm", "Prof. Name Satterfield", false, 1370099585, 895722201},
@@ -23,19 +23,33 @@ var connections = []tools.InternalPairwise{
 	{"27f18a75-5ca2-42c6-b509-08c5fe07a65d", "vCrqgVmpbyltcKcFAeJGnpIhh", "euDSUETPKeZQmTunecrAuiyWU", "https://www.BdFpLDu.org/qhnQhcS", "Princess Patricia Gleason", true, 1545036772, 328612424},
 }
 
-type ByCreated []tools.InternalPairwise
+type ByCreated []InternalPairwise
 
 func (a ByCreated) Len() int           { return len(a) }
 func (a ByCreated) Swap(i, j int)      { a[i], a[j] = a[j], a[i] }
 func (a ByCreated) Less(i, j int) bool { return a[i].CreatedMs < a[j].CreatedMs }
 
-func createCursor(created int64, t reflect.Type) string {
+func CreateCursor(created int64, t reflect.Type) string {
 	return base64.StdEncoding.EncodeToString([]byte(t.Name() + ":" + strconv.FormatInt(created, 10)))
 }
 
-func parseCursor(cursor string, t reflect.Type) string {
-	plain, _ := base64.StdEncoding.DecodeString(cursor)
-	return strings.Split(string(plain), ":")[1]
+func parseCursor(cursor string, t reflect.Type) (int64, error) {
+	plain, err := base64.StdEncoding.DecodeString(cursor)
+	if err != nil {
+		return 0, errors.New(resolver.ErrorCursorInvalid)
+	}
+
+	parts := strings.Split(string(plain), ":")
+	if len(parts) != 2 {
+		return 0, errors.New(resolver.ErrorCursorInvalid)
+	}
+
+	value, err := strconv.ParseInt(parts[1], 10, 64)
+	if err != nil {
+		return 0, errors.New(resolver.ErrorCursorInvalid)
+	}
+
+	return value, nil
 }
 
 func (r *mutationResolver) CreateTodo(ctx context.Context, input model.NewTodo) (*model.Todo, error) {
@@ -64,49 +78,60 @@ If no less last+1 results are returned, I set hasPreviousPage: true, otherwise I
 
 func (r *queryResolver) Connections(ctx context.Context, after *string, before *string, first *int, last *int) (*model.PairwiseConnection, error) {
 	if first == nil && last == nil {
-		return nil, errors.New(ErrorFirstLastMissing)
+		return nil, errors.New(resolver.ErrorFirstLastMissing)
 	}
 	if (first != nil && (*first < 1 || *first > 100)) || (last != nil && (*last < 1 || *last > 100)) {
-		return nil, errors.New(ErrorFirstLastInvalid)
+		return nil, errors.New(resolver.ErrorFirstLastInvalid)
 	}
 
-	sort.Sort(ByCreated(connections))
+	sort.Sort(ByCreated(Connections))
 	afterIndex := 0
-	beforeIndex := len(connections) - 1
+	beforeIndex := len(Connections) - 1
 	if after != nil || before != nil {
 		var afterVal int64
 		var beforeVal int64
+		var err error
 		if after != nil {
-			afterVal, _ = strconv.ParseInt(parseCursor(*after, reflect.TypeOf(model.Pairwise{})), 10, 64)
+			afterVal, err = parseCursor(*after, reflect.TypeOf(model.Pairwise{}))
+			if err != nil {
+				return nil, err
+			}
 		}
 		if before != nil {
-			beforeVal, _ = strconv.ParseInt(parseCursor(*before, reflect.TypeOf(model.Pairwise{})), 10, 64)
+			beforeVal, err = parseCursor(*before, reflect.TypeOf(model.Pairwise{}))
+			if err != nil {
+				return nil, err
+			}
 		}
-		for index, value := range connections {
-			if afterVal > 0 && value.CreatedMs < afterVal {
-				afterIndex = index
+		for index, value := range Connections {
+			if afterVal > 0 && value.CreatedMs <= afterVal {
+				afterIndex = index + 1
 			}
 			if beforeVal > 0 && value.CreatedMs < beforeVal {
 				beforeIndex = index
 			}
-			if value.CreatedMs > beforeVal {
+			if (beforeVal > 0 && value.CreatedMs > beforeVal) || (beforeVal == 0 && value.CreatedMs > afterVal) {
 				break
 			}
 		}
 	}
 
+	//hasPreviousPage := first == nil
+	//hasNextPage := last == nil
 	if first != nil {
-		afterPlusFirst := afterIndex + *first - 1
+		afterPlusFirst := afterIndex + (*first - 1)
 		if beforeIndex > afterPlusFirst {
 			beforeIndex = afterPlusFirst
+			//hasNextPage = true
 		}
 	} else if last != nil {
-		beforeMinusLast := beforeIndex - *last
+		beforeMinusLast := beforeIndex - (*last - 1)
 		if afterIndex < beforeMinusLast {
 			afterIndex = beforeMinusLast
+			//hasPreviousPage = true
 		}
 	}
-	result := connections[afterIndex:(beforeIndex + 1)]
+	result := Connections[afterIndex:(beforeIndex + 1)]
 	totalCount := len(result)
 	nodes := make([]*model.Pairwise, totalCount)
 	for index, pairwise := range result {
@@ -125,7 +150,7 @@ func (r *queryResolver) Connections(ctx context.Context, after *string, before *
 	edges := make([]*model.PairwiseEdge, totalCount)
 	for index, pairwise := range nodes {
 		edges[index] = &model.PairwiseEdge{
-			Cursor: createCursor(result[index].CreatedMs, reflect.TypeOf(model.Pairwise{})),
+			Cursor: CreateCursor(result[index].CreatedMs, reflect.TypeOf(model.Pairwise{})),
 			Node:   pairwise,
 		}
 	}
@@ -141,8 +166,8 @@ func (r *queryResolver) Connections(ctx context.Context, after *string, before *
 		Nodes: nodes,
 		PageInfo: &model.PageInfo{
 			EndCursor:       endCursor,
-			HasNextPage:     true,
-			HasPreviousPage: true,
+			HasNextPage:     edges[len(edges)-1].Node.ID != Connections[len(Connections)-1].ID,
+			HasPreviousPage: edges[0].Node.ID != Connections[0].ID,
 			StartCursor:     startCursor,
 		},
 		TotalCount: totalCount,

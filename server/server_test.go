@@ -11,6 +11,8 @@ import (
 	"testing"
 
 	"github.com/findy-network/findy-agent-api/graph/model"
+	"github.com/findy-network/findy-agent-api/resolver"
+	"github.com/findy-network/findy-agent-api/tools"
 )
 
 type JSONError struct {
@@ -40,7 +42,7 @@ func doQuery(query string) (payload JSON) {
 	request.Header.Set("Content-Type", "application/json")
 	response := httptest.NewRecorder()
 
-	Handler(&Resolver{}).ServeHTTP(response, request)
+	Handler(&tools.Resolver{}).ServeHTTP(response, request)
 
 	bytes := response.Body.Bytes()
 	fmt.Println(string(bytes))
@@ -50,7 +52,7 @@ func doQuery(query string) (payload JSON) {
 
 func connQuery(arguments string) string {
 	if len(arguments) > 0 {
-		arguments = "(" + arguments + ")"
+		arguments = "(" + strings.Replace(arguments, "\"", "\\\"", -1) + ")"
 	}
 	return `{
 		connections` + arguments + ` {
@@ -77,10 +79,14 @@ func TestGetConnections(t *testing.T) {
 			query string
 		}
 		errorPath := []string{"connections"}
-		data := connections
+		first := tools.Connections[0]
+		firstCursor := tools.CreateCursor(first.CreatedMs, reflect.TypeOf(model.Pairwise{}))
+		second := tools.Connections[1]
+		secondCursor := tools.CreateCursor(second.CreatedMs, reflect.TypeOf(model.Pairwise{}))
+		last := tools.Connections[len(tools.Connections)-1]
 		paginationInvalidError := JSON{Errors: &[]JSONError{
 			{
-				Message: ErrorFirstLastInvalid,
+				Message: resolver.ErrorFirstLastInvalid,
 				Path:    errorPath,
 			},
 		}}
@@ -91,7 +97,7 @@ func TestGetConnections(t *testing.T) {
 		}{
 			{"connections, pagination missing", args{connQuery("")}, JSON{Errors: &[]JSONError{
 				{
-					Message: ErrorFirstLastMissing,
+					Message: resolver.ErrorFirstLastMissing,
 					Path:    errorPath,
 				},
 			}}},
@@ -99,17 +105,65 @@ func TestGetConnections(t *testing.T) {
 			{"connections, pagination first too high", args{connQuery("first: 101")}, paginationInvalidError},
 			{"connections, pagination last too low", args{connQuery("last: 0")}, paginationInvalidError},
 			{"connections, pagination last too high", args{connQuery("last: 101")}, paginationInvalidError},
+			{"connections, after cursor invalid", args{connQuery("first: 1, after: \"1\"")}, JSON{Errors: &[]JSONError{
+				{
+					Message: resolver.ErrorCursorInvalid,
+					Path:    errorPath,
+				},
+			}}},
 			{"first connection ", args{connQuery("first: 1")}, JSON{Data: &JSONData{Connections: model.PairwiseConnection{
 				Edges: []*model.PairwiseEdge{
-					{Cursor: createCursor(data[0].CreatedMs, reflect.TypeOf(model.Pairwise{})), Node: &model.Pairwise{
-						ID:            data[0].ID,
-						OurDid:        data[0].OurDid,
-						TheirDid:      data[0].TheirDid,
-						TheirEndpoint: data[0].TheirEndpoint,
-						TheirLabel:    data[0].TheirLabel,
-						CreatedMs:     strconv.FormatInt(data[0].CreatedMs, 10),
-						ApprovedMs:    strconv.FormatInt(data[0].ApprovedMs, 10),
-						InitiatedByUs: data[0].InitiatedByUs,
+					{Cursor: firstCursor, Node: &model.Pairwise{
+						ID:            first.ID,
+						OurDid:        first.OurDid,
+						TheirDid:      first.TheirDid,
+						TheirEndpoint: first.TheirEndpoint,
+						TheirLabel:    first.TheirLabel,
+						CreatedMs:     strconv.FormatInt(first.CreatedMs, 10),
+						ApprovedMs:    strconv.FormatInt(first.ApprovedMs, 10),
+						InitiatedByUs: first.InitiatedByUs,
+					}},
+				},
+			}}}},
+			{"last connection ", args{connQuery("last: 1")}, JSON{Data: &JSONData{Connections: model.PairwiseConnection{
+				Edges: []*model.PairwiseEdge{
+					{Cursor: tools.CreateCursor(last.CreatedMs, reflect.TypeOf(model.Pairwise{})), Node: &model.Pairwise{
+						ID:            last.ID,
+						OurDid:        last.OurDid,
+						TheirDid:      last.TheirDid,
+						TheirEndpoint: last.TheirEndpoint,
+						TheirLabel:    last.TheirLabel,
+						CreatedMs:     strconv.FormatInt(last.CreatedMs, 10),
+						ApprovedMs:    strconv.FormatInt(last.ApprovedMs, 10),
+						InitiatedByUs: last.InitiatedByUs,
+					}},
+				},
+			}}}},
+			{"second connection ", args{connQuery("first: 1, after: \"" + firstCursor + "\"")}, JSON{Data: &JSONData{Connections: model.PairwiseConnection{
+				Edges: []*model.PairwiseEdge{
+					{Cursor: secondCursor, Node: &model.Pairwise{
+						ID:            second.ID,
+						OurDid:        second.OurDid,
+						TheirDid:      second.TheirDid,
+						TheirEndpoint: second.TheirEndpoint,
+						TheirLabel:    second.TheirLabel,
+						CreatedMs:     strconv.FormatInt(second.CreatedMs, 10),
+						ApprovedMs:    strconv.FormatInt(second.ApprovedMs, 10),
+						InitiatedByUs: second.InitiatedByUs,
+					}},
+				},
+			}}}},
+			{"previous to second connection ", args{connQuery("first: 1, before: \"" + secondCursor + "\"")}, JSON{Data: &JSONData{Connections: model.PairwiseConnection{
+				Edges: []*model.PairwiseEdge{
+					{Cursor: firstCursor, Node: &model.Pairwise{
+						ID:            first.ID,
+						OurDid:        first.OurDid,
+						TheirDid:      first.TheirDid,
+						TheirEndpoint: first.TheirEndpoint,
+						TheirLabel:    first.TheirLabel,
+						CreatedMs:     strconv.FormatInt(first.CreatedMs, 10),
+						ApprovedMs:    strconv.FormatInt(first.ApprovedMs, 10),
+						InitiatedByUs: first.InitiatedByUs,
 					}},
 				},
 			}}}},
