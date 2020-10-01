@@ -2,10 +2,19 @@
 
 package model
 
+import (
+	"fmt"
+	"io"
+	"strconv"
+)
+
 type Event struct {
-	ID          string    `json:"id"`
-	Description string    `json:"description"`
-	Connection  *Pairwise `json:"connection"`
+	ID          string       `json:"id"`
+	Description string       `json:"description"`
+	Protocol    ProtocolType `json:"protocol"`
+	Type        EventType    `json:"type"`
+	CreatedMs   string       `json:"createdMs"`
+	Connection  *Pairwise    `json:"connection"`
 }
 
 type EventConnection struct {
@@ -66,4 +75,92 @@ type Request struct {
 
 type Response struct {
 	Ok bool `json:"ok"`
+}
+
+type EventType string
+
+const (
+	EventTypeNotification EventType = "NOTIFICATION"
+	EventTypeAction       EventType = "ACTION"
+)
+
+var AllEventType = []EventType{
+	EventTypeNotification,
+	EventTypeAction,
+}
+
+func (e EventType) IsValid() bool {
+	switch e {
+	case EventTypeNotification, EventTypeAction:
+		return true
+	}
+	return false
+}
+
+func (e EventType) String() string {
+	return string(e)
+}
+
+func (e *EventType) UnmarshalGQL(v interface{}) error {
+	str, ok := v.(string)
+	if !ok {
+		return fmt.Errorf("enums must be strings")
+	}
+
+	*e = EventType(str)
+	if !e.IsValid() {
+		return fmt.Errorf("%s is not a valid EventType", str)
+	}
+	return nil
+}
+
+func (e EventType) MarshalGQL(w io.Writer) {
+	fmt.Fprint(w, strconv.Quote(e.String()))
+}
+
+type ProtocolType string
+
+const (
+	ProtocolTypeNone         ProtocolType = "NONE"
+	ProtocolTypeConnection   ProtocolType = "CONNECTION"
+	ProtocolTypeCredential   ProtocolType = "CREDENTIAL"
+	ProtocolTypeProof        ProtocolType = "PROOF"
+	ProtocolTypeBasicMessage ProtocolType = "BASIC_MESSAGE"
+)
+
+var AllProtocolType = []ProtocolType{
+	ProtocolTypeNone,
+	ProtocolTypeConnection,
+	ProtocolTypeCredential,
+	ProtocolTypeProof,
+	ProtocolTypeBasicMessage,
+}
+
+func (e ProtocolType) IsValid() bool {
+	switch e {
+	case ProtocolTypeNone, ProtocolTypeConnection, ProtocolTypeCredential, ProtocolTypeProof, ProtocolTypeBasicMessage:
+		return true
+	}
+	return false
+}
+
+func (e ProtocolType) String() string {
+	return string(e)
+}
+
+func (e *ProtocolType) UnmarshalGQL(v interface{}) error {
+	str, ok := v.(string)
+	if !ok {
+		return fmt.Errorf("enums must be strings")
+	}
+
+	*e = ProtocolType(str)
+	if !e.IsValid() {
+		return fmt.Errorf("%s is not a valid ProtocolType", str)
+	}
+	return nil
+}
+
+func (e ProtocolType) MarshalGQL(w io.Writer) {
+	fmt.Fprint(w, strconv.Quote(e.String()))
 }

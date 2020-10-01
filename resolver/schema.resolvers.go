@@ -47,7 +47,7 @@ func (r *queryResolver) Event(ctx context.Context, id string) (*model.Event, err
 	panic(fmt.Errorf("not implemented"))
 }
 
-func (r *subscriptionResolver) EventAdded(ctx context.Context, eventID string) (<-chan *model.Event, error) {
+func (r *subscriptionResolver) EventAdded(ctx context.Context) (<-chan *model.Event, error) {
 	panic(fmt.Errorf("not implemented"))
 }
 

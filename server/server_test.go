@@ -42,7 +42,7 @@ func doQuery(query string) (payload JSON) {
 	request.Header.Set("Content-Type", "application/json")
 	response := httptest.NewRecorder()
 
-	Handler(&tools.Resolver{}).ServeHTTP(response, request)
+	Server(&tools.Resolver{}).ServeHTTP(response, request)
 
 	bytes := response.Body.Bytes()
 	fmt.Println(string(bytes))
@@ -80,9 +80,9 @@ func TestGetConnections(t *testing.T) {
 		}
 		errorPath := []string{"connections"}
 		first := tools.Connections[0]
-		firstCursor := tools.CreateCursor(first.CreatedMs, reflect.TypeOf(model.Pairwise{}))
+		firstCursor := tools.CreateCursor(first.CreatedMs, model.Pairwise{})
 		second := tools.Connections[1]
-		secondCursor := tools.CreateCursor(second.CreatedMs, reflect.TypeOf(model.Pairwise{}))
+		secondCursor := tools.CreateCursor(second.CreatedMs, model.Pairwise{})
 		last := tools.Connections[len(tools.Connections)-1]
 		paginationInvalidError := JSON{Errors: &[]JSONError{
 			{
@@ -127,7 +127,7 @@ func TestGetConnections(t *testing.T) {
 			}}}},
 			{"last connection ", args{connQuery("last: 1")}, JSON{Data: &JSONData{Connections: model.PairwiseConnection{
 				Edges: []*model.PairwiseEdge{
-					{Cursor: tools.CreateCursor(last.CreatedMs, reflect.TypeOf(model.Pairwise{})), Node: &model.Pairwise{
+					{Cursor: tools.CreateCursor(last.CreatedMs, model.Pairwise{}), Node: &model.Pairwise{
 						ID:            last.ID,
 						OurDid:        last.OurDid,
 						TheirDid:      last.TheirDid,

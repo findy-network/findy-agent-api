@@ -47,8 +47,11 @@ type DirectiveRoot struct {
 type ComplexityRoot struct {
 	Event struct {
 		Connection  func(childComplexity int) int
+		CreatedMs   func(childComplexity int) int
 		Description func(childComplexity int) int
 		ID          func(childComplexity int) int
+		Protocol    func(childComplexity int) int
+		Type        func(childComplexity int) int
 	}
 
 	EventConnection struct {
@@ -113,7 +116,7 @@ type ComplexityRoot struct {
 	}
 
 	Subscription struct {
-		EventAdded func(childComplexity int, eventID string) int
+		EventAdded func(childComplexity int) int
 	}
 }
 
@@ -131,7 +134,7 @@ type QueryResolver interface {
 	Event(ctx context.Context, id string) (*model.Event, error)
 }
 type SubscriptionResolver interface {
-	EventAdded(ctx context.Context, eventID string) (<-chan *model.Event, error)
+	EventAdded(ctx context.Context) (<-chan *model.Event, error)
 }
 
 type executableSchema struct {
@@ -156,6 +159,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Event.Connection(childComplexity), true
 
+	case "Event.createdMs":
+		if e.complexity.Event.CreatedMs == nil {
+			break
+		}
+
+		return e.complexity.Event.CreatedMs(childComplexity), true
+
 	case "Event.description":
 		if e.complexity.Event.Description == nil {
 			break
@@ -169,6 +179,20 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Event.ID(childComplexity), true
+
+	case "Event.protocol":
+		if e.complexity.Event.Protocol == nil {
+			break
+		}
+
+		return e.complexity.Event.Protocol(childComplexity), true
+
+	case "Event.type":
+		if e.complexity.Event.Type == nil {
+			break
+		}
+
+		return e.complexity.Event.Type(childComplexity), true
 
 	case "EventConnection.edges":
 		if e.complexity.EventConnection.Edges == nil {
@@ -448,12 +472,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			break
 		}
 
-		args, err := ec.field_Subscription_eventAdded_args(context.TODO(), rawArgs)
-		if err != nil {
-			return 0, false
-		}
-
-		return e.complexity.Subscription.EventAdded(childComplexity, args["eventID"].(string)), true
+		return e.complexity.Subscription.EventAdded(childComplexity), true
 
 	}
 	return 0, false
@@ -571,9 +590,25 @@ type PairwiseConnection {
   totalCount: Int!
 }
 
+enum ProtocolType {
+  NONE
+  CONNECTION
+  CREDENTIAL
+  PROOF
+  BASIC_MESSAGE
+}
+
+enum EventType {
+  NOTIFICATION
+  ACTION
+}
+
 type Event {
   id: ID!
   description: String!
+  protocol: ProtocolType!
+  type: EventType!
+  createdMs: String!
   connection: Pairwise
 }
 
@@ -629,7 +664,7 @@ type Mutation {
 }
 
 type Subscription {
-  eventAdded(eventID: ID!): Event
+  eventAdded: Event!
 }
 `, BuiltIn: false},
 }
@@ -813,21 +848,6 @@ func (ec *executionContext) field_Query_events_args(ctx context.Context, rawArgs
 	return args, nil
 }
 
-func (ec *executionContext) field_Subscription_eventAdded_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
-	var err error
-	args := map[string]interface{}{}
-	var arg0 string
-	if tmp, ok := rawArgs["eventID"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("eventID"))
-		arg0, err = ec.unmarshalNID2string(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
-	}
-	args["eventID"] = arg0
-	return args, nil
-}
-
 func (ec *executionContext) field___Type_enumValues_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
@@ -920,6 +940,111 @@ func (ec *executionContext) _Event_description(ctx context.Context, field graphq
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
 		return obj.Description, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Event_protocol(ctx context.Context, field graphql.CollectedField, obj *model.Event) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Event",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Protocol, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(model.ProtocolType)
+	fc.Result = res
+	return ec.marshalNProtocolType2githubᚗcomᚋfindyᚑnetworkᚋfindyᚑagentᚑapiᚋgraphᚋmodelᚐProtocolType(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Event_type(ctx context.Context, field graphql.CollectedField, obj *model.Event) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Event",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Type, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(model.EventType)
+	fc.Result = res
+	return ec.marshalNEventType2githubᚗcomᚋfindyᚑnetworkᚋfindyᚑagentᚑapiᚋgraphᚋmodelᚐEventType(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Event_createdMs(ctx context.Context, field graphql.CollectedField, obj *model.Event) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Event",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.CreatedMs, nil
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -2270,22 +2395,18 @@ func (ec *executionContext) _Subscription_eventAdded(ctx context.Context, field 
 	}
 
 	ctx = graphql.WithFieldContext(ctx, fc)
-	rawArgs := field.ArgumentMap(ec.Variables)
-	args, err := ec.field_Subscription_eventAdded_args(ctx, rawArgs)
-	if err != nil {
-		ec.Error(ctx, err)
-		return nil
-	}
-	fc.Args = args
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Subscription().EventAdded(rctx, args["eventID"].(string))
+		return ec.resolvers.Subscription().EventAdded(rctx)
 	})
 	if err != nil {
 		ec.Error(ctx, err)
 		return nil
 	}
 	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
 		return nil
 	}
 	return func() graphql.Marshaler {
@@ -2297,7 +2418,7 @@ func (ec *executionContext) _Subscription_eventAdded(ctx context.Context, field 
 			w.Write([]byte{'{'})
 			graphql.MarshalString(field.Alias).MarshalGQL(w)
 			w.Write([]byte{':'})
-			ec.marshalOEvent2ᚖgithubᚗcomᚋfindyᚑnetworkᚋfindyᚑagentᚑapiᚋgraphᚋmodelᚐEvent(ctx, field.Selections, res).MarshalGQL(w)
+			ec.marshalNEvent2ᚖgithubᚗcomᚋfindyᚑnetworkᚋfindyᚑagentᚑapiᚋgraphᚋmodelᚐEvent(ctx, field.Selections, res).MarshalGQL(w)
 			w.Write([]byte{'}'})
 		})
 	}
@@ -3495,6 +3616,21 @@ func (ec *executionContext) _Event(ctx context.Context, sel ast.SelectionSet, ob
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
+		case "protocol":
+			out.Values[i] = ec._Event_protocol(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "type":
+			out.Values[i] = ec._Event_type(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "createdMs":
+			out.Values[i] = ec._Event_createdMs(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
 		case "connection":
 			out.Values[i] = ec._Event_connection(ctx, field, obj)
 		default:
@@ -4180,6 +4316,10 @@ func (ec *executionContext) marshalNBoolean2bool(ctx context.Context, sel ast.Se
 	return res
 }
 
+func (ec *executionContext) marshalNEvent2githubᚗcomᚋfindyᚑnetworkᚋfindyᚑagentᚑapiᚋgraphᚋmodelᚐEvent(ctx context.Context, sel ast.SelectionSet, v model.Event) graphql.Marshaler {
+	return ec._Event(ctx, sel, &v)
+}
+
 func (ec *executionContext) marshalNEvent2ᚖgithubᚗcomᚋfindyᚑnetworkᚋfindyᚑagentᚑapiᚋgraphᚋmodelᚐEvent(ctx context.Context, sel ast.SelectionSet, v *model.Event) graphql.Marshaler {
 	if v == nil {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
@@ -4202,6 +4342,16 @@ func (ec *executionContext) marshalNEventConnection2ᚖgithubᚗcomᚋfindyᚑne
 		return graphql.Null
 	}
 	return ec._EventConnection(ctx, sel, v)
+}
+
+func (ec *executionContext) unmarshalNEventType2githubᚗcomᚋfindyᚑnetworkᚋfindyᚑagentᚑapiᚋgraphᚋmodelᚐEventType(ctx context.Context, v interface{}) (model.EventType, error) {
+	var res model.EventType
+	err := res.UnmarshalGQL(v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalNEventType2githubᚗcomᚋfindyᚑnetworkᚋfindyᚑagentᚑapiᚋgraphᚋmodelᚐEventType(ctx context.Context, sel ast.SelectionSet, v model.EventType) graphql.Marshaler {
+	return v
 }
 
 func (ec *executionContext) unmarshalNID2string(ctx context.Context, v interface{}) (string, error) {
@@ -4276,6 +4426,16 @@ func (ec *executionContext) marshalNPairwiseConnection2ᚖgithubᚗcomᚋfindy�
 		return graphql.Null
 	}
 	return ec._PairwiseConnection(ctx, sel, v)
+}
+
+func (ec *executionContext) unmarshalNProtocolType2githubᚗcomᚋfindyᚑnetworkᚋfindyᚑagentᚑapiᚋgraphᚋmodelᚐProtocolType(ctx context.Context, v interface{}) (model.ProtocolType, error) {
+	var res model.ProtocolType
+	err := res.UnmarshalGQL(v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalNProtocolType2githubᚗcomᚋfindyᚑnetworkᚋfindyᚑagentᚑapiᚋgraphᚋmodelᚐProtocolType(ctx context.Context, sel ast.SelectionSet, v model.ProtocolType) graphql.Marshaler {
+	return v
 }
 
 func (ec *executionContext) unmarshalNRequest2githubᚗcomᚋfindyᚑnetworkᚋfindyᚑagentᚑapiᚋgraphᚋmodelᚐRequest(ctx context.Context, v interface{}) (model.Request, error) {

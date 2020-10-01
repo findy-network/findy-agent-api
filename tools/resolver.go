@@ -9,28 +9,22 @@ import (
 	"sort"
 	"strconv"
 	"strings"
+	"time"
 
 	"github.com/findy-network/findy-agent-api/graph/generated"
 	"github.com/findy-network/findy-agent-api/graph/model"
 	"github.com/findy-network/findy-agent-api/resolver"
 )
 
-var Connections = []InternalPairwise{
-	{"4b7565eb-062b-4286-9115-c0584fa486bf", "wHELJGmdZnWZKSttXfrTlNadR", "gvZZqQTEsyijwXEBaLyHyKKfi", "http://www.BvYYcKn.com/", "Ms. Vivian Dibbert", true, 190080541, 274877981},
-	{"2de0c34e-3d97-4cba-95a6-99d2f675e2b7", "iGlpntctWWocPKVMNkeYNsRbZ", "DWXRRNVCDcSEDVrcNtDvTJsje", "http://nUrkwXD.com/QiOfbAg.html", "Miss Angie Volkman", true, 972509823, 1225650817},
-	{"01fbf139-9ef6-44b5-a8ed-355d737442d7", "GCdvuVODIqrmnjLwtpYZueqnp", "qirbjDmmNwuHVYebuEswnGItS", "https://www.JCawACK.com/VALjSMm", "Prof. Name Satterfield", false, 1370099585, 895722201},
-	{"96458265-5e4d-462a-a107-04ac606a8c79", "eHWscqOMorqcRitXTooXxkglU", "SjlQjYwLbkflyLljskJfGjnZR", "https://www.mhAyHBc.biz/", "Miss Breana Goodwin", false, 1403296283, 1508512828},
-	{"27f18a75-5ca2-42c6-b509-08c5fe07a65d", "vCrqgVmpbyltcKcFAeJGnpIhh", "euDSUETPKeZQmTunecrAuiyWU", "https://www.BdFpLDu.org/qhnQhcS", "Princess Patricia Gleason", true, 1545036772, 328612424},
+var eventAddedObserver map[string]chan *model.Event
+
+func init() {
+	eventAddedObserver = map[string]chan *model.Event{}
 }
 
-type ByCreated []InternalPairwise
-
-func (a ByCreated) Len() int           { return len(a) }
-func (a ByCreated) Swap(i, j int)      { a[i], a[j] = a[j], a[i] }
-func (a ByCreated) Less(i, j int) bool { return a[i].CreatedMs < a[j].CreatedMs }
-
-func CreateCursor(created int64, t reflect.Type) string {
-	return base64.StdEncoding.EncodeToString([]byte(t.Name() + ":" + strconv.FormatInt(created, 10)))
+func CreateCursor(created int64, object interface{}) string {
+	typeName := reflect.TypeOf(object).Name()
+	return base64.StdEncoding.EncodeToString([]byte(typeName + ":" + strconv.FormatInt(created, 10)))
 }
 
 func parseCursor(cursor string, t reflect.Type) (int64, error) {
@@ -98,7 +92,10 @@ func (r *queryResolver) Connections(ctx context.Context, after *string, before *
 		return nil, errors.New(resolver.ErrorFirstLastInvalid)
 	}
 
-	sort.Sort(ByCreated(Connections))
+	sort.Slice(Connections, func(i, j int) bool {
+		return Connections[i].CreatedMs < Connections[j].CreatedMs
+	})
+
 	afterIndex := 0
 	beforeIndex := len(Connections) - 1
 	if after != nil || before != nil {
@@ -164,7 +161,7 @@ func (r *queryResolver) Connections(ctx context.Context, after *string, before *
 	edges := make([]*model.PairwiseEdge, totalCount)
 	for index, pairwise := range nodes {
 		edges[index] = &model.PairwiseEdge{
-			Cursor: CreateCursor(result[index].CreatedMs, reflect.TypeOf(model.Pairwise{})),
+			Cursor: CreateCursor(result[index].CreatedMs, model.Pairwise{}),
 			Node:   pairwise,
 		}
 	}
@@ -194,15 +191,121 @@ func (r *queryResolver) Connection(ctx context.Context, id string) (*model.Pairw
 }
 
 func (r *queryResolver) Events(ctx context.Context, after *string, before *string, first *int, last *int) (*model.EventConnection, error) {
-	panic(fmt.Errorf("not implemented"))
+	if first == nil && last == nil {
+		return nil, errors.New(resolver.ErrorFirstLastMissing)
+	}
+	if (first != nil && (*first < 1 || *first > 100)) || (last != nil && (*last < 1 || *last > 100)) {
+		return nil, errors.New(resolver.ErrorFirstLastInvalid)
+	}
+
+	sort.Slice(Events, func(i, j int) bool {
+		return Events[i].CreatedMs < Events[j].CreatedMs
+	})
+
+	afterIndex := 0
+	beforeIndex := len(Events) - 1
+	if after != nil || before != nil {
+		var afterVal int64
+		var beforeVal int64
+		var err error
+		if after != nil {
+			afterVal, err = parseCursor(*after, reflect.TypeOf(model.Event{}))
+			if err != nil {
+				return nil, err
+			}
+		}
+		if before != nil {
+			beforeVal, err = parseCursor(*before, reflect.TypeOf(model.Event{}))
+			if err != nil {
+				return nil, err
+			}
+		}
+		for index, value := range Events {
+			if afterVal > 0 && value.CreatedMs <= afterVal {
+				afterIndex = index + 1
+			}
+			if beforeVal > 0 && value.CreatedMs < beforeVal {
+				beforeIndex = index
+			}
+			if (beforeVal > 0 && value.CreatedMs > beforeVal) || (beforeVal == 0 && value.CreatedMs > afterVal) {
+				break
+			}
+		}
+	}
+
+	//hasPreviousPage := first == nil
+	//hasNextPage := last == nil
+	if first != nil {
+		afterPlusFirst := afterIndex + (*first - 1)
+		if beforeIndex > afterPlusFirst {
+			beforeIndex = afterPlusFirst
+		}
+	} else if last != nil {
+		beforeMinusLast := beforeIndex - (*last - 1)
+		if afterIndex < beforeMinusLast {
+			afterIndex = beforeMinusLast
+		}
+	}
+	result := Events[afterIndex:(beforeIndex + 1)]
+	totalCount := len(result)
+	nodes := make([]*model.Event, totalCount)
+	for index, event := range result {
+		nodes[index] = &model.Event{
+			ID:          event.ID,
+			Description: event.Description,
+			Protocol:    event.ProtocolType,
+			Type:        event.Type,
+			CreatedMs:   strconv.FormatInt(event.CreatedMs, 10),
+			// TODO: pairwise
+		}
+	}
+
+	edges := make([]*model.EventEdge, totalCount)
+	for index, node := range nodes {
+		edges[index] = &model.EventEdge{
+			Cursor: CreateCursor(result[index].CreatedMs, model.Event{}),
+			Node:   node,
+		}
+	}
+
+	var startCursor *string
+	var endCursor *string
+	if totalCount > 0 {
+		startCursor = &edges[0].Cursor
+		endCursor = &edges[totalCount-1].Cursor
+	}
+	p := &model.EventConnection{
+		Edges: edges,
+		Nodes: nodes,
+		PageInfo: &model.PageInfo{
+			EndCursor:       endCursor,
+			HasNextPage:     edges[len(edges)-1].Node.ID != Events[len(Events)-1].ID,
+			HasPreviousPage: edges[0].Node.ID != Events[0].ID,
+			StartCursor:     startCursor,
+		},
+		TotalCount: totalCount,
+	}
+	return p, nil
 }
 
 func (r *queryResolver) Event(ctx context.Context, id string) (*model.Event, error) {
 	panic(fmt.Errorf("not implemented"))
 }
 
-func (r *subscriptionResolver) EventAdded(ctx context.Context, eventID string) (<-chan *model.Event, error) {
-	panic(fmt.Errorf("not implemented"))
+func (r *subscriptionResolver) EventAdded(ctx context.Context) (<-chan *model.Event, error) {
+	id := "tenantId-" + strconv.FormatInt(time.Now().Unix(), 10)
+	fmt.Println("Add id", id)
+	events := make(chan *model.Event, 1)
+
+	go func() {
+		<-ctx.Done()
+		fmt.Println("Delete id", id)
+		delete(eventAddedObserver, id)
+	}()
+
+	eventAddedObserver[id] = events
+
+	return events, nil
 }
 
 // Mutation returns generated.MutationResolver implementation.
