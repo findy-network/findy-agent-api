@@ -16,10 +16,10 @@ import (
 	"github.com/findy-network/findy-agent-api/resolver"
 )
 
-var eventAddedObserver map[string]chan *model.Event
+var eventAddedObserver map[string]chan *model.EventEdge
 
 func init() {
-	eventAddedObserver = map[string]chan *model.Event{}
+	eventAddedObserver = map[string]chan *model.EventEdge{}
 }
 
 func CreateCursor(created int64, object interface{}) string {
@@ -292,10 +292,10 @@ func (r *queryResolver) Event(ctx context.Context, id string) (*model.Event, err
 	panic(fmt.Errorf("not implemented"))
 }
 
-func (r *subscriptionResolver) EventAdded(ctx context.Context) (<-chan *model.Event, error) {
+func (r *subscriptionResolver) EventAdded(ctx context.Context) (<-chan *model.EventEdge, error) {
 	id := "tenantId-" + strconv.FormatInt(time.Now().Unix(), 10)
 	fmt.Println("Add id", id)
-	events := make(chan *model.Event, 1)
+	events := make(chan *model.EventEdge, 1)
 
 	go func() {
 		<-ctx.Done()

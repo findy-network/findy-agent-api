@@ -9,18 +9,29 @@ import (
 )
 
 func AddEvent() {
-	newEvent := Events[len(Events)-1]
-	newEvent.CreatedMs = time.Now().Unix()
+	created := time.Now().Unix()
+	createdStr := strconv.FormatInt(created, 10)
+	newEvent := InternalEvent{
+		ID:           createdStr,
+		Description:  "New event " + createdStr,
+		ProtocolType: model.ProtocolTypeConnection,
+		Type:         model.EventTypeNotification,
+		CreatedMs:    created,
+	}
 	Events = append(Events, newEvent)
-	fmt.Println("Add event")
+	cursor := CreateCursor(newEvent.CreatedMs, model.Event{})
+	fmt.Println("Add event " + createdStr)
 	for _, observer := range eventAddedObserver {
-		observer <- &model.Event{
-			ID:          newEvent.ID,
-			Description: newEvent.Description,
-			Protocol:    newEvent.ProtocolType,
-			Type:        newEvent.Type,
-			CreatedMs:   strconv.FormatInt(newEvent.CreatedMs, 10),
-			// TODO: pairwise
+		observer <- &model.EventEdge{
+			Cursor: cursor,
+			Node: &model.Event{
+				ID:          createdStr,
+				Description: newEvent.Description,
+				Protocol:    newEvent.ProtocolType,
+				Type:        newEvent.Type,
+				CreatedMs:   createdStr,
+				// TODO: pairwise
+			},
 		}
 	}
 }

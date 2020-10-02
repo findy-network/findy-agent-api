@@ -134,7 +134,7 @@ type QueryResolver interface {
 	Event(ctx context.Context, id string) (*model.Event, error)
 }
 type SubscriptionResolver interface {
-	EventAdded(ctx context.Context) (<-chan *model.Event, error)
+	EventAdded(ctx context.Context) (<-chan *model.EventEdge, error)
 }
 
 type executableSchema struct {
@@ -664,7 +664,7 @@ type Mutation {
 }
 
 type Subscription {
-  eventAdded: Event!
+  eventAdded: EventEdge!
 }
 `, BuiltIn: false},
 }
@@ -2410,7 +2410,7 @@ func (ec *executionContext) _Subscription_eventAdded(ctx context.Context, field 
 		return nil
 	}
 	return func() graphql.Marshaler {
-		res, ok := <-resTmp.(<-chan *model.Event)
+		res, ok := <-resTmp.(<-chan *model.EventEdge)
 		if !ok {
 			return nil
 		}
@@ -2418,7 +2418,7 @@ func (ec *executionContext) _Subscription_eventAdded(ctx context.Context, field 
 			w.Write([]byte{'{'})
 			graphql.MarshalString(field.Alias).MarshalGQL(w)
 			w.Write([]byte{':'})
-			ec.marshalNEvent2ᚖgithubᚗcomᚋfindyᚑnetworkᚋfindyᚑagentᚑapiᚋgraphᚋmodelᚐEvent(ctx, field.Selections, res).MarshalGQL(w)
+			ec.marshalNEventEdge2ᚖgithubᚗcomᚋfindyᚑnetworkᚋfindyᚑagentᚑapiᚋgraphᚋmodelᚐEventEdge(ctx, field.Selections, res).MarshalGQL(w)
 			w.Write([]byte{'}'})
 		})
 	}
@@ -4316,10 +4316,6 @@ func (ec *executionContext) marshalNBoolean2bool(ctx context.Context, sel ast.Se
 	return res
 }
 
-func (ec *executionContext) marshalNEvent2githubᚗcomᚋfindyᚑnetworkᚋfindyᚑagentᚑapiᚋgraphᚋmodelᚐEvent(ctx context.Context, sel ast.SelectionSet, v model.Event) graphql.Marshaler {
-	return ec._Event(ctx, sel, &v)
-}
-
 func (ec *executionContext) marshalNEvent2ᚖgithubᚗcomᚋfindyᚑnetworkᚋfindyᚑagentᚑapiᚋgraphᚋmodelᚐEvent(ctx context.Context, sel ast.SelectionSet, v *model.Event) graphql.Marshaler {
 	if v == nil {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
@@ -4342,6 +4338,20 @@ func (ec *executionContext) marshalNEventConnection2ᚖgithubᚗcomᚋfindyᚑne
 		return graphql.Null
 	}
 	return ec._EventConnection(ctx, sel, v)
+}
+
+func (ec *executionContext) marshalNEventEdge2githubᚗcomᚋfindyᚑnetworkᚋfindyᚑagentᚑapiᚋgraphᚋmodelᚐEventEdge(ctx context.Context, sel ast.SelectionSet, v model.EventEdge) graphql.Marshaler {
+	return ec._EventEdge(ctx, sel, &v)
+}
+
+func (ec *executionContext) marshalNEventEdge2ᚖgithubᚗcomᚋfindyᚑnetworkᚋfindyᚑagentᚑapiᚋgraphᚋmodelᚐEventEdge(ctx context.Context, sel ast.SelectionSet, v *model.EventEdge) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	return ec._EventEdge(ctx, sel, v)
 }
 
 func (ec *executionContext) unmarshalNEventType2githubᚗcomᚋfindyᚑnetworkᚋfindyᚑagentᚑapiᚋgraphᚋmodelᚐEventType(ctx context.Context, v interface{}) (model.EventType, error) {

@@ -107,5 +107,5 @@ type Mutation {
 }
 
 type Subscription {
-  eventAdded: Event!
+  eventAdded: EventEdge!
 }
