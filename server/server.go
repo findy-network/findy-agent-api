@@ -13,7 +13,8 @@ func schema(resolver generated.ResolverRoot) graphql.ExecutableSchema {
 
 // Handler provides graphQL query handler
 func Server(resolver generated.ResolverRoot) *handler.Server {
-	srv := handler.New(schema(resolver))
+	srv := handler.NewDefaultServer(schema(resolver))
 	srv.AddTransport(transport.POST{})
+
 	return srv
 }

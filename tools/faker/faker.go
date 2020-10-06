@@ -38,10 +38,23 @@ func printObject(objectPtr interface{}, object interface{}) {
 	fmt.Println("},")
 }
 
+type fakeLastName struct {
+	Name string `faker:"last_name"`
+}
+
 func fakeConnections(count int) (c *[]tools.InternalPairwise, err error) {
 	defer err2.Return(&err)
 	conns := make([]tools.InternalPairwise, count)
 	c = &conns
+
+	err = faker.AddProvider("organisationLabel", func(v reflect.Value) (interface{}, error) {
+		orgs := []string{"Bank", "Ltd", "Agency", "Company", "United"}
+		index := rand.Intn(len(orgs))
+		f := fakeLastName{}
+		faker.FakeData(&f)
+		return f.Name + " " + orgs[index], nil
+	})
+
 	for i := 0; i < count; i++ {
 		conn := tools.InternalPairwise{}
 		err2.Check(faker.FakeData(&conn))
@@ -85,7 +98,9 @@ func main() {
 		fmt.Println("ERROR:", err)
 	})
 
-	conns, err := fakeConnections(5)
+	connCount := 5
+
+	conns, err := fakeConnections(connCount)
 	err2.Check(err)
 
 	err = faker.AddProvider("eventPairwiseId", func(v reflect.Value) (interface{}, error) {
@@ -95,6 +110,6 @@ func main() {
 	})
 	err2.Check(err)
 
-	_, err = fakeEvents(5)
+	_, err = fakeEvents(connCount * 10)
 	err2.Check(err)
 }

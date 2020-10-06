@@ -25,7 +25,7 @@ func main() {
 	}
 
 	// TEST subscription
-	ticker := time.NewTicker(time.Second * 5)
+	ticker := time.NewTicker(time.Second * 30)
 	done := make(chan bool)
 	go func() {
 		for {

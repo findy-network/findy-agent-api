@@ -127,19 +127,15 @@ func (r *queryResolver) Connections(ctx context.Context, after *string, before *
 		}
 	}
 
-	//hasPreviousPage := first == nil
-	//hasNextPage := last == nil
 	if first != nil {
 		afterPlusFirst := afterIndex + (*first - 1)
 		if beforeIndex > afterPlusFirst {
 			beforeIndex = afterPlusFirst
-			//hasNextPage = true
 		}
 	} else if last != nil {
 		beforeMinusLast := beforeIndex - (*last - 1)
 		if afterIndex < beforeMinusLast {
 			afterIndex = beforeMinusLast
-			//hasPreviousPage = true
 		}
 	}
 	result := Connections[afterIndex:(beforeIndex + 1)]
@@ -191,6 +187,8 @@ func (r *queryResolver) Connection(ctx context.Context, id string) (*model.Pairw
 }
 
 func (r *queryResolver) Events(ctx context.Context, after *string, before *string, first *int, last *int) (*model.EventConnection, error) {
+	fmt.Println("after", after)
+	fmt.Println("before", before)
 	if first == nil && last == nil {
 		return nil, errors.New(resolver.ErrorFirstLastMissing)
 	}
@@ -233,8 +231,6 @@ func (r *queryResolver) Events(ctx context.Context, after *string, before *strin
 		}
 	}
 
-	//hasPreviousPage := first == nil
-	//hasNextPage := last == nil
 	if first != nil {
 		afterPlusFirst := afterIndex + (*first - 1)
 		if beforeIndex > afterPlusFirst {
@@ -249,23 +245,14 @@ func (r *queryResolver) Events(ctx context.Context, after *string, before *strin
 	result := Events[afterIndex:(beforeIndex + 1)]
 	totalCount := len(result)
 	nodes := make([]*model.Event, totalCount)
-	for index, event := range result {
-		nodes[index] = &model.Event{
-			ID:          event.ID,
-			Description: event.Description,
-			Protocol:    event.ProtocolType,
-			Type:        event.Type,
-			CreatedMs:   strconv.FormatInt(event.CreatedMs, 10),
-			// TODO: pairwise
-		}
-	}
 
 	edges := make([]*model.EventEdge, totalCount)
-	for index, node := range nodes {
-		edges[index] = &model.EventEdge{
-			Cursor: CreateCursor(result[index].CreatedMs, model.Event{}),
-			Node:   node,
-		}
+	for index, event := range result {
+		edges[index] = event.toEdge()
+	}
+
+	for index, edge := range edges {
+		nodes[index] = edge.Node
 	}
 
 	var startCursor *string
