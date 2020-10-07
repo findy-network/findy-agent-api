@@ -44,7 +44,7 @@ func validateFirstAndLast(first, last *int) error {
 }
 
 func pick(
-	items data.Items,
+	items *data.Items,
 	after *string, before *string,
 	first *int, last *int) (afterIndex int, beforeIndex int, err error) {
 	defer err2.Return(&err)

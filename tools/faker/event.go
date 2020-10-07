@@ -22,7 +22,7 @@ func init() {
 
 func FakeEvents(
 	count int,
-	connections data.Items,
+	connections *data.Items,
 ) (events []data.InternalEvent, err error) {
 
 	getConnectionId = func() string {

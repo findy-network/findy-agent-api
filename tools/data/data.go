@@ -1,15 +1,27 @@
 package data
 
 import (
+	"sort"
+
 	"github.com/findy-network/findy-agent-api/graph/model"
 )
 
+func init() {
+	sort.Slice(Connections, func(i, j int) bool {
+		return Connections[i].Created() < Connections[j].Created()
+	})
+
+	sort.Slice(Events, func(i, j int) bool {
+		return Events[i].Created() < Events[j].Created()
+	})
+}
+
 var Connections = []InternalPairwise{
+	{"95b2eab7-d664-4868-b684-3dbbcc3e0375", "ETbgvUngPJyPMIDJbDmoAogAS", "sxxyLTYTIsipWVqcXFPGwUahc", "https://www.hEPvSuS.net/lbOBXiP", "Greenholt Agency", true, 1183630175, 706882240},
+	{"0a7f8386-833d-4c2c-9ffd-daf0805242f2", "DtrbPMCagUXDlaFddnsewtcgs", "cQXRRuWuHmShTHXolcqWSOKYk", "http://sZPgmbo.info/", "Wiegand Ltd", true, 1277848304, 1108656723},
 	{"bd5b6b66-a2cd-451f-b906-37ea3dbb1301", "QdECjfqjnKknVkOhGkyHTWWfF", "EXJPYmHNbNAYmZvMNkHEhrBrJ", "http://www.QmQKaaZ.info/", "Schimmel Company", false, 744290621, 74771059},
 	{"8c514a6d-3363-453e-a427-023b7fae1142", "MarWsYNWANqXlYuHFWIuFoNvX", "tccXlnYclQIjjbaZbaOBwgtVt", "http://www.OxDkypZ.net/", "Beahan Agency", false, 1206575362, 159350386},
 	{"a8c976cb-f6bb-46f5-aca9-1d78d33c7325", "qnRpvcbkOoAsHdrvcVvsNTvbX", "kqgRDpcJYCigLbqSQFGFPHfMG", "http://BPXcHVW.biz/", "Will Ltd", false, 243980551, 616638567},
-	{"95b2eab7-d664-4868-b684-3dbbcc3e0375", "ETbgvUngPJyPMIDJbDmoAogAS", "sxxyLTYTIsipWVqcXFPGwUahc", "https://www.hEPvSuS.net/lbOBXiP", "Greenholt Agency", true, 1183630175, 706882240},
-	{"0a7f8386-833d-4c2c-9ffd-daf0805242f2", "DtrbPMCagUXDlaFddnsewtcgs", "cQXRRuWuHmShTHXolcqWSOKYk", "http://sZPgmbo.info/", "Wiegand Ltd", true, 1277848304, 1108656723},
 }
 
 var Events = []InternalEvent{
