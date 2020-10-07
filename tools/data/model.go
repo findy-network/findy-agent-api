@@ -13,6 +13,13 @@ func CreateCursor(created int64, object interface{}) string {
 	return base64.StdEncoding.EncodeToString([]byte(typeName + ":" + strconv.FormatInt(created, 10)))
 }
 
+type APIObject interface {
+	Identifier() string
+	Created() int64
+	Pairwise() *InternalPairwise
+	Event() *InternalEvent
+}
+
 type InternalPairwise struct {
 	ID            string `faker:"uuid_hyphenated"`
 	OurDid        string
@@ -24,7 +31,23 @@ type InternalPairwise struct {
 	CreatedMs     int64 `faker:"unix_time"`
 }
 
-func (p *InternalPairwise) toNode() *model.Pairwise {
+func (p *InternalPairwise) Created() int64 {
+	return p.CreatedMs
+}
+
+func (p *InternalPairwise) Identifier() string {
+	return p.ID
+}
+
+func (p *InternalPairwise) Pairwise() *InternalPairwise {
+	return p
+}
+
+func (p *InternalPairwise) Event() *InternalEvent {
+	panic("Pairwise is not event")
+}
+
+func (p *InternalPairwise) ToNode() *model.Pairwise {
 	return &model.Pairwise{
 		ID:            p.ID,
 		OurDid:        p.OurDid,
@@ -46,21 +69,38 @@ type InternalEvent struct {
 	CreatedMs    int64              `faker:"unix_time"`
 }
 
+func (e *InternalEvent) Created() int64 {
+	return e.CreatedMs
+}
+
+func (e *InternalEvent) Identifier() string {
+	return e.ID
+}
+
+func (e *InternalEvent) Pairwise() *InternalPairwise {
+	panic("Event is not pairwise")
+}
+
+func (e *InternalEvent) Event() *InternalEvent {
+	return e
+}
+
 func (e *InternalEvent) ToEdge() *model.EventEdge {
 	cursor := CreateCursor(e.CreatedMs, model.Event{})
 	return &model.EventEdge{
 		Cursor: cursor,
-		Node:   e.toNode(),
+		Node:   e.ToNode(),
 	}
 
 }
 
-func (e *InternalEvent) toNode() *model.Event {
+func (e *InternalEvent) ToNode() *model.Event {
 	createdStr := strconv.FormatInt(e.CreatedMs, 10)
 	var node *model.Pairwise
-	for index, c := range Connections {
-		if c.ID == e.PairwiseID {
-			node = Connections[index].toNode()
+	for _, c := range State.Connections.items {
+		if c.Identifier() == e.PairwiseID {
+			node = c.Pairwise().ToNode()
+			break
 		}
 	}
 	return &model.Event{

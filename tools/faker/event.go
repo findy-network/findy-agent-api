@@ -2,7 +2,6 @@ package faker
 
 import (
 	"fmt"
-	"math/rand"
 	"reflect"
 	"sort"
 
@@ -23,13 +22,11 @@ func init() {
 
 func FakeEvents(
 	count int,
-	connections []data.InternalPairwise,
+	connections data.Items,
 ) (events []data.InternalEvent, err error) {
 
 	getConnectionId = func() string {
-		max := len(connections) - 1
-		index := rand.Intn(max)
-		return (connections)[index].ID
+		return connections.RandomID()
 	}
 
 	events = make([]data.InternalEvent, count)
@@ -51,7 +48,7 @@ func fakeAndPrintEvents(
 	var err error
 	defer err2.Annotate("fakeAndPrintEvents", &err)
 
-	events, err := FakeEvents(count, connections)
+	events, err := FakeEvents(count, data.State.Connections)
 
 	fmt.Println("\nvar Events = []InternalEvent{")
 	for i := 0; i < len(events); i++ {

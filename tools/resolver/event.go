@@ -2,18 +2,14 @@ package resolver
 
 import (
 	"context"
-	"errors"
 	"fmt"
-	"reflect"
-	"sort"
 	"strconv"
 	"time"
 
-	"github.com/findy-network/findy-agent-api/tools/faker"
-
 	"github.com/findy-network/findy-agent-api/graph/model"
-	"github.com/findy-network/findy-agent-api/resolver"
 	"github.com/findy-network/findy-agent-api/tools/data"
+	"github.com/findy-network/findy-agent-api/tools/faker"
+	"github.com/lainio/err2"
 )
 
 var eventAddedObserver map[string]chan *model.EventEdge
@@ -23,93 +19,16 @@ func initEvents() {
 
 }
 
-func (r *queryResolver) Events(_ context.Context, after *string, before *string, first *int, last *int) (*model.EventConnection, error) {
-	fmt.Println("after", after)
-	fmt.Println("before", before)
-	if first == nil && last == nil {
-		return nil, errors.New(resolver.ErrorFirstLastMissing)
-	}
-	if (first != nil && (*first < 1 || *first > 100)) || (last != nil && (*last < 1 || *last > 100)) {
-		return nil, errors.New(resolver.ErrorFirstLastInvalid)
-	}
+func (r *queryResolver) Events(
+	_ context.Context,
+	after *string, before *string,
+	first *int, last *int) (c *model.EventConnection, err error) {
+	defer err2.Return(&err)
 
-	sort.Slice(data.Events, func(i, j int) bool {
-		return data.Events[i].CreatedMs < data.Events[j].CreatedMs
-	})
+	afterIndex, beforeIndex, err := pick(data.State.Events, after, before, first, last)
+	err2.Check(err)
 
-	afterIndex := 0
-	beforeIndex := len(data.Events) - 1
-	if after != nil || before != nil {
-		var afterVal int64
-		var beforeVal int64
-		var err error
-		if after != nil {
-			afterVal, err = parseCursor(*after, reflect.TypeOf(model.Event{}))
-			if err != nil {
-				return nil, err
-			}
-		}
-		if before != nil {
-			beforeVal, err = parseCursor(*before, reflect.TypeOf(model.Event{}))
-			if err != nil {
-				return nil, err
-			}
-		}
-		for index, value := range data.Events {
-			if afterVal > 0 && value.CreatedMs <= afterVal {
-				afterIndex = index + 1
-			}
-			if beforeVal > 0 && value.CreatedMs < beforeVal {
-				beforeIndex = index
-			}
-			if (beforeVal > 0 && value.CreatedMs > beforeVal) || (beforeVal == 0 && value.CreatedMs > afterVal) {
-				break
-			}
-		}
-	}
-
-	if first != nil {
-		afterPlusFirst := afterIndex + (*first - 1)
-		if beforeIndex > afterPlusFirst {
-			beforeIndex = afterPlusFirst
-		}
-	} else if last != nil {
-		beforeMinusLast := beforeIndex - (*last - 1)
-		if afterIndex < beforeMinusLast {
-			afterIndex = beforeMinusLast
-		}
-	}
-	result := data.Events[afterIndex:(beforeIndex + 1)]
-	totalCount := len(result)
-	nodes := make([]*model.Event, totalCount)
-
-	edges := make([]*model.EventEdge, totalCount)
-	for index, event := range result {
-		edges[index] = event.ToEdge()
-	}
-
-	for index, edge := range edges {
-		nodes[index] = edge.Node
-	}
-
-	var startCursor *string
-	var endCursor *string
-	if totalCount > 0 {
-		startCursor = &edges[0].Cursor
-		endCursor = &edges[totalCount-1].Cursor
-	}
-	p := &model.EventConnection{
-		Edges: edges,
-		Nodes: nodes,
-		PageInfo: &model.PageInfo{
-			EndCursor:       endCursor,
-			HasNextPage:     edges[len(edges)-1].Node.ID != data.Events[len(data.Events)-1].ID,
-			HasPreviousPage: edges[0].Node.ID != data.Events[0].ID,
-			StartCursor:     startCursor,
-		},
-		TotalCount: totalCount,
-	}
-	return p, nil
+	return data.State.Events.EventConnection(afterIndex, beforeIndex), nil
 }
 
 func (r *subscriptionResolver) EventAdded(ctx context.Context) (<-chan *model.EventEdge, error) {
@@ -129,12 +48,12 @@ func (r *subscriptionResolver) EventAdded(ctx context.Context) (<-chan *model.Ev
 }
 
 func (r *mutationResolver) AddRandomEvent(ctx context.Context) (bool, error) {
-	events, err := faker.FakeEvents(1, data.Connections)
+	events, err := faker.FakeEvents(1, data.State.Connections)
 	if err == nil {
-		data.Events = append(data.Events, events...)
+		data.State.Events.Append(&events[0])
 		fmt.Println("Added event", events[0].ID)
 		for _, observer := range eventAddedObserver {
-			observer <- data.Events[len(data.Events)-1].ToEdge()
+			observer <- events[0].ToEdge()
 		}
 	}
 	return true, err

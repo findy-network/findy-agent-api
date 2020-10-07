@@ -2,39 +2,14 @@ package resolver
 
 import (
 	"context"
-	"encoding/base64"
-	"errors"
 	"fmt"
-	"reflect"
-	"strconv"
-	"strings"
 
 	"github.com/findy-network/findy-agent-api/graph/generated"
 	"github.com/findy-network/findy-agent-api/graph/model"
-	"github.com/findy-network/findy-agent-api/resolver"
 )
 
 func init() {
 	initEvents()
-}
-
-func parseCursor(cursor string, t reflect.Type) (int64, error) {
-	plain, err := base64.StdEncoding.DecodeString(cursor)
-	if err != nil {
-		return 0, errors.New(resolver.ErrorCursorInvalid)
-	}
-
-	parts := strings.Split(string(plain), ":")
-	if len(parts) != 2 {
-		return 0, errors.New(resolver.ErrorCursorInvalid)
-	}
-
-	value, err := strconv.ParseInt(parts[1], 10, 64)
-	if err != nil {
-		return 0, errors.New(resolver.ErrorCursorInvalid)
-	}
-
-	return value, nil
 }
 
 type Resolver struct{}
