@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"log"
 	"net/http"
 	"os"
@@ -10,7 +9,7 @@ import (
 	"github.com/99designs/gqlgen/graphql/handler/transport"
 	"github.com/99designs/gqlgen/graphql/playground"
 	"github.com/findy-network/findy-agent-api/server"
-	"github.com/findy-network/findy-agent-api/tools"
+	"github.com/findy-network/findy-agent-api/tools/resolver"
 	"github.com/gorilla/websocket"
 	"github.com/rs/cors"
 )
@@ -24,7 +23,7 @@ func main() {
 		port = defaultPort
 	}
 
-	// TEST subscription
+	/*// TEST subscription
 	ticker := time.NewTicker(time.Second * 30)
 	done := make(chan bool)
 	go func() {
@@ -34,13 +33,13 @@ func main() {
 				return
 			case t := <-ticker.C:
 				fmt.Println("Tick at", t)
-				tools.AddEvent()
+				resolver.AddEvent()
 			}
 		}
 	}()
-	// TEST SUBSCRIPTION end
+	// TEST SUBSCRIPTION end*/
 
-	srv := server.Server(&tools.Resolver{})
+	srv := server.Server(&resolver.Resolver{})
 	srv.AddTransport(transport.Websocket{
 		KeepAlivePingInterval: 10 * time.Second,
 		Upgrader: websocket.Upgrader{

@@ -1,15 +1,43 @@
 package resolver
 
-// This file will be automatically regenerated based on the schema, any resolver implementations
-// will be copied through when generating and any unknown code will be moved to the end.
-
 import (
 	"context"
+	"encoding/base64"
+	"errors"
 	"fmt"
+	"reflect"
+	"strconv"
+	"strings"
 
 	"github.com/findy-network/findy-agent-api/graph/generated"
 	"github.com/findy-network/findy-agent-api/graph/model"
+	"github.com/findy-network/findy-agent-api/resolver"
 )
+
+func init() {
+	initEvents()
+}
+
+func parseCursor(cursor string, t reflect.Type) (int64, error) {
+	plain, err := base64.StdEncoding.DecodeString(cursor)
+	if err != nil {
+		return 0, errors.New(resolver.ErrorCursorInvalid)
+	}
+
+	parts := strings.Split(string(plain), ":")
+	if len(parts) != 2 {
+		return 0, errors.New(resolver.ErrorCursorInvalid)
+	}
+
+	value, err := strconv.ParseInt(parts[1], 10, 64)
+	if err != nil {
+		return 0, errors.New(resolver.ErrorCursorInvalid)
+	}
+
+	return value, nil
+}
+
+type Resolver struct{}
 
 func (r *mutationResolver) Invite(ctx context.Context) (*model.Response, error) {
 	panic(fmt.Errorf("not implemented"))
@@ -31,27 +59,11 @@ func (r *mutationResolver) AcceptRequest(ctx context.Context, input model.Reques
 	panic(fmt.Errorf("not implemented"))
 }
 
-func (r *mutationResolver) AddRandomEvent(ctx context.Context) (bool, error) {
-	panic(fmt.Errorf("not implemented"))
-}
-
-func (r *queryResolver) Connections(ctx context.Context, after *string, before *string, first *int, last *int) (*model.PairwiseConnection, error) {
-	panic(fmt.Errorf("not implemented"))
-}
-
 func (r *queryResolver) Connection(ctx context.Context, id string) (*model.Pairwise, error) {
 	panic(fmt.Errorf("not implemented"))
 }
 
-func (r *queryResolver) Events(ctx context.Context, after *string, before *string, first *int, last *int) (*model.EventConnection, error) {
-	panic(fmt.Errorf("not implemented"))
-}
-
 func (r *queryResolver) Event(ctx context.Context, id string) (*model.Event, error) {
-	panic(fmt.Errorf("not implemented"))
-}
-
-func (r *subscriptionResolver) EventAdded(ctx context.Context) (<-chan *model.EventEdge, error) {
 	panic(fmt.Errorf("not implemented"))
 }
 

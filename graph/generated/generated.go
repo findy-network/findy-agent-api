@@ -67,11 +67,12 @@ type ComplexityRoot struct {
 	}
 
 	Mutation struct {
-		AcceptOffer   func(childComplexity int, input model.Offer) int
-		AcceptRequest func(childComplexity int, input model.Request) int
-		Connect       func(childComplexity int, input model.Invitation) int
-		Invite        func(childComplexity int) int
-		SendMessage   func(childComplexity int) int
+		AcceptOffer    func(childComplexity int, input model.Offer) int
+		AcceptRequest  func(childComplexity int, input model.Request) int
+		AddRandomEvent func(childComplexity int) int
+		Connect        func(childComplexity int, input model.Invitation) int
+		Invite         func(childComplexity int) int
+		SendMessage    func(childComplexity int) int
 	}
 
 	PageInfo struct {
@@ -126,6 +127,7 @@ type MutationResolver interface {
 	SendMessage(ctx context.Context) (*model.Response, error)
 	AcceptOffer(ctx context.Context, input model.Offer) (*model.Response, error)
 	AcceptRequest(ctx context.Context, input model.Request) (*model.Response, error)
+	AddRandomEvent(ctx context.Context) (bool, error)
 }
 type QueryResolver interface {
 	Connections(ctx context.Context, after *string, before *string, first *int, last *int) (*model.PairwiseConnection, error)
@@ -259,6 +261,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Mutation.AcceptRequest(childComplexity, args["input"].(model.Request)), true
+
+	case "Mutation.addRandomEvent":
+		if e.complexity.Mutation.AddRandomEvent == nil {
+			break
+		}
+
+		return e.complexity.Mutation.AddRandomEvent(childComplexity), true
 
 	case "Mutation.connect":
 		if e.complexity.Mutation.Connect == nil {
@@ -661,6 +670,9 @@ type Mutation {
   sendMessage: Response!
   acceptOffer(input: Offer!): Response!
   acceptRequest(input: Request!): Response!
+
+  # for testing only
+  addRandomEvent: Boolean!
 }
 
 type Subscription {
@@ -1491,6 +1503,41 @@ func (ec *executionContext) _Mutation_acceptRequest(ctx context.Context, field g
 	res := resTmp.(*model.Response)
 	fc.Result = res
 	return ec.marshalNResponse2ᚖgithubᚗcomᚋfindyᚑnetworkᚋfindyᚑagentᚑapiᚋgraphᚋmodelᚐResponse(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Mutation_addRandomEvent(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   true,
+		IsResolver: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().AddRandomEvent(rctx)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(bool)
+	fc.Result = res
+	return ec.marshalNBoolean2bool(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _PageInfo_endCursor(ctx context.Context, field graphql.CollectedField, obj *model.PageInfo) (ret graphql.Marshaler) {
@@ -3749,6 +3796,11 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 			}
 		case "acceptRequest":
 			out.Values[i] = ec._Mutation_acceptRequest(ctx, field)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "addRandomEvent":
+			out.Values[i] = ec._Mutation_addRandomEvent(ctx, field)
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}

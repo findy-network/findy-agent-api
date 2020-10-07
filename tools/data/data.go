@@ -1,30 +1,8 @@
-package tools
+package data
 
 import (
-	"fmt"
-	"strconv"
-	"time"
-
 	"github.com/findy-network/findy-agent-api/graph/model"
 )
-
-func AddEvent() {
-	created := time.Now().Unix()
-	createdStr := strconv.FormatInt(created, 10)
-	newEvent := InternalEvent{
-		ID:           createdStr,
-		Description:  "New event " + createdStr,
-		ProtocolType: model.ProtocolTypeCredential,
-		Type:         model.EventTypeNotification,
-		CreatedMs:    created,
-		PairwiseID:   Connections[0].ID,
-	}
-	Events = append(Events, newEvent)
-	fmt.Println("Add event " + createdStr)
-	for _, observer := range eventAddedObserver {
-		observer <- newEvent.toEdge()
-	}
-}
 
 var Connections = []InternalPairwise{
 	{"bd5b6b66-a2cd-451f-b906-37ea3dbb1301", "QdECjfqjnKknVkOhGkyHTWWfF", "EXJPYmHNbNAYmZvMNkHEhrBrJ", "http://www.QmQKaaZ.info/", "Schimmel Company", false, 744290621, 74771059},

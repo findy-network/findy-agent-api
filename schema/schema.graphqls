@@ -104,6 +104,9 @@ type Mutation {
   sendMessage: Response!
   acceptOffer(input: Offer!): Response!
   acceptRequest(input: Request!): Response!
+
+  # for testing only
+  addRandomEvent: Boolean!
 }
 
 type Subscription {

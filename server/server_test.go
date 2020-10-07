@@ -12,7 +12,8 @@ import (
 
 	"github.com/findy-network/findy-agent-api/graph/model"
 	"github.com/findy-network/findy-agent-api/resolver"
-	"github.com/findy-network/findy-agent-api/tools"
+	"github.com/findy-network/findy-agent-api/tools/data"
+	tools "github.com/findy-network/findy-agent-api/tools/resolver"
 )
 
 type JSONError struct {
@@ -46,7 +47,7 @@ func doQuery(query string) (payload JSON) {
 
 	bytes := response.Body.Bytes()
 	fmt.Println(string(bytes))
-	json.Unmarshal(bytes, &payload)
+	_ = json.Unmarshal(bytes, &payload)
 	return
 }
 
@@ -79,11 +80,11 @@ func TestGetConnections(t *testing.T) {
 			query string
 		}
 		errorPath := []string{"connections"}
-		first := tools.Connections[0]
-		firstCursor := tools.CreateCursor(first.CreatedMs, model.Pairwise{})
-		second := tools.Connections[1]
-		secondCursor := tools.CreateCursor(second.CreatedMs, model.Pairwise{})
-		last := tools.Connections[len(tools.Connections)-1]
+		first := data.Connections[0]
+		firstCursor := data.CreateCursor(first.CreatedMs, model.Pairwise{})
+		second := data.Connections[1]
+		secondCursor := data.CreateCursor(second.CreatedMs, model.Pairwise{})
+		last := data.Connections[len(data.Connections)-1]
 		paginationInvalidError := JSON{Errors: &[]JSONError{
 			{
 				Message: resolver.ErrorFirstLastInvalid,
@@ -127,7 +128,7 @@ func TestGetConnections(t *testing.T) {
 			}}}},
 			{"last connection ", args{connQuery("last: 1")}, JSON{Data: &JSONData{Connections: model.PairwiseConnection{
 				Edges: []*model.PairwiseEdge{
-					{Cursor: tools.CreateCursor(last.CreatedMs, model.Pairwise{}), Node: &model.Pairwise{
+					{Cursor: data.CreateCursor(last.CreatedMs, model.Pairwise{}), Node: &model.Pairwise{
 						ID:            last.ID,
 						OurDid:        last.OurDid,
 						TheirDid:      last.TheirDid,

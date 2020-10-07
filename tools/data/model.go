@@ -1,10 +1,17 @@
-package tools
+package data
 
 import (
+	"encoding/base64"
+	"reflect"
 	"strconv"
 
 	"github.com/findy-network/findy-agent-api/graph/model"
 )
+
+func CreateCursor(created int64, object interface{}) string {
+	typeName := reflect.TypeOf(object).Name()
+	return base64.StdEncoding.EncodeToString([]byte(typeName + ":" + strconv.FormatInt(created, 10)))
+}
 
 type InternalPairwise struct {
 	ID            string `faker:"uuid_hyphenated"`
@@ -39,7 +46,7 @@ type InternalEvent struct {
 	CreatedMs    int64              `faker:"unix_time"`
 }
 
-func (e *InternalEvent) toEdge() *model.EventEdge {
+func (e *InternalEvent) ToEdge() *model.EventEdge {
 	cursor := CreateCursor(e.CreatedMs, model.Event{})
 	return &model.EventEdge{
 		Cursor: cursor,
@@ -50,10 +57,10 @@ func (e *InternalEvent) toEdge() *model.EventEdge {
 
 func (e *InternalEvent) toNode() *model.Event {
 	createdStr := strconv.FormatInt(e.CreatedMs, 10)
-	var conn *InternalPairwise
+	var node *model.Pairwise
 	for index, c := range Connections {
 		if c.ID == e.PairwiseID {
-			conn = &Connections[index]
+			node = Connections[index].toNode()
 		}
 	}
 	return &model.Event{
@@ -62,7 +69,7 @@ func (e *InternalEvent) toNode() *model.Event {
 		Protocol:    e.ProtocolType,
 		Type:        e.Type,
 		CreatedMs:   createdStr,
-		Connection:  conn.toNode(),
+		Connection:  node,
 	}
 
 }
