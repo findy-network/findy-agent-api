@@ -2,6 +2,10 @@ package resolver
 
 import (
 	"context"
+	"errors"
+	"fmt"
+
+	"github.com/golang/glog"
 
 	"github.com/lainio/err2"
 
@@ -31,8 +35,26 @@ func (r *queryResolver) Connections(
 	first *int, last *int) (c *model.PairwiseConnection, err error) {
 	defer err2.Return(&err)
 
-	afterIndex, beforeIndex, err := pick(data.State.Connections, after, before, first, last)
+	pagination := &PaginationParams{
+		first:  first,
+		last:   last,
+		after:  after,
+		before: before,
+	}
+	logPaginationRequest("queryResolver:Connections", pagination)
+
+	afterIndex, beforeIndex, err := pick(data.State.Connections, pagination)
 	err2.Check(err)
 
 	return data.State.Connections.PairwiseConnection(afterIndex, beforeIndex), nil
+}
+
+func (r *queryResolver) Connection(ctx context.Context, id string) (node *model.Pairwise, err error) {
+	glog.V(2).Info("queryResolver:Connection, id: ", id)
+
+	node = data.State.Connections.PairwiseForID(id)
+	if node == nil {
+		err = errors.New(fmt.Sprintf("Connection for id %s was not found", id))
+	}
+	return
 }

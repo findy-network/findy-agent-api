@@ -3,8 +3,11 @@ package resolver
 import (
 	"encoding/base64"
 	"errors"
+	"fmt"
 	"strconv"
 	"strings"
+
+	"github.com/golang/glog"
 
 	"github.com/findy-network/findy-agent-api/resolver"
 	"github.com/findy-network/findy-agent-api/tools/data"
@@ -12,6 +15,31 @@ import (
 )
 
 const MAX_PATCH_SIZE = 100
+
+type PaginationParams struct {
+	first  *int
+	last   *int
+	before *string
+	after  *string
+}
+
+func logPaginationRequest(prefix string, params *PaginationParams) {
+	var first, last, before, after string
+	if params.first != nil {
+		first = fmt.Sprintf(", first: %d", *params.first)
+	}
+	if params.last != nil {
+		last = fmt.Sprintf(", last: %d", *params.last)
+	}
+	if params.before != nil {
+		before = fmt.Sprintf(", before: %s", *params.before)
+	}
+	if params.after != nil {
+		after = fmt.Sprintf(", after: %s", *params.after)
+	}
+	glog.V(2).Infof("%s%s%s%s%s", prefix, after, before, first, last)
+
+}
 
 func parseCursor(cursor string) (int64, error) {
 	plain, err := base64.StdEncoding.DecodeString(cursor)
@@ -43,25 +71,22 @@ func validateFirstAndLast(first, last *int) error {
 	return nil
 }
 
-func pick(
-	items *data.Items,
-	after *string, before *string,
-	first *int, last *int) (afterIndex int, beforeIndex int, err error) {
+func pick(items *data.Items, pagination *PaginationParams) (afterIndex int, beforeIndex int, err error) {
 	defer err2.Return(&err)
 
 	afterIndex = 0
 	beforeIndex = items.Count() - 1
 
-	err2.Check(validateFirstAndLast(first, last))
+	err2.Check(validateFirstAndLast(pagination.first, pagination.last))
 
-	if after != nil || before != nil {
+	if pagination.after != nil || pagination.before != nil {
 		var afterVal, beforeVal int64
-		if after != nil {
-			afterVal, err = parseCursor(*after)
+		if pagination.after != nil {
+			afterVal, err = parseCursor(*pagination.after)
 			err2.Check(err)
 		}
-		if before != nil {
-			beforeVal, err = parseCursor(*before)
+		if pagination.before != nil {
+			beforeVal, err = parseCursor(*pagination.before)
 			err2.Check(err)
 		}
 		for index := 0; index < items.Count(); index++ {
@@ -79,13 +104,13 @@ func pick(
 		}
 	}
 
-	if first != nil {
-		afterPlusFirst := afterIndex + (*first - 1)
+	if pagination.first != nil {
+		afterPlusFirst := afterIndex + (*pagination.first - 1)
 		if beforeIndex > afterPlusFirst {
 			beforeIndex = afterPlusFirst
 		}
-	} else if last != nil {
-		beforeMinusLast := beforeIndex - (*last - 1)
+	} else if pagination.last != nil {
+		beforeMinusLast := beforeIndex - (*pagination.last - 1)
 		if afterIndex < beforeMinusLast {
 			afterIndex = beforeMinusLast
 		}

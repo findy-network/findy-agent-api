@@ -34,10 +34,6 @@ func (r *mutationResolver) AcceptRequest(ctx context.Context, input model.Reques
 	panic(fmt.Errorf("not implemented"))
 }
 
-func (r *queryResolver) Connection(ctx context.Context, id string) (*model.Pairwise, error) {
-	panic(fmt.Errorf("not implemented"))
-}
-
 func (r *queryResolver) Event(ctx context.Context, id string) (*model.Event, error) {
 	panic(fmt.Errorf("not implemented"))
 }

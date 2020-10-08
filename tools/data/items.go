@@ -81,6 +81,22 @@ func (i *Items) Sort() {
 	})
 }
 
+func (i *Items) PairwiseForID(id string) *model.Pairwise {
+	var node *model.Pairwise
+
+	i.mutex.RLock()
+	defer i.mutex.RUnlock()
+
+	for _, item := range i.items {
+		if item.Identifier() == id {
+			node = item.Pairwise().ToNode()
+			break
+		}
+	}
+
+	return node
+}
+
 func (i *Items) PairwiseConnection(after, before int) *model.PairwiseConnection {
 	i.mutex.RLock()
 	result := i.items[after:before]

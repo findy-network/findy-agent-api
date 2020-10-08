@@ -5,8 +5,11 @@ go 1.13
 require (
 	github.com/99designs/gqlgen v0.13.0
 	github.com/bxcodec/faker/v3 v3.5.0
+	github.com/felixge/httpsnoop v1.0.1 // indirect
+	github.com/golang/glog v0.0.0-20160126235308-23def4e6c14b
 	github.com/gorilla/mux v1.6.1
 	github.com/gorilla/websocket v1.4.2
+	github.com/hashicorp/golang-lru v0.5.0
 	github.com/lainio/err2 v0.0.0-20191102185951-8064eeb0a9a3
 	github.com/rs/cors v1.6.0
 	github.com/vektah/gqlparser/v2 v2.1.0
