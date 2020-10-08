@@ -32,12 +32,13 @@ func (r *queryResolver) Events(
 		after:  after,
 		before: before,
 	}
-	logPaginationRequest("queryResolver:Connections", pagination)
+	logPaginationRequest("queryResolver:conns", pagination)
 
-	afterIndex, beforeIndex, err := pick(data.State.Events, pagination)
+	state := data.State.Events
+	afterIndex, beforeIndex, err := pick(state, pagination)
 	err2.Check(err)
 
-	return data.State.Events.EventConnection(afterIndex, beforeIndex), nil
+	return state.EventConnection(afterIndex, beforeIndex), nil
 }
 
 func (r *subscriptionResolver) EventAdded(ctx context.Context) (<-chan *model.EventEdge, error) {
@@ -59,11 +60,12 @@ func (r *subscriptionResolver) EventAdded(ctx context.Context) (<-chan *model.Ev
 func (r *mutationResolver) AddRandomEvent(ctx context.Context) (bool, error) {
 	glog.V(2).Info("mutationResolver:AddRandomEvent ")
 
-	events, err := faker.FakeEvents(1, data.State.Connections)
+	state := data.State.Events
+	events, err := faker.FakeEvents(1)
 	if err == nil {
 		event := &events[0]
 		event.CreatedMs = time.Now().Unix()
-		data.State.Events.Append(event)
+		state.Append(event)
 		glog.Infof("Added random event %s", events[0].ID)
 		for _, observer := range eventAddedObserver {
 			observer <- events[0].ToEdge()

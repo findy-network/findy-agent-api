@@ -41,18 +41,20 @@ func (r *queryResolver) Connections(
 		after:  after,
 		before: before,
 	}
-	logPaginationRequest("queryResolver:Connections", pagination)
+	logPaginationRequest("queryResolver:conns", pagination)
 
-	afterIndex, beforeIndex, err := pick(data.State.Connections, pagination)
+	state := data.State.Connections
+	afterIndex, beforeIndex, err := pick(state, pagination)
 	err2.Check(err)
 
-	return data.State.Connections.PairwiseConnection(afterIndex, beforeIndex), nil
+	return state.PairwiseConnection(afterIndex, beforeIndex), nil
 }
 
 func (r *queryResolver) Connection(ctx context.Context, id string) (node *model.Pairwise, err error) {
 	glog.V(2).Info("queryResolver:Connection, id: ", id)
 
-	node = data.State.Connections.PairwiseForID(id)
+	state := data.State.Connections
+	node = state.PairwiseForID(id)
 	if node == nil {
 		err = errors.New(fmt.Sprintf("Connection for id %s was not found", id))
 	}

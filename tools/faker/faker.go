@@ -41,9 +41,8 @@ func Run() {
 
 	connCount := 5
 
-	_, err := fakeConnections(connCount)
+	conns, err := fakeConnections(connCount)
 	err2.Check(err)
 
-	//_, err = FakeEvents(connCount*10, &conns)
-	err2.Check(err)
+	fakeAndPrintEvents(connCount*10, conns)
 }

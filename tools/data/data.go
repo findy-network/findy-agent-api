@@ -7,16 +7,16 @@ import (
 )
 
 func init() {
-	sort.Slice(Connections, func(i, j int) bool {
-		return Connections[i].Created() < Connections[j].Created()
+	sort.Slice(connections, func(i, j int) bool {
+		return connections[i].Created() < connections[j].Created()
 	})
 
-	sort.Slice(Events, func(i, j int) bool {
-		return Events[i].Created() < Events[j].Created()
+	sort.Slice(events, func(i, j int) bool {
+		return events[i].Created() < events[j].Created()
 	})
 }
 
-var Connections = []InternalPairwise{
+var connections = []InternalPairwise{
 	{"95b2eab7-d664-4868-b684-3dbbcc3e0375", "ETbgvUngPJyPMIDJbDmoAogAS", "sxxyLTYTIsipWVqcXFPGwUahc", "https://www.hEPvSuS.net/lbOBXiP", "Greenholt Agency", true, 1183630175, 706882240},
 	{"0a7f8386-833d-4c2c-9ffd-daf0805242f2", "DtrbPMCagUXDlaFddnsewtcgs", "cQXRRuWuHmShTHXolcqWSOKYk", "http://sZPgmbo.info/", "Wiegand Ltd", true, 1277848304, 1108656723},
 	{"bd5b6b66-a2cd-451f-b906-37ea3dbb1301", "QdECjfqjnKknVkOhGkyHTWWfF", "EXJPYmHNbNAYmZvMNkHEhrBrJ", "http://www.QmQKaaZ.info/", "Schimmel Company", false, 744290621, 74771059},
@@ -24,7 +24,7 @@ var Connections = []InternalPairwise{
 	{"a8c976cb-f6bb-46f5-aca9-1d78d33c7325", "qnRpvcbkOoAsHdrvcVvsNTvbX", "kqgRDpcJYCigLbqSQFGFPHfMG", "http://BPXcHVW.biz/", "Will Ltd", false, 243980551, 616638567},
 }
 
-var Events = []InternalEvent{
+var events = []InternalEvent{
 	{"98ca8b18-0289-4125-a88c-1a59097acb21", "Perferendis sit accusantium aut voluptatem consequatur.", model.ProtocolTypeConnection, model.EventTypeAction, "8c514a6d-3363-453e-a427-023b7fae1142", 13721960},
 	{"0130b796-7afb-435a-9235-d6b03ad9273b", "Accusantium consequatur voluptatem aut sit perferendis.", model.ProtocolTypeNone, model.EventTypeNotification, "a8c976cb-f6bb-46f5-aca9-1d78d33c7325", 38274631},
 	{"21dbd8a3-d13e-4918-a8c9-ef35ad35fe06", "Aut accusantium sit perferendis consequatur voluptatem.", model.ProtocolTypeConnection, model.EventTypeNotification, "8c514a6d-3363-453e-a427-023b7fae1142", 80228851},

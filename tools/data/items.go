@@ -181,13 +181,13 @@ func init() {
 		Connections: &Items{items: make([]APIObject, 0), apiType: reflect.TypeOf(model.Pairwise{}).Name()},
 		Events:      &Items{items: make([]APIObject, 0), apiType: reflect.TypeOf(model.Event{}).Name()},
 	}
-	for index := range Connections {
-		State.Connections.items = append(State.Connections.items, &Connections[index])
+	for index := range connections {
+		State.Connections.items = append(State.Connections.items, &connections[index])
 	}
 	State.Connections.Sort()
 
-	for index := range Events {
-		State.Events.items = append(State.Events.items, &Events[index])
+	for index := range events {
+		State.Events.items = append(State.Events.items, &events[index])
 	}
 	State.Events.Sort()
 }

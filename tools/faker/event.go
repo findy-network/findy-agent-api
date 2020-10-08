@@ -10,25 +10,13 @@ import (
 	"github.com/lainio/err2"
 )
 
-var getConnectionId = func() string {
-	return ""
-}
-
 func init() {
 	_ = faker.AddProvider("eventPairwiseId", func(v reflect.Value) (interface{}, error) {
-		return getConnectionId(), nil
+		return data.State.Connections.RandomID(), nil
 	})
 }
 
-func FakeEvents(
-	count int,
-	connections *data.Items,
-) (events []data.InternalEvent, err error) {
-
-	getConnectionId = func() string {
-		return connections.RandomID()
-	}
-
+func FakeEvents(count int) (events []data.InternalEvent, err error) {
 	events = make([]data.InternalEvent, count)
 	for i := 0; i < count; i++ {
 		event := data.InternalEvent{}
@@ -48,9 +36,13 @@ func fakeAndPrintEvents(
 	var err error
 	defer err2.Annotate("fakeAndPrintEvents", &err)
 
-	events, err := FakeEvents(count, data.State.Connections)
+	// Add connections to state so that events get a valid connection id
+	for index := range connections {
+		data.State.Connections.Append(&connections[index])
+	}
+	events, err := FakeEvents(count)
 
-	fmt.Println("\nvar Events = []InternalEvent{")
+	fmt.Println("\nvar events = []InternalEvent{")
 	for i := 0; i < len(events); i++ {
 		fmt.Printf("	")
 		printObject(&events[i], events[i])

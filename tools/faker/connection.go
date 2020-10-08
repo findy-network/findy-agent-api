@@ -35,7 +35,7 @@ func fakeConnections(count int) (conns []data.InternalPairwise, err error) {
 	sort.Slice(conns, func(i, j int) bool {
 		return conns[i].CreatedMs < conns[j].CreatedMs
 	})
-	fmt.Println("var Connections = []InternalPairwise{")
+	fmt.Println("var connections = []InternalPairwise{")
 	for i := 0; i < len(conns); i++ {
 		fmt.Printf("	")
 		printObject(&(conns)[i], (conns)[i])
