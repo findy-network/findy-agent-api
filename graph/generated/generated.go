@@ -72,6 +72,7 @@ type ComplexityRoot struct {
 		AddRandomEvent func(childComplexity int) int
 		Connect        func(childComplexity int, input model.Invitation) int
 		Invite         func(childComplexity int) int
+		Login          func(childComplexity int) int
 		SendMessage    func(childComplexity int) int
 	}
 
@@ -110,6 +111,7 @@ type ComplexityRoot struct {
 		Connections func(childComplexity int, after *string, before *string, first *int, last *int) int
 		Event       func(childComplexity int, id string) int
 		Events      func(childComplexity int, after *string, before *string, first *int, last *int) int
+		User        func(childComplexity int) int
 	}
 
 	Response struct {
@@ -118,6 +120,11 @@ type ComplexityRoot struct {
 
 	Subscription struct {
 		EventAdded func(childComplexity int) int
+	}
+
+	User struct {
+		LastLoginTimeMs func(childComplexity int) int
+		Name            func(childComplexity int) int
 	}
 }
 
@@ -128,12 +135,14 @@ type MutationResolver interface {
 	AcceptOffer(ctx context.Context, input model.Offer) (*model.Response, error)
 	AcceptRequest(ctx context.Context, input model.Request) (*model.Response, error)
 	AddRandomEvent(ctx context.Context) (bool, error)
+	Login(ctx context.Context) (bool, error)
 }
 type QueryResolver interface {
 	Connections(ctx context.Context, after *string, before *string, first *int, last *int) (*model.PairwiseConnection, error)
 	Connection(ctx context.Context, id string) (*model.Pairwise, error)
 	Events(ctx context.Context, after *string, before *string, first *int, last *int) (*model.EventConnection, error)
 	Event(ctx context.Context, id string) (*model.Event, error)
+	User(ctx context.Context) (*model.User, error)
 }
 type SubscriptionResolver interface {
 	EventAdded(ctx context.Context) (<-chan *model.EventEdge, error)
@@ -287,6 +296,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Mutation.Invite(childComplexity), true
+
+	case "Mutation.login":
+		if e.complexity.Mutation.Login == nil {
+			break
+		}
+
+		return e.complexity.Mutation.Login(childComplexity), true
 
 	case "Mutation.sendMessage":
 		if e.complexity.Mutation.SendMessage == nil {
@@ -469,6 +485,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Query.Events(childComplexity, args["after"].(*string), args["before"].(*string), args["first"].(*int), args["last"].(*int)), true
 
+	case "Query.user":
+		if e.complexity.Query.User == nil {
+			break
+		}
+
+		return e.complexity.Query.User(childComplexity), true
+
 	case "Response.ok":
 		if e.complexity.Response.Ok == nil {
 			break
@@ -482,6 +505,20 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Subscription.EventAdded(childComplexity), true
+
+	case "User.lastLoginTimeMs":
+		if e.complexity.User.LastLoginTimeMs == nil {
+			break
+		}
+
+		return e.complexity.User.LastLoginTimeMs(childComplexity), true
+
+	case "User.name":
+		if e.complexity.User.Name == nil {
+			break
+		}
+
+		return e.complexity.User.Name(childComplexity), true
 
 	}
 	return 0, false
@@ -633,17 +670,9 @@ type EventConnection {
   totalCount: Int!
 }
 
-type Query {
-  connections(
-    after: String
-    before: String
-    first: Int
-    last: Int
-  ): PairwiseConnection!
-  connection(id: ID!): Pairwise
-
-  events(after: String, before: String, first: Int, last: Int): EventConnection!
-  event(id: ID!): Event
+type User {
+  name: String!
+  lastLoginTimeMs: String!
 }
 
 input Invitation {
@@ -664,6 +693,21 @@ type Response {
   ok: Boolean!
 }
 
+type Query {
+  connections(
+    after: String
+    before: String
+    first: Int
+    last: Int
+  ): PairwiseConnection!
+  connection(id: ID!): Pairwise
+
+  events(after: String, before: String, first: Int, last: Int): EventConnection!
+  event(id: ID!): Event
+
+  user: User!
+}
+
 type Mutation {
   invite: Response!
   connect(input: Invitation!): Response!
@@ -673,6 +717,7 @@ type Mutation {
 
   # for testing only
   addRandomEvent: Boolean!
+  login: Boolean!
 }
 
 type Subscription {
@@ -1540,6 +1585,41 @@ func (ec *executionContext) _Mutation_addRandomEvent(ctx context.Context, field 
 	return ec.marshalNBoolean2bool(ctx, field.Selections, res)
 }
 
+func (ec *executionContext) _Mutation_login(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   true,
+		IsResolver: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().Login(rctx)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(bool)
+	fc.Result = res
+	return ec.marshalNBoolean2bool(ctx, field.Selections, res)
+}
+
 func (ec *executionContext) _PageInfo_endCursor(ctx context.Context, field graphql.CollectedField, obj *model.PageInfo) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
@@ -2320,6 +2400,41 @@ func (ec *executionContext) _Query_event(ctx context.Context, field graphql.Coll
 	return ec.marshalOEvent2ᚖgithubᚗcomᚋfindyᚑnetworkᚋfindyᚑagentᚑapiᚋgraphᚋmodelᚐEvent(ctx, field.Selections, res)
 }
 
+func (ec *executionContext) _Query_user(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Query",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   true,
+		IsResolver: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Query().User(rctx)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*model.User)
+	fc.Result = res
+	return ec.marshalNUser2ᚖgithubᚗcomᚋfindyᚑnetworkᚋfindyᚑagentᚑapiᚋgraphᚋmodelᚐUser(ctx, field.Selections, res)
+}
+
 func (ec *executionContext) _Query___type(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
@@ -2469,6 +2584,76 @@ func (ec *executionContext) _Subscription_eventAdded(ctx context.Context, field 
 			w.Write([]byte{'}'})
 		})
 	}
+}
+
+func (ec *executionContext) _User_name(ctx context.Context, field graphql.CollectedField, obj *model.User) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "User",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Name, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _User_lastLoginTimeMs(ctx context.Context, field graphql.CollectedField, obj *model.User) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "User",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.LastLoginTimeMs, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) ___Directive_name(ctx context.Context, field graphql.CollectedField, obj *introspection.Directive) (ret graphql.Marshaler) {
@@ -3804,6 +3989,11 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
+		case "login":
+			out.Values[i] = ec._Mutation_login(ctx, field)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -4046,6 +4236,20 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 				res = ec._Query_event(ctx, field)
 				return res
 			})
+		case "user":
+			field := field
+			out.Concurrently(i, func() (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Query_user(ctx, field)
+				if res == graphql.Null {
+					atomic.AddUint32(&invalids, 1)
+				}
+				return res
+			})
 		case "__type":
 			out.Values[i] = ec._Query___type(ctx, field)
 		case "__schema":
@@ -4106,6 +4310,38 @@ func (ec *executionContext) _Subscription(ctx context.Context, sel ast.Selection
 	default:
 		panic("unknown field " + strconv.Quote(fields[0].Name))
 	}
+}
+
+var userImplementors = []string{"User"}
+
+func (ec *executionContext) _User(ctx context.Context, sel ast.SelectionSet, obj *model.User) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, userImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	var invalids uint32
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("User")
+		case "name":
+			out.Values[i] = ec._User_name(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "lastLoginTimeMs":
+			out.Values[i] = ec._User_lastLoginTimeMs(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch()
+	if invalids > 0 {
+		return graphql.Null
+	}
+	return out
 }
 
 var __DirectiveImplementors = []string{"__Directive"}
@@ -4532,6 +4768,20 @@ func (ec *executionContext) marshalNString2string(ctx context.Context, sel ast.S
 		}
 	}
 	return res
+}
+
+func (ec *executionContext) marshalNUser2githubᚗcomᚋfindyᚑnetworkᚋfindyᚑagentᚑapiᚋgraphᚋmodelᚐUser(ctx context.Context, sel ast.SelectionSet, v model.User) graphql.Marshaler {
+	return ec._User(ctx, sel, &v)
+}
+
+func (ec *executionContext) marshalNUser2ᚖgithubᚗcomᚋfindyᚑnetworkᚋfindyᚑagentᚑapiᚋgraphᚋmodelᚐUser(ctx context.Context, sel ast.SelectionSet, v *model.User) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	return ec._User(ctx, sel, v)
 }
 
 func (ec *executionContext) marshalN__Directive2githubᚗcomᚋ99designsᚋgqlgenᚋgraphqlᚋintrospectionᚐDirective(ctx context.Context, sel ast.SelectionSet, v introspection.Directive) graphql.Marshaler {

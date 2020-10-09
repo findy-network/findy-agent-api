@@ -2,6 +2,7 @@ package data
 
 import (
 	"sort"
+	"time"
 
 	"github.com/findy-network/findy-agent-api/graph/model"
 )
@@ -14,6 +15,10 @@ func init() {
 	sort.Slice(events, func(i, j int) bool {
 		return events[i].Created() < events[j].Created()
 	})
+}
+
+var users = []InternalUser{
+	{"Emmett", time.Now().Unix()},
 }
 
 var connections = []InternalPairwise{

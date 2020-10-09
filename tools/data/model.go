@@ -113,3 +113,8 @@ func (e *InternalEvent) ToNode() *model.Event {
 	}
 
 }
+
+type InternalUser struct {
+	name            string
+	lastLoginTimeMs int64
+}

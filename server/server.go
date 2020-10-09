@@ -18,17 +18,17 @@ func schema(resolver generated.ResolverRoot) graphql.ExecutableSchema {
 	return generated.NewExecutableSchema(generated.Config{Resolvers: resolver})
 }
 
-// Handler provides graphQL query handler
 func Server(resolver generated.ResolverRoot) *handler.Server {
 	srv := handler.New(schema(resolver))
 
+	// TODO: figure out CORS policy
 	srv.AddTransport(transport.Websocket{
 		KeepAlivePingInterval: 10 * time.Second,
 		Upgrader: websocket.Upgrader{
 			CheckOrigin: func(r *http.Request) bool {
-				// TODO:
 				return true
 			},
+			EnableCompression: true,
 		},
 	})
 	srv.AddTransport(transport.Options{})
@@ -44,5 +44,4 @@ func Server(resolver generated.ResolverRoot) *handler.Server {
 	})
 
 	return srv
-
 }

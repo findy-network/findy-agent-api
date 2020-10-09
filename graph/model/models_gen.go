@@ -77,6 +77,11 @@ type Response struct {
 	Ok bool `json:"ok"`
 }
 
+type User struct {
+	Name            string `json:"name"`
+	LastLoginTimeMs string `json:"lastLoginTimeMs"`
+}
+
 type EventType string
 
 const (

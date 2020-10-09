@@ -56,7 +56,7 @@ func main() {
 
 	srv := server.Server(&resolver.Resolver{})
 	http.Handle("/", playground.Handler("GraphQL playground", "/query"))
-	http.Handle("/query", cors.AllowAll().Handler(logRequest(srv))) // TODO: adjust CORS policy
+	http.Handle("/query", cors.AllowAll().Handler(logRequest(server.JWTChecker(srv))))
 
 	glog.Infof("connect to http://localhost:%s/ for GraphQL playground", port)
 	log.Fatal(http.ListenAndServe(":"+port, nil))

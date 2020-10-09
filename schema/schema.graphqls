@@ -67,17 +67,9 @@ type EventConnection {
   totalCount: Int!
 }
 
-type Query {
-  connections(
-    after: String
-    before: String
-    first: Int
-    last: Int
-  ): PairwiseConnection!
-  connection(id: ID!): Pairwise
-
-  events(after: String, before: String, first: Int, last: Int): EventConnection!
-  event(id: ID!): Event
+type User {
+  name: String!
+  lastLoginTimeMs: String!
 }
 
 input Invitation {
@@ -98,6 +90,21 @@ type Response {
   ok: Boolean!
 }
 
+type Query {
+  connections(
+    after: String
+    before: String
+    first: Int
+    last: Int
+  ): PairwiseConnection!
+  connection(id: ID!): Pairwise
+
+  events(after: String, before: String, first: Int, last: Int): EventConnection!
+  event(id: ID!): Event
+
+  user: User!
+}
+
 type Mutation {
   invite: Response!
   connect(input: Invitation!): Response!
@@ -107,6 +114,7 @@ type Mutation {
 
   # for testing only
   addRandomEvent: Boolean!
+  login: Boolean!
 }
 
 type Subscription {

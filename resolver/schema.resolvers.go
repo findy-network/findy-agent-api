@@ -35,6 +35,10 @@ func (r *mutationResolver) AddRandomEvent(ctx context.Context) (bool, error) {
 	panic(fmt.Errorf("not implemented"))
 }
 
+func (r *mutationResolver) Login(ctx context.Context) (bool, error) {
+	panic(fmt.Errorf("not implemented"))
+}
+
 func (r *queryResolver) Connections(ctx context.Context, after *string, before *string, first *int, last *int) (*model.PairwiseConnection, error) {
 	panic(fmt.Errorf("not implemented"))
 }
@@ -48,6 +52,10 @@ func (r *queryResolver) Events(ctx context.Context, after *string, before *strin
 }
 
 func (r *queryResolver) Event(ctx context.Context, id string) (*model.Event, error) {
+	panic(fmt.Errorf("not implemented"))
+}
+
+func (r *queryResolver) User(ctx context.Context) (*model.User, error) {
 	panic(fmt.Errorf("not implemented"))
 }
 

@@ -2,6 +2,7 @@ package resolver
 
 import (
 	"context"
+	"fmt"
 	"strconv"
 	"time"
 
@@ -44,6 +45,10 @@ func (r *queryResolver) Events(
 func (r *subscriptionResolver) EventAdded(ctx context.Context) (<-chan *model.EventEdge, error) {
 	id := "tenantId-" + strconv.FormatInt(time.Now().Unix(), 10)
 	glog.V(2).Info("subscriptionResolver:EventAdded, id: ", id)
+
+	user := ctx.Value("user")
+	fmt.Printf("%v", user)
+
 	events := make(chan *model.EventEdge, 1)
 
 	go func() {
