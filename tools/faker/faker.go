@@ -8,7 +8,7 @@ import (
 	"github.com/lainio/err2"
 )
 
-func printObject(objectPtr interface{}, object interface{}) {
+func printObject(objectPtr interface{}, object interface{}, printComma bool) {
 	t := reflect.TypeOf(object)
 	s := reflect.ValueOf(objectPtr).Elem()
 	fmt.Printf("{")
@@ -31,7 +31,12 @@ func printObject(objectPtr interface{}, object interface{}) {
 
 		}
 	}
-	fmt.Println("},")
+
+	fmt.Print("}")
+	if printComma {
+		fmt.Print(",")
+	}
+	fmt.Print("\n")
 }
 
 func Run() {
@@ -45,4 +50,6 @@ func Run() {
 	err2.Check(err)
 
 	fakeAndPrintEvents(connCount*10, conns)
+
+	fakeUser()
 }

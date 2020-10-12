@@ -14,6 +14,6 @@ require (
 	github.com/hashicorp/golang-lru v0.5.0
 	github.com/lainio/err2 v0.0.0-20191102185951-8064eeb0a9a3
 	github.com/rs/cors v1.6.0
-	github.com/spf13/cobra v1.0.0 // indirect
+	github.com/spf13/cobra v1.0.0
 	github.com/vektah/gqlparser/v2 v2.1.0
 )

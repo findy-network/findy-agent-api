@@ -78,6 +78,7 @@ type Response struct {
 }
 
 type User struct {
+	ID              string `json:"id"`
 	Name            string `json:"name"`
 	LastLoginTimeMs string `json:"lastLoginTimeMs"`
 }

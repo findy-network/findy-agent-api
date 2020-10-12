@@ -38,7 +38,7 @@ func fakeConnections(count int) (conns []data.InternalPairwise, err error) {
 	fmt.Println("var connections = []InternalPairwise{")
 	for i := 0; i < len(conns); i++ {
 		fmt.Printf("	")
-		printObject(&(conns)[i], (conns)[i])
+		printObject(&(conns)[i], (conns)[i], true)
 	}
 	fmt.Println("}")
 	return

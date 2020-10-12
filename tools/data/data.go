@@ -2,7 +2,6 @@ package data
 
 import (
 	"sort"
-	"time"
 
 	"github.com/findy-network/findy-agent-api/graph/model"
 )
@@ -17,8 +16,8 @@ func init() {
 	})
 }
 
-var users = []InternalUser{
-	{"Emmett", time.Now().Unix()},
+var user = InternalUser{
+	"035f09fe-7e21-4546-a427-d954251f7082", "Carissa", 1453063800,
 }
 
 var connections = []InternalPairwise{

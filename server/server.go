@@ -18,7 +18,7 @@ func schema(resolver generated.ResolverRoot) graphql.ExecutableSchema {
 	return generated.NewExecutableSchema(generated.Config{Resolvers: resolver})
 }
 
-func Server(resolver generated.ResolverRoot) *handler.Server {
+func Server(resolver generated.ResolverRoot) http.Handler {
 	srv := handler.New(schema(resolver))
 
 	// TODO: figure out CORS policy
@@ -43,5 +43,5 @@ func Server(resolver generated.ResolverRoot) *handler.Server {
 		Cache: lru.New(100),
 	})
 
-	return srv
+	return JWTChecker(srv)
 }

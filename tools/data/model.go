@@ -115,6 +115,16 @@ func (e *InternalEvent) ToNode() *model.Event {
 }
 
 type InternalUser struct {
-	name            string
-	lastLoginTimeMs int64
+	ID              string `faker:"uuid_hyphenated"`
+	Name            string `faker:"first_name"`
+	LastLoginTimeMs int64  `faker:"unix_time"`
+}
+
+func (u *InternalUser) ToNode() *model.User {
+	lastLoginTimeMsStr := strconv.FormatInt(u.LastLoginTimeMs, 10)
+	return &model.User{
+		ID:              u.ID,
+		Name:            u.Name,
+		LastLoginTimeMs: lastLoginTimeMsStr,
+	}
 }

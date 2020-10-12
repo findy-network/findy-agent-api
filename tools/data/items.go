@@ -172,6 +172,7 @@ func (i *Items) EventConnection(after, before int) *model.EventConnection {
 type Data struct {
 	Connections *Items
 	Events      *Items
+	User        *InternalUser
 }
 
 var State *Data
@@ -190,4 +191,6 @@ func init() {
 		State.Events.items = append(State.Events.items, &events[index])
 	}
 	State.Events.Sort()
+
+	State.User = &user
 }

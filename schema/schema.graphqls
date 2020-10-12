@@ -68,6 +68,7 @@ type EventConnection {
 }
 
 type User {
+  id: ID!
   name: String!
   lastLoginTimeMs: String!
 }

@@ -45,7 +45,7 @@ func fakeAndPrintEvents(
 	fmt.Println("\nvar events = []InternalEvent{")
 	for i := 0; i < len(events); i++ {
 		fmt.Printf("	")
-		printObject(&events[i], events[i])
+		printObject(&events[i], events[i], true)
 	}
 	fmt.Println("}")
 
