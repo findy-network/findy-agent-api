@@ -33,6 +33,10 @@ type Invitation struct {
 	Payload string `json:"payload"`
 }
 
+type LoginResponse struct {
+	Token string `json:"token"`
+}
+
 type Offer struct {
 	ID     string `json:"id"`
 	Accept bool   `json:"accept"`

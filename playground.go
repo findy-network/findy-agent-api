@@ -6,28 +6,36 @@ import (
 	"net/http"
 	"os"
 
+	"github.com/rs/cors"
+
+	"github.com/findy-network/findy-agent-api/tools/data"
+
 	"github.com/golang/glog"
 
 	"github.com/99designs/gqlgen/graphql/playground"
 	"github.com/findy-network/findy-agent-api/server"
 	"github.com/findy-network/findy-agent-api/tools/resolver"
-	"github.com/rs/cors"
 )
 
 const defaultPort = "8085"
-
-func logRequest(next http.Handler) http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		glog.V(3).Infof("received request: %s %s", r.Method, r.URL.String())
-		next.ServeHTTP(w, r)
-	})
-}
 
 func initLogging() {
 	flag.Set("logtostderr", "true")
 	flag.Set("stderrthreshold", "WARNING")
 	flag.Set("v", "3")
 	flag.Parse()
+}
+
+func TokenHandler() http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		token, err := server.CreateToken(data.State.User.ID)
+		if err == nil {
+			w.Header().Add("Content-Type", "text/plain")
+			w.Write([]byte(token))
+		} else {
+			panic(err)
+		}
+	}
 }
 
 func main() {
@@ -56,7 +64,8 @@ func main() {
 
 	srv := server.Server(&resolver.Resolver{})
 	http.Handle("/", playground.Handler("GraphQL playground", "/query"))
-	http.Handle("/query", cors.AllowAll().Handler(logRequest(srv)))
+	http.Handle("/query", srv)
+	http.Handle("/token", cors.AllowAll().Handler(TokenHandler()))
 
 	glog.Infof("connect to http://localhost:%s/ for GraphQL playground", port)
 	log.Fatal(http.ListenAndServe(":"+port, nil))

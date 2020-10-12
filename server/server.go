@@ -4,6 +4,10 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/rs/cors"
+
+	"github.com/golang/glog"
+
 	"github.com/99designs/gqlgen/graphql/handler/extension"
 	"github.com/99designs/gqlgen/graphql/handler/lru"
 
@@ -18,10 +22,17 @@ func schema(resolver generated.ResolverRoot) graphql.ExecutableSchema {
 	return generated.NewExecutableSchema(generated.Config{Resolvers: resolver})
 }
 
+func logRequest(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		glog.V(3).Infof("received request: %s %s", r.Method, r.URL.String())
+		next.ServeHTTP(w, r)
+	})
+}
+
 func Server(resolver generated.ResolverRoot) http.Handler {
 	srv := handler.New(schema(resolver))
 
-	// TODO: figure out CORS policy
+	// TODO: figure out CORS policy for our WS use case
 	srv.AddTransport(transport.Websocket{
 		KeepAlivePingInterval: 10 * time.Second,
 		Upgrader: websocket.Upgrader{
@@ -43,5 +54,6 @@ func Server(resolver generated.ResolverRoot) http.Handler {
 		Cache: lru.New(100),
 	})
 
-	return JWTChecker(srv)
+	// TODO: figure out CORS policy for our HTTP use case
+	return cors.AllowAll().Handler(logRequest(jwtChecker(srv)))
 }

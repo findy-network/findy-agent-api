@@ -91,6 +91,10 @@ type Response {
   ok: Boolean!
 }
 
+type LoginResponse {
+  token: String!
+}
+
 type Query {
   connections(
     after: String
@@ -115,7 +119,6 @@ type Mutation {
 
   # for testing only
   addRandomEvent: Boolean!
-  login: Boolean!
 }
 
 type Subscription {

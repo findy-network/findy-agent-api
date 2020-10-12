@@ -66,13 +66,16 @@ type ComplexityRoot struct {
 		Node   func(childComplexity int) int
 	}
 
+	LoginResponse struct {
+		Token func(childComplexity int) int
+	}
+
 	Mutation struct {
 		AcceptOffer    func(childComplexity int, input model.Offer) int
 		AcceptRequest  func(childComplexity int, input model.Request) int
 		AddRandomEvent func(childComplexity int) int
 		Connect        func(childComplexity int, input model.Invitation) int
 		Invite         func(childComplexity int) int
-		Login          func(childComplexity int) int
 		SendMessage    func(childComplexity int) int
 	}
 
@@ -136,7 +139,6 @@ type MutationResolver interface {
 	AcceptOffer(ctx context.Context, input model.Offer) (*model.Response, error)
 	AcceptRequest(ctx context.Context, input model.Request) (*model.Response, error)
 	AddRandomEvent(ctx context.Context) (bool, error)
-	Login(ctx context.Context) (bool, error)
 }
 type QueryResolver interface {
 	Connections(ctx context.Context, after *string, before *string, first *int, last *int) (*model.PairwiseConnection, error)
@@ -248,6 +250,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.EventEdge.Node(childComplexity), true
 
+	case "LoginResponse.token":
+		if e.complexity.LoginResponse.Token == nil {
+			break
+		}
+
+		return e.complexity.LoginResponse.Token(childComplexity), true
+
 	case "Mutation.acceptOffer":
 		if e.complexity.Mutation.AcceptOffer == nil {
 			break
@@ -297,13 +306,6 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Mutation.Invite(childComplexity), true
-
-	case "Mutation.login":
-		if e.complexity.Mutation.Login == nil {
-			break
-		}
-
-		return e.complexity.Mutation.Login(childComplexity), true
 
 	case "Mutation.sendMessage":
 		if e.complexity.Mutation.SendMessage == nil {
@@ -702,6 +704,10 @@ type Response {
   ok: Boolean!
 }
 
+type LoginResponse {
+  token: String!
+}
+
 type Query {
   connections(
     after: String
@@ -726,7 +732,6 @@ type Mutation {
 
   # for testing only
   addRandomEvent: Boolean!
-  login: Boolean!
 }
 
 type Subscription {
@@ -1363,6 +1368,41 @@ func (ec *executionContext) _EventEdge_node(ctx context.Context, field graphql.C
 	return ec.marshalNEvent2ᚖgithubᚗcomᚋfindyᚑnetworkᚋfindyᚑagentᚑapiᚋgraphᚋmodelᚐEvent(ctx, field.Selections, res)
 }
 
+func (ec *executionContext) _LoginResponse_token(ctx context.Context, field graphql.CollectedField, obj *model.LoginResponse) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "LoginResponse",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Token, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
 func (ec *executionContext) _Mutation_invite(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
@@ -1578,41 +1618,6 @@ func (ec *executionContext) _Mutation_addRandomEvent(ctx context.Context, field 
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
 		return ec.resolvers.Mutation().AddRandomEvent(rctx)
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(bool)
-	fc.Result = res
-	return ec.marshalNBoolean2bool(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) _Mutation_login(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	fc := &graphql.FieldContext{
-		Object:     "Mutation",
-		Field:      field,
-		Args:       nil,
-		IsMethod:   true,
-		IsResolver: true,
-	}
-
-	ctx = graphql.WithFieldContext(ctx, fc)
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Mutation().Login(rctx)
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -3988,6 +3993,33 @@ func (ec *executionContext) _EventEdge(ctx context.Context, sel ast.SelectionSet
 	return out
 }
 
+var loginResponseImplementors = []string{"LoginResponse"}
+
+func (ec *executionContext) _LoginResponse(ctx context.Context, sel ast.SelectionSet, obj *model.LoginResponse) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, loginResponseImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	var invalids uint32
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("LoginResponse")
+		case "token":
+			out.Values[i] = ec._LoginResponse_token(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch()
+	if invalids > 0 {
+		return graphql.Null
+	}
+	return out
+}
+
 var mutationImplementors = []string{"Mutation"}
 
 func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet) graphql.Marshaler {
@@ -4030,11 +4062,6 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 			}
 		case "addRandomEvent":
 			out.Values[i] = ec._Mutation_addRandomEvent(ctx, field)
-			if out.Values[i] == graphql.Null {
-				invalids++
-			}
-		case "login":
-			out.Values[i] = ec._Mutation_login(ctx, field)
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}

@@ -16,8 +16,8 @@ const JWT_SECRET = "supersecret"
 // JWTChecker checks the token for all requests
 // The authentication error is generated here instead of resolvers to make sure all resolvers use authentication.
 // Error should be in compatible GQL format so that frontend frameworks succeed in parsing.
-// TODO: improve error generation
-func JWTChecker(next http.Handler) http.Handler {
+// TODO: move authentication to resolvers so that errors are generated at correct level?
+func jwtChecker(next http.Handler) http.Handler {
 	checker := jwtmiddleware.New(jwtmiddleware.Options{
 		ValidationKeyGetter: func(token *jwt.Token) (interface{}, error) {
 			return []byte(JWT_SECRET), nil
