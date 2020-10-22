@@ -585,13 +585,20 @@ func (*Protocol_CredDef) isProtocol_StartMsg() {}
 
 func (*Protocol_ProofAttributesJson) isProtocol_StartMsg() {}
 
-// Protocol ID identifies the current protocol conversation.
+//
+//Protocol ID is a primary minimal identification of the _current_ protocol
+//conversation. Protocol is an elementary concept in SSI. With the protocols we
+//build the trust over the state of the connection (aka pairwise). That's why the
+//connection ID is always the most important thing and we should drive towards
+//reuse of the previous connection when ever it's possible. Still, we operate with
+//protocols.
 type ProtocolID struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	Id string `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"` // UUID
+	TypeId Protocol_Type `protobuf:"varint,1,opt,name=type_id,json=typeId,proto3,enum=agency.Protocol_Type" json:"type_id,omitempty"` // protocol type
+	Id     string        `protobuf:"bytes,2,opt,name=id,proto3" json:"id,omitempty"`                                                  // UUID of the current protocol
 }
 
 func (x *ProtocolID) Reset() {
@@ -626,6 +633,13 @@ func (*ProtocolID) Descriptor() ([]byte, []int) {
 	return file_agency_proto_rawDescGZIP(), []int{5}
 }
 
+func (x *ProtocolID) GetTypeId() Protocol_Type {
+	if x != nil {
+		return x.TypeId
+	}
+	return Protocol_CONNECT
+}
+
 func (x *ProtocolID) GetId() string {
 	if x != nil {
 		return x.Id
@@ -633,8 +647,8 @@ func (x *ProtocolID) GetId() string {
 	return ""
 }
 
-// ProtocolState is light and simplest way to tell outside what is going on
-// during the protocol run.
+// ProtocolState is lightest and simplest way to tell outside what is going on
+// during a protocol run.
 type ProtocolState struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
@@ -896,8 +910,11 @@ var file_agency_proto_rawDesc = []byte{
 	0x46, 0x49, 0x4e, 0x47, 0x10, 0x04, 0x12, 0x0e, 0x0a, 0x0a, 0x54, 0x52, 0x55, 0x53, 0x54, 0x5f,
 	0x50, 0x49, 0x4e, 0x47, 0x10, 0x05, 0x12, 0x11, 0x0a, 0x0d, 0x42, 0x41, 0x53, 0x49, 0x43, 0x5f,
 	0x4d, 0x45, 0x53, 0x53, 0x41, 0x47, 0x45, 0x10, 0x06, 0x42, 0x0a, 0x0a, 0x08, 0x53, 0x74, 0x61,
-	0x72, 0x74, 0x4d, 0x73, 0x67, 0x22, 0x1c, 0x0a, 0x0a, 0x50, 0x72, 0x6f, 0x74, 0x6f, 0x63, 0x6f,
-	0x6c, 0x49, 0x44, 0x12, 0x0e, 0x0a, 0x02, 0x69, 0x64, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52,
+	0x72, 0x74, 0x4d, 0x73, 0x67, 0x22, 0x4c, 0x0a, 0x0a, 0x50, 0x72, 0x6f, 0x74, 0x6f, 0x63, 0x6f,
+	0x6c, 0x49, 0x44, 0x12, 0x2e, 0x0a, 0x07, 0x74, 0x79, 0x70, 0x65, 0x5f, 0x69, 0x64, 0x18, 0x01,
+	0x20, 0x01, 0x28, 0x0e, 0x32, 0x15, 0x2e, 0x61, 0x67, 0x65, 0x6e, 0x63, 0x79, 0x2e, 0x50, 0x72,
+	0x6f, 0x74, 0x6f, 0x63, 0x6f, 0x6c, 0x2e, 0x54, 0x79, 0x70, 0x65, 0x52, 0x06, 0x74, 0x79, 0x70,
+	0x65, 0x49, 0x64, 0x12, 0x0e, 0x0a, 0x02, 0x69, 0x64, 0x18, 0x02, 0x20, 0x01, 0x28, 0x09, 0x52,
 	0x02, 0x69, 0x64, 0x22, 0xb6, 0x01, 0x0a, 0x0d, 0x50, 0x72, 0x6f, 0x74, 0x6f, 0x63, 0x6f, 0x6c,
 	0x53, 0x74, 0x61, 0x74, 0x65, 0x12, 0x33, 0x0a, 0x0b, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x63, 0x6f,
 	0x6c, 0x5f, 0x69, 0x64, 0x18, 0x01, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x12, 0x2e, 0x61, 0x67, 0x65,
@@ -976,24 +993,25 @@ var file_agency_proto_depIdxs = []int32{
 	0,  // 3: agency.Notification.type_id:type_name -> agency.Notification.Type
 	1,  // 4: agency.Protocol.type_id:type_name -> agency.Protocol.Type
 	11, // 5: agency.Protocol.cred_def:type_name -> agency.Protocol.Issuing
-	8,  // 6: agency.ProtocolState.protocol_id:type_name -> agency.ProtocolID
-	2,  // 7: agency.ProtocolState.state:type_name -> agency.ProtocolState.State
-	9,  // 8: agency.ProtocolStatus.state:type_name -> agency.ProtocolState
-	7,  // 9: agency.DIDComm.Run:input_type -> agency.Protocol
-	7,  // 10: agency.DIDComm.Start:input_type -> agency.Protocol
-	8,  // 11: agency.DIDComm.Status:input_type -> agency.ProtocolID
-	4,  // 12: agency.Agent.Listen:input_type -> agency.ClientID
-	3,  // 13: agency.Agent.Give:input_type -> agency.Answer
-	9,  // 14: agency.DIDComm.Run:output_type -> agency.ProtocolState
-	8,  // 15: agency.DIDComm.Start:output_type -> agency.ProtocolID
-	10, // 16: agency.DIDComm.Status:output_type -> agency.ProtocolStatus
-	5,  // 17: agency.Agent.Listen:output_type -> agency.AgentStatus
-	4,  // 18: agency.Agent.Give:output_type -> agency.ClientID
-	14, // [14:19] is the sub-list for method output_type
-	9,  // [9:14] is the sub-list for method input_type
-	9,  // [9:9] is the sub-list for extension type_name
-	9,  // [9:9] is the sub-list for extension extendee
-	0,  // [0:9] is the sub-list for field type_name
+	1,  // 6: agency.ProtocolID.type_id:type_name -> agency.Protocol.Type
+	8,  // 7: agency.ProtocolState.protocol_id:type_name -> agency.ProtocolID
+	2,  // 8: agency.ProtocolState.state:type_name -> agency.ProtocolState.State
+	9,  // 9: agency.ProtocolStatus.state:type_name -> agency.ProtocolState
+	7,  // 10: agency.DIDComm.Run:input_type -> agency.Protocol
+	7,  // 11: agency.DIDComm.Start:input_type -> agency.Protocol
+	8,  // 12: agency.DIDComm.Status:input_type -> agency.ProtocolID
+	4,  // 13: agency.Agent.Listen:input_type -> agency.ClientID
+	3,  // 14: agency.Agent.Give:input_type -> agency.Answer
+	9,  // 15: agency.DIDComm.Run:output_type -> agency.ProtocolState
+	8,  // 16: agency.DIDComm.Start:output_type -> agency.ProtocolID
+	10, // 17: agency.DIDComm.Status:output_type -> agency.ProtocolStatus
+	5,  // 18: agency.Agent.Listen:output_type -> agency.AgentStatus
+	4,  // 19: agency.Agent.Give:output_type -> agency.ClientID
+	15, // [15:20] is the sub-list for method output_type
+	10, // [10:15] is the sub-list for method input_type
+	10, // [10:10] is the sub-list for extension type_name
+	10, // [10:10] is the sub-list for extension extendee
+	0,  // [0:10] is the sub-list for field type_name
 }
 
 func init() { file_agency_proto_init() }

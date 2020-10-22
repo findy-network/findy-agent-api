@@ -115,13 +115,21 @@ message Protocol {
   }
 }
 
-// Protocol ID identifies the current protocol conversation.
+/*
+Protocol ID is a primary minimal identification of the _current_ protocol
+conversation. Protocol is an elementary concept in SSI. With the protocols we
+build the trust over the state of the connection (aka pairwise). That's why the
+connection ID is always the most important thing and we should drive towards
+reuse of the previous connection when ever it's possible. Still, we operate with
+protocols.
+*/
 message ProtocolID {
-  string id = 1; // UUID
+  Protocol.Type type_id = 1; // protocol type
+  string id = 2; // UUID of the current protocol
 }
 
-// ProtocolState is light and simplest way to tell outside what is going on
-// during the protocol run.
+// ProtocolState is lightest and simplest way to tell outside what is going on
+// during a protocol run.
 message ProtocolState {
   ProtocolID protocol_id = 1;
   enum State {
