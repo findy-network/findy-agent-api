@@ -4,6 +4,13 @@ This documentation describes the API of how [findy-agent](https://github.com/fin
 
 **Note! This is the initial beta version of the API and it is likely to change with no backward compatibility in the coming findy-agent versions.**
 
+**Update! We have started to development of a new gRPC API. Please note:**
+- The gRPC API is still under development, and **you shouldn't use it before it's released**.
+- Both APIs can be used same time after gRPC API release. 
+- We will continue to offer the existing JSON/DIDComm based client API described in this documentation until it's officially deprecated.
+- The gRPC API will be totally new one; we will refactor concepts and conventions according the feedback and experience we have had with the exiting one.
+- By bringing the API here offers an opportunity to review and comment it during the process.
+
 ## Protocol
 
 The API is based on a proprietary protocol over HTTP(S) implemented for findy-agent communication. The protocol is inspired by the early [indy-sdk](https://github.com/hyperledger/indy-sdk) agent communication protocol. Some design decisions are based on legacy functionality that is nowadays obsolete and therefore the protocol is likely to change in the future.
