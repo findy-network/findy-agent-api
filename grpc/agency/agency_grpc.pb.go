@@ -13,37 +13,27 @@ import (
 // is compatible with the grpc package it is being compiled against.
 const _ = grpc.SupportPackageIsVersion7
 
-// DIDCommClient is the client API for DIDComm service.
+// AgencyClient is the client API for Agency service.
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
-type DIDCommClient interface {
-	// Run is async function to start a protocol and return a stream to listen to
-	// its progress.
-	Run(ctx context.Context, in *Protocol, opts ...grpc.CallOption) (DIDComm_RunClient, error)
-	// Start asks the agency to start a protocol. It immediately returns a
-	// protocol id that allows to monitor protocol with the Status function. If
-	// Agent service's Listen is in use, we get a notification when protocol is
-	// ready.
-	Start(ctx context.Context, in *Protocol, opts ...grpc.CallOption) (*ProtocolID, error)
-	// Status returns a current ProtocolStatus. ProtocolStatus is under
-	// construction TODO
-	Status(ctx context.Context, in *ProtocolID, opts ...grpc.CallOption) (*ProtocolStatus, error)
+type AgencyClient interface {
+	PSMHook(ctx context.Context, in *DataHook, opts ...grpc.CallOption) (Agency_PSMHookClient, error)
 }
 
-type dIDCommClient struct {
+type agencyClient struct {
 	cc grpc.ClientConnInterface
 }
 
-func NewDIDCommClient(cc grpc.ClientConnInterface) DIDCommClient {
-	return &dIDCommClient{cc}
+func NewAgencyClient(cc grpc.ClientConnInterface) AgencyClient {
+	return &agencyClient{cc}
 }
 
-func (c *dIDCommClient) Run(ctx context.Context, in *Protocol, opts ...grpc.CallOption) (DIDComm_RunClient, error) {
-	stream, err := c.cc.NewStream(ctx, &_DIDComm_serviceDesc.Streams[0], "/agency.DIDComm/Run", opts...)
+func (c *agencyClient) PSMHook(ctx context.Context, in *DataHook, opts ...grpc.CallOption) (Agency_PSMHookClient, error) {
+	stream, err := c.cc.NewStream(ctx, &_Agency_serviceDesc.Streams[0], "/agency.Agency/PSMHook", opts...)
 	if err != nil {
 		return nil, err
 	}
-	x := &dIDCommRunClient{stream}
+	x := &agencyPSMHookClient{stream}
 	if err := x.ClientStream.SendMsg(in); err != nil {
 		return nil, err
 	}
@@ -53,312 +43,165 @@ func (c *dIDCommClient) Run(ctx context.Context, in *Protocol, opts ...grpc.Call
 	return x, nil
 }
 
-type DIDComm_RunClient interface {
-	Recv() (*ProtocolState, error)
+type Agency_PSMHookClient interface {
+	Recv() (*AgencyStatus, error)
 	grpc.ClientStream
 }
 
-type dIDCommRunClient struct {
+type agencyPSMHookClient struct {
 	grpc.ClientStream
 }
 
-func (x *dIDCommRunClient) Recv() (*ProtocolState, error) {
-	m := new(ProtocolState)
+func (x *agencyPSMHookClient) Recv() (*AgencyStatus, error) {
+	m := new(AgencyStatus)
 	if err := x.ClientStream.RecvMsg(m); err != nil {
 		return nil, err
 	}
 	return m, nil
 }
 
-func (c *dIDCommClient) Start(ctx context.Context, in *Protocol, opts ...grpc.CallOption) (*ProtocolID, error) {
-	out := new(ProtocolID)
-	err := c.cc.Invoke(ctx, "/agency.DIDComm/Start", in, out, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (c *dIDCommClient) Status(ctx context.Context, in *ProtocolID, opts ...grpc.CallOption) (*ProtocolStatus, error) {
-	out := new(ProtocolStatus)
-	err := c.cc.Invoke(ctx, "/agency.DIDComm/Status", in, out, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-// DIDCommServer is the server API for DIDComm service.
-// All implementations must embed UnimplementedDIDCommServer
+// AgencyServer is the server API for Agency service.
+// All implementations must embed UnimplementedAgencyServer
 // for forward compatibility
-type DIDCommServer interface {
-	// Run is async function to start a protocol and return a stream to listen to
-	// its progress.
-	Run(*Protocol, DIDComm_RunServer) error
-	// Start asks the agency to start a protocol. It immediately returns a
-	// protocol id that allows to monitor protocol with the Status function. If
-	// Agent service's Listen is in use, we get a notification when protocol is
-	// ready.
-	Start(context.Context, *Protocol) (*ProtocolID, error)
-	// Status returns a current ProtocolStatus. ProtocolStatus is under
-	// construction TODO
-	Status(context.Context, *ProtocolID) (*ProtocolStatus, error)
-	mustEmbedUnimplementedDIDCommServer()
+type AgencyServer interface {
+	PSMHook(*DataHook, Agency_PSMHookServer) error
+	mustEmbedUnimplementedAgencyServer()
 }
 
-// UnimplementedDIDCommServer must be embedded to have forward compatible implementations.
-type UnimplementedDIDCommServer struct {
+// UnimplementedAgencyServer must be embedded to have forward compatible implementations.
+type UnimplementedAgencyServer struct {
 }
 
-func (UnimplementedDIDCommServer) Run(*Protocol, DIDComm_RunServer) error {
-	return status.Errorf(codes.Unimplemented, "method Run not implemented")
+func (UnimplementedAgencyServer) PSMHook(*DataHook, Agency_PSMHookServer) error {
+	return status.Errorf(codes.Unimplemented, "method PSMHook not implemented")
 }
-func (UnimplementedDIDCommServer) Start(context.Context, *Protocol) (*ProtocolID, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method Start not implemented")
-}
-func (UnimplementedDIDCommServer) Status(context.Context, *ProtocolID) (*ProtocolStatus, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method Status not implemented")
-}
-func (UnimplementedDIDCommServer) mustEmbedUnimplementedDIDCommServer() {}
+func (UnimplementedAgencyServer) mustEmbedUnimplementedAgencyServer() {}
 
-// UnsafeDIDCommServer may be embedded to opt out of forward compatibility for this service.
-// Use of this interface is not recommended, as added methods to DIDCommServer will
+// UnsafeAgencyServer may be embedded to opt out of forward compatibility for this service.
+// Use of this interface is not recommended, as added methods to AgencyServer will
 // result in compilation errors.
-type UnsafeDIDCommServer interface {
-	mustEmbedUnimplementedDIDCommServer()
+type UnsafeAgencyServer interface {
+	mustEmbedUnimplementedAgencyServer()
 }
 
-func RegisterDIDCommServer(s *grpc.Server, srv DIDCommServer) {
-	s.RegisterService(&_DIDComm_serviceDesc, srv)
+func RegisterAgencyServer(s *grpc.Server, srv AgencyServer) {
+	s.RegisterService(&_Agency_serviceDesc, srv)
 }
 
-func _DIDComm_Run_Handler(srv interface{}, stream grpc.ServerStream) error {
-	m := new(Protocol)
+func _Agency_PSMHook_Handler(srv interface{}, stream grpc.ServerStream) error {
+	m := new(DataHook)
 	if err := stream.RecvMsg(m); err != nil {
 		return err
 	}
-	return srv.(DIDCommServer).Run(m, &dIDCommRunServer{stream})
+	return srv.(AgencyServer).PSMHook(m, &agencyPSMHookServer{stream})
 }
 
-type DIDComm_RunServer interface {
-	Send(*ProtocolState) error
+type Agency_PSMHookServer interface {
+	Send(*AgencyStatus) error
 	grpc.ServerStream
 }
 
-type dIDCommRunServer struct {
+type agencyPSMHookServer struct {
 	grpc.ServerStream
 }
 
-func (x *dIDCommRunServer) Send(m *ProtocolState) error {
+func (x *agencyPSMHookServer) Send(m *AgencyStatus) error {
 	return x.ServerStream.SendMsg(m)
 }
 
-func _DIDComm_Start_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(Protocol)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(DIDCommServer).Start(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: "/agency.DIDComm/Start",
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(DIDCommServer).Start(ctx, req.(*Protocol))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
-func _DIDComm_Status_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(ProtocolID)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(DIDCommServer).Status(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: "/agency.DIDComm/Status",
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(DIDCommServer).Status(ctx, req.(*ProtocolID))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
-var _DIDComm_serviceDesc = grpc.ServiceDesc{
-	ServiceName: "agency.DIDComm",
-	HandlerType: (*DIDCommServer)(nil),
-	Methods: []grpc.MethodDesc{
-		{
-			MethodName: "Start",
-			Handler:    _DIDComm_Start_Handler,
-		},
-		{
-			MethodName: "Status",
-			Handler:    _DIDComm_Status_Handler,
-		},
-	},
+var _Agency_serviceDesc = grpc.ServiceDesc{
+	ServiceName: "agency.Agency",
+	HandlerType: (*AgencyServer)(nil),
+	Methods:     []grpc.MethodDesc{},
 	Streams: []grpc.StreamDesc{
 		{
-			StreamName:    "Run",
-			Handler:       _DIDComm_Run_Handler,
+			StreamName:    "PSMHook",
+			Handler:       _Agency_PSMHook_Handler,
 			ServerStreams: true,
 		},
 	},
 	Metadata: "agency.proto",
 }
 
-// AgentClient is the client API for Agent service.
+// DevOpsClient is the client API for DevOps service.
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
-type AgentClient interface {
-	// Listen is async function to stream AgentStatus. ClientID must be unique.
-	Listen(ctx context.Context, in *ClientID, opts ...grpc.CallOption) (Agent_ListenClient, error)
-	// Give is function to give answer to ACTION_NEEDED_xx notifications.
-	Give(ctx context.Context, in *Answer, opts ...grpc.CallOption) (*ClientID, error)
+type DevOpsClient interface {
+	Enter(ctx context.Context, in *Cmd, opts ...grpc.CallOption) (*CmdReturn, error)
 }
 
-type agentClient struct {
+type devOpsClient struct {
 	cc grpc.ClientConnInterface
 }
 
-func NewAgentClient(cc grpc.ClientConnInterface) AgentClient {
-	return &agentClient{cc}
+func NewDevOpsClient(cc grpc.ClientConnInterface) DevOpsClient {
+	return &devOpsClient{cc}
 }
 
-func (c *agentClient) Listen(ctx context.Context, in *ClientID, opts ...grpc.CallOption) (Agent_ListenClient, error) {
-	stream, err := c.cc.NewStream(ctx, &_Agent_serviceDesc.Streams[0], "/agency.Agent/Listen", opts...)
-	if err != nil {
-		return nil, err
-	}
-	x := &agentListenClient{stream}
-	if err := x.ClientStream.SendMsg(in); err != nil {
-		return nil, err
-	}
-	if err := x.ClientStream.CloseSend(); err != nil {
-		return nil, err
-	}
-	return x, nil
-}
-
-type Agent_ListenClient interface {
-	Recv() (*AgentStatus, error)
-	grpc.ClientStream
-}
-
-type agentListenClient struct {
-	grpc.ClientStream
-}
-
-func (x *agentListenClient) Recv() (*AgentStatus, error) {
-	m := new(AgentStatus)
-	if err := x.ClientStream.RecvMsg(m); err != nil {
-		return nil, err
-	}
-	return m, nil
-}
-
-func (c *agentClient) Give(ctx context.Context, in *Answer, opts ...grpc.CallOption) (*ClientID, error) {
-	out := new(ClientID)
-	err := c.cc.Invoke(ctx, "/agency.Agent/Give", in, out, opts...)
+func (c *devOpsClient) Enter(ctx context.Context, in *Cmd, opts ...grpc.CallOption) (*CmdReturn, error) {
+	out := new(CmdReturn)
+	err := c.cc.Invoke(ctx, "/agency.DevOps/Enter", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-// AgentServer is the server API for Agent service.
-// All implementations must embed UnimplementedAgentServer
+// DevOpsServer is the server API for DevOps service.
+// All implementations must embed UnimplementedDevOpsServer
 // for forward compatibility
-type AgentServer interface {
-	// Listen is async function to stream AgentStatus. ClientID must be unique.
-	Listen(*ClientID, Agent_ListenServer) error
-	// Give is function to give answer to ACTION_NEEDED_xx notifications.
-	Give(context.Context, *Answer) (*ClientID, error)
-	mustEmbedUnimplementedAgentServer()
+type DevOpsServer interface {
+	Enter(context.Context, *Cmd) (*CmdReturn, error)
+	mustEmbedUnimplementedDevOpsServer()
 }
 
-// UnimplementedAgentServer must be embedded to have forward compatible implementations.
-type UnimplementedAgentServer struct {
+// UnimplementedDevOpsServer must be embedded to have forward compatible implementations.
+type UnimplementedDevOpsServer struct {
 }
 
-func (UnimplementedAgentServer) Listen(*ClientID, Agent_ListenServer) error {
-	return status.Errorf(codes.Unimplemented, "method Listen not implemented")
+func (UnimplementedDevOpsServer) Enter(context.Context, *Cmd) (*CmdReturn, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Enter not implemented")
 }
-func (UnimplementedAgentServer) Give(context.Context, *Answer) (*ClientID, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method Give not implemented")
-}
-func (UnimplementedAgentServer) mustEmbedUnimplementedAgentServer() {}
+func (UnimplementedDevOpsServer) mustEmbedUnimplementedDevOpsServer() {}
 
-// UnsafeAgentServer may be embedded to opt out of forward compatibility for this service.
-// Use of this interface is not recommended, as added methods to AgentServer will
+// UnsafeDevOpsServer may be embedded to opt out of forward compatibility for this service.
+// Use of this interface is not recommended, as added methods to DevOpsServer will
 // result in compilation errors.
-type UnsafeAgentServer interface {
-	mustEmbedUnimplementedAgentServer()
+type UnsafeDevOpsServer interface {
+	mustEmbedUnimplementedDevOpsServer()
 }
 
-func RegisterAgentServer(s *grpc.Server, srv AgentServer) {
-	s.RegisterService(&_Agent_serviceDesc, srv)
+func RegisterDevOpsServer(s *grpc.Server, srv DevOpsServer) {
+	s.RegisterService(&_DevOps_serviceDesc, srv)
 }
 
-func _Agent_Listen_Handler(srv interface{}, stream grpc.ServerStream) error {
-	m := new(ClientID)
-	if err := stream.RecvMsg(m); err != nil {
-		return err
-	}
-	return srv.(AgentServer).Listen(m, &agentListenServer{stream})
-}
-
-type Agent_ListenServer interface {
-	Send(*AgentStatus) error
-	grpc.ServerStream
-}
-
-type agentListenServer struct {
-	grpc.ServerStream
-}
-
-func (x *agentListenServer) Send(m *AgentStatus) error {
-	return x.ServerStream.SendMsg(m)
-}
-
-func _Agent_Give_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(Answer)
+func _DevOps_Enter_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(Cmd)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(AgentServer).Give(ctx, in)
+		return srv.(DevOpsServer).Enter(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/agency.Agent/Give",
+		FullMethod: "/agency.DevOps/Enter",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(AgentServer).Give(ctx, req.(*Answer))
+		return srv.(DevOpsServer).Enter(ctx, req.(*Cmd))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-var _Agent_serviceDesc = grpc.ServiceDesc{
-	ServiceName: "agency.Agent",
-	HandlerType: (*AgentServer)(nil),
+var _DevOps_serviceDesc = grpc.ServiceDesc{
+	ServiceName: "agency.DevOps",
+	HandlerType: (*DevOpsServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
-			MethodName: "Give",
-			Handler:    _Agent_Give_Handler,
+			MethodName: "Enter",
+			Handler:    _DevOps_Enter_Handler,
 		},
 	},
-	Streams: []grpc.StreamDesc{
-		{
-			StreamName:    "Listen",
-			Handler:       _Agent_Listen_Handler,
-			ServerStreams: true,
-		},
-	},
+	Streams:  []grpc.StreamDesc{},
 	Metadata: "agency.proto",
 }

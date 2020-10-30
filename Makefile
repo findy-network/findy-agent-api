@@ -7,7 +7,7 @@ update-deps:
 	go get -u ./...
 
 protoc:
-	protoc --proto_path=idl --go_out=$(SRC_ROOT) --go-grpc_out=$(SRC_ROOT) agency.proto
+	protoc --proto_path=idl --go_out=$(SRC_ROOT) --go-grpc_out=$(SRC_ROOT) agency.proto agent.proto protocol.proto
 
 install:
 	@echo "Not implemented"

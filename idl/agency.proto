@@ -3,148 +3,49 @@
 
 syntax = "proto3";
 
+//import "protocol.proto";
+
 option go_package = "github.com/findy-network/findy-agent-api/grpc/agency";
 
 package agency;
 
 /*
-DIDComm is service to run and monitor DIDComm protocols.
+Agency is a service for agency level functionality i.e. multi-tenant features
+like data migrations, etc.
  */
-service DIDComm {
-  // Run is async function to start a protocol and return a stream to listen to
-  // its progress.
-  rpc Run(Protocol) returns (stream ProtocolState) {}
-
-  // Start asks the agency to start a protocol. It immediately returns a
-  // protocol id that allows to monitor protocol with the Status function. If
-  // Agent service's Listen is in use, we get a notification when protocol is
-  // ready.
-  rpc Start(Protocol) returns (ProtocolID) {}
-
-  // Status returns a current ProtocolStatus. ProtocolStatus is under
-  // construction TODO
-  rpc Status(ProtocolID) returns (ProtocolStatus) {}
+service Agency {
+  rpc PSMHook(DataHook) returns (stream AgencyStatus) {}
 }
 
-/*
-Agent is a service to communicate with your cloud agent.
- */
-service Agent {
-  // Listen is async function to stream AgentStatus. ClientID must be unique.
-  rpc Listen(ClientID) returns (stream AgentStatus) {}
-
-  // Give is function to give answer to ACTION_NEEDED_xx notifications.
-  rpc Give(Answer) returns (ClientID) {}
+message AgencyStatus {
+  string id = 1;
+  string info = 2;
 }
 
-/*
-Answer is a message send by Give function of Agent service.
- */
-message Answer {
-  string id = 1; // Same as Notification ID (UUID)
-  ClientID client_id = 2; // Same as your ClientID when Listening was started
-  bool ack = 3; // Your response to the protocol question
-  string info = 4; // General info, mostly used for debugging
+message DataHook {
+  string id = 1;
 }
 
-// ClientID is UUID. If user has many different client device connected to
-// cloud agent it must identify who is talking to.
-message ClientID {
-  string id = 1; // UUID of the client
+service DevOps {
+  rpc Enter(Cmd) returns (CmdReturn) {}
 }
 
-/*
-AgentStatus is a message identifying current agent events returned as
-notifications.
- */
-message AgentStatus {
-  ClientID client_id = 1; // UUID of the client listening
-  Notification notification = 3; // The actual Notification message
-}
-
-/*
-Notification is a message used to tell meaningful events outside from cloud
-agent.
- */
-message Notification {
-  // Type is enum type to tell what happening
+message Cmd {
   enum Type {
-    STATUS_UPDATE = 0; // General status update where no action needed
-    ACTION_NEEDED = 1; // General action needed update notification
-    ACTION_NEEDED_PING = 2; // Your CA controller has been pinged
-    ACTION_NEEDED_ISSUE_PROPOSE = 3; // Issuing is proposed
-    ACTION_NEEDED_PROOF_PROPOSE = 4; // Proof is proposed
-    ACTION_NEEDED_PROOF_VERIFY = 5; // During proof values need to be verified
+    PING = 0;
+    LOGGING = 1;
+    COUNT = 2;
   }
-  Type type_id = 1; // Notification type, see Type
-  string id = 2; // Notification's unique ID
-  string connection_id = 3; // Current pairwise ID between agents
-  string protocol_id = 4; // Current protocol ID, see Aries Thread ID
-  string protocol_family = 5; // Text version of the protocol family/namespace
-  uint64 timestamp = 6; // timestamp in ms
-}
-
-/*
-Protocol is the actual DIDComm/Aries protocol.
- */
-message Protocol {
-  // Type is enum type to identify the protocol, we aren't tight to Aries strings
-  enum Type {
-    CONNECT = 0;
-    ISSUE = 1;
-    PROPOSE_ISSUING = 2;
-    REQUEST_PROOF = 3;
-    PROPOSE_PROOFING = 4;
-    TRUST_PING = 5;
-    BASIC_MESSAGE = 6;
-  }
-  Type type_id = 1; // Protocol type
-  string prev_thread_id = 2; // Previous protocol ID if there was any
-  string connection_id = 3; // pairwise ID, this only empty when Type is CONNECT
-
-  // Issuing attributes
-  message Issuing {
-    string cred_def_id = 1;
-    string attributes_json = 2;
-  }
-  // Protocol type specific data: one of or no one
-  oneof StartMsg {
-    string invitation_json = 4; // Invitation JSON string, only for CONNECT
-    Issuing cred_def = 5; // Only for Issuing protocol
-    string proof_attributes_json = 6; // Only for Proof protocol
+  Type type = 1;
+  oneof Request {
+    string logging = 2;
   }
 }
 
-/*
-Protocol ID is a primary minimal identification of the _current_ protocol
-conversation. Protocol is an elementary concept in SSI. With the protocols we
-build the trust over the state of the connection (aka pairwise). That's why the
-connection ID is always the most important thing and we should drive towards
-reuse of the previous connection when ever it's possible. Still, we operate with
-protocols.
-*/
-message ProtocolID {
-  Protocol.Type type_id = 1; // protocol type
-  string id = 2; // UUID of the current protocol
-}
-
-// ProtocolState is lightest and simplest way to tell outside what is going on
-// during a protocol run.
-message ProtocolState {
-  ProtocolID protocol_id = 1;
-  enum State {
-    OK = 0; // Protocol is finalized successfully
-    ERR = 1; // Protocol is finalized with error or other side NACK
-    WAIT_ACTION = 2; // Protocol is waiting user's action to continue
+message CmdReturn {
+  Cmd.Type type = 1;
+  oneof Response {
+    string ping = 2;
+    string count = 3;
   }
-  State state = 2; // See the State enum, tells whats going on
-  string info = 3; // Extra information, mostly used for debugging
-}
-
-// ProtocolStatus is message to include whole status of the protocol. This is
-// UNDER CONSTRUCTION, TODO
-message ProtocolStatus {
-  ProtocolState state = 1;
-  string Message = 2;
-  uint64 timestamp = 3;
 }

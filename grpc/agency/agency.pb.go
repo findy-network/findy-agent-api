@@ -23,191 +23,66 @@ const (
 	_ = protoimpl.EnforceVersion(protoimpl.MaxVersion - 20)
 )
 
-// Type is enum type to tell what happening
-type Notification_Type int32
+type Cmd_Type int32
 
 const (
-	Notification_STATUS_UPDATE               Notification_Type = 0 // General status update where no action needed
-	Notification_ACTION_NEEDED               Notification_Type = 1 // General action needed update notification
-	Notification_ACTION_NEEDED_PING          Notification_Type = 2 // Your CA controller has been pinged
-	Notification_ACTION_NEEDED_ISSUE_PROPOSE Notification_Type = 3 // Issuing is proposed
-	Notification_ACTION_NEEDED_PROOF_PROPOSE Notification_Type = 4 // Proof is proposed
-	Notification_ACTION_NEEDED_PROOF_VERIFY  Notification_Type = 5 // During proof values need to be verified
+	Cmd_PING    Cmd_Type = 0
+	Cmd_LOGGING Cmd_Type = 1
+	Cmd_COUNT   Cmd_Type = 2
 )
 
-// Enum value maps for Notification_Type.
+// Enum value maps for Cmd_Type.
 var (
-	Notification_Type_name = map[int32]string{
-		0: "STATUS_UPDATE",
-		1: "ACTION_NEEDED",
-		2: "ACTION_NEEDED_PING",
-		3: "ACTION_NEEDED_ISSUE_PROPOSE",
-		4: "ACTION_NEEDED_PROOF_PROPOSE",
-		5: "ACTION_NEEDED_PROOF_VERIFY",
+	Cmd_Type_name = map[int32]string{
+		0: "PING",
+		1: "LOGGING",
+		2: "COUNT",
 	}
-	Notification_Type_value = map[string]int32{
-		"STATUS_UPDATE":               0,
-		"ACTION_NEEDED":               1,
-		"ACTION_NEEDED_PING":          2,
-		"ACTION_NEEDED_ISSUE_PROPOSE": 3,
-		"ACTION_NEEDED_PROOF_PROPOSE": 4,
-		"ACTION_NEEDED_PROOF_VERIFY":  5,
+	Cmd_Type_value = map[string]int32{
+		"PING":    0,
+		"LOGGING": 1,
+		"COUNT":   2,
 	}
 )
 
-func (x Notification_Type) Enum() *Notification_Type {
-	p := new(Notification_Type)
+func (x Cmd_Type) Enum() *Cmd_Type {
+	p := new(Cmd_Type)
 	*p = x
 	return p
 }
 
-func (x Notification_Type) String() string {
+func (x Cmd_Type) String() string {
 	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
 }
 
-func (Notification_Type) Descriptor() protoreflect.EnumDescriptor {
+func (Cmd_Type) Descriptor() protoreflect.EnumDescriptor {
 	return file_agency_proto_enumTypes[0].Descriptor()
 }
 
-func (Notification_Type) Type() protoreflect.EnumType {
+func (Cmd_Type) Type() protoreflect.EnumType {
 	return &file_agency_proto_enumTypes[0]
 }
 
-func (x Notification_Type) Number() protoreflect.EnumNumber {
+func (x Cmd_Type) Number() protoreflect.EnumNumber {
 	return protoreflect.EnumNumber(x)
 }
 
-// Deprecated: Use Notification_Type.Descriptor instead.
-func (Notification_Type) EnumDescriptor() ([]byte, []int) {
-	return file_agency_proto_rawDescGZIP(), []int{3, 0}
+// Deprecated: Use Cmd_Type.Descriptor instead.
+func (Cmd_Type) EnumDescriptor() ([]byte, []int) {
+	return file_agency_proto_rawDescGZIP(), []int{2, 0}
 }
 
-// Type is enum type to identify the protocol, we aren't tight to Aries strings
-type Protocol_Type int32
-
-const (
-	Protocol_CONNECT          Protocol_Type = 0
-	Protocol_ISSUE            Protocol_Type = 1
-	Protocol_PROPOSE_ISSUING  Protocol_Type = 2
-	Protocol_REQUEST_PROOF    Protocol_Type = 3
-	Protocol_PROPOSE_PROOFING Protocol_Type = 4
-	Protocol_TRUST_PING       Protocol_Type = 5
-	Protocol_BASIC_MESSAGE    Protocol_Type = 6
-)
-
-// Enum value maps for Protocol_Type.
-var (
-	Protocol_Type_name = map[int32]string{
-		0: "CONNECT",
-		1: "ISSUE",
-		2: "PROPOSE_ISSUING",
-		3: "REQUEST_PROOF",
-		4: "PROPOSE_PROOFING",
-		5: "TRUST_PING",
-		6: "BASIC_MESSAGE",
-	}
-	Protocol_Type_value = map[string]int32{
-		"CONNECT":          0,
-		"ISSUE":            1,
-		"PROPOSE_ISSUING":  2,
-		"REQUEST_PROOF":    3,
-		"PROPOSE_PROOFING": 4,
-		"TRUST_PING":       5,
-		"BASIC_MESSAGE":    6,
-	}
-)
-
-func (x Protocol_Type) Enum() *Protocol_Type {
-	p := new(Protocol_Type)
-	*p = x
-	return p
-}
-
-func (x Protocol_Type) String() string {
-	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
-}
-
-func (Protocol_Type) Descriptor() protoreflect.EnumDescriptor {
-	return file_agency_proto_enumTypes[1].Descriptor()
-}
-
-func (Protocol_Type) Type() protoreflect.EnumType {
-	return &file_agency_proto_enumTypes[1]
-}
-
-func (x Protocol_Type) Number() protoreflect.EnumNumber {
-	return protoreflect.EnumNumber(x)
-}
-
-// Deprecated: Use Protocol_Type.Descriptor instead.
-func (Protocol_Type) EnumDescriptor() ([]byte, []int) {
-	return file_agency_proto_rawDescGZIP(), []int{4, 0}
-}
-
-type ProtocolState_State int32
-
-const (
-	ProtocolState_OK          ProtocolState_State = 0 // Protocol is finalized successfully
-	ProtocolState_ERR         ProtocolState_State = 1 // Protocol is finalized with error or other side NACK
-	ProtocolState_WAIT_ACTION ProtocolState_State = 2 // Protocol is waiting user's action to continue
-)
-
-// Enum value maps for ProtocolState_State.
-var (
-	ProtocolState_State_name = map[int32]string{
-		0: "OK",
-		1: "ERR",
-		2: "WAIT_ACTION",
-	}
-	ProtocolState_State_value = map[string]int32{
-		"OK":          0,
-		"ERR":         1,
-		"WAIT_ACTION": 2,
-	}
-)
-
-func (x ProtocolState_State) Enum() *ProtocolState_State {
-	p := new(ProtocolState_State)
-	*p = x
-	return p
-}
-
-func (x ProtocolState_State) String() string {
-	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
-}
-
-func (ProtocolState_State) Descriptor() protoreflect.EnumDescriptor {
-	return file_agency_proto_enumTypes[2].Descriptor()
-}
-
-func (ProtocolState_State) Type() protoreflect.EnumType {
-	return &file_agency_proto_enumTypes[2]
-}
-
-func (x ProtocolState_State) Number() protoreflect.EnumNumber {
-	return protoreflect.EnumNumber(x)
-}
-
-// Deprecated: Use ProtocolState_State.Descriptor instead.
-func (ProtocolState_State) EnumDescriptor() ([]byte, []int) {
-	return file_agency_proto_rawDescGZIP(), []int{6, 0}
-}
-
-//
-//Answer is a message send by Give function of Agent service.
-type Answer struct {
+type AgencyStatus struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	Id       string    `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`                             // Same as Notification ID (UUID)
-	ClientId *ClientID `protobuf:"bytes,2,opt,name=client_id,json=clientId,proto3" json:"client_id,omitempty"` // Same as your ClientID when Listening was started
-	Ack      bool      `protobuf:"varint,3,opt,name=ack,proto3" json:"ack,omitempty"`                          // Your response to the protocol question
-	Info     string    `protobuf:"bytes,4,opt,name=info,proto3" json:"info,omitempty"`                         // General info, mostly used for debugging
+	Id   string `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	Info string `protobuf:"bytes,2,opt,name=info,proto3" json:"info,omitempty"`
 }
 
-func (x *Answer) Reset() {
-	*x = Answer{}
+func (x *AgencyStatus) Reset() {
+	*x = AgencyStatus{}
 	if protoimpl.UnsafeEnabled {
 		mi := &file_agency_proto_msgTypes[0]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -215,13 +90,13 @@ func (x *Answer) Reset() {
 	}
 }
 
-func (x *Answer) String() string {
+func (x *AgencyStatus) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*Answer) ProtoMessage() {}
+func (*AgencyStatus) ProtoMessage() {}
 
-func (x *Answer) ProtoReflect() protoreflect.Message {
+func (x *AgencyStatus) ProtoReflect() protoreflect.Message {
 	mi := &file_agency_proto_msgTypes[0]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -233,51 +108,35 @@ func (x *Answer) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use Answer.ProtoReflect.Descriptor instead.
-func (*Answer) Descriptor() ([]byte, []int) {
+// Deprecated: Use AgencyStatus.ProtoReflect.Descriptor instead.
+func (*AgencyStatus) Descriptor() ([]byte, []int) {
 	return file_agency_proto_rawDescGZIP(), []int{0}
 }
 
-func (x *Answer) GetId() string {
+func (x *AgencyStatus) GetId() string {
 	if x != nil {
 		return x.Id
 	}
 	return ""
 }
 
-func (x *Answer) GetClientId() *ClientID {
-	if x != nil {
-		return x.ClientId
-	}
-	return nil
-}
-
-func (x *Answer) GetAck() bool {
-	if x != nil {
-		return x.Ack
-	}
-	return false
-}
-
-func (x *Answer) GetInfo() string {
+func (x *AgencyStatus) GetInfo() string {
 	if x != nil {
 		return x.Info
 	}
 	return ""
 }
 
-// ClientID is UUID. If user has many different client device connected to
-// cloud agent it must identify who is talking to.
-type ClientID struct {
+type DataHook struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	Id string `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"` // UUID of the client
+	Id string `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
 }
 
-func (x *ClientID) Reset() {
-	*x = ClientID{}
+func (x *DataHook) Reset() {
+	*x = DataHook{}
 	if protoimpl.UnsafeEnabled {
 		mi := &file_agency_proto_msgTypes[1]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -285,13 +144,13 @@ func (x *ClientID) Reset() {
 	}
 }
 
-func (x *ClientID) String() string {
+func (x *DataHook) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*ClientID) ProtoMessage() {}
+func (*DataHook) ProtoMessage() {}
 
-func (x *ClientID) ProtoReflect() protoreflect.Message {
+func (x *DataHook) ProtoReflect() protoreflect.Message {
 	mi := &file_agency_proto_msgTypes[1]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -303,32 +162,31 @@ func (x *ClientID) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use ClientID.ProtoReflect.Descriptor instead.
-func (*ClientID) Descriptor() ([]byte, []int) {
+// Deprecated: Use DataHook.ProtoReflect.Descriptor instead.
+func (*DataHook) Descriptor() ([]byte, []int) {
 	return file_agency_proto_rawDescGZIP(), []int{1}
 }
 
-func (x *ClientID) GetId() string {
+func (x *DataHook) GetId() string {
 	if x != nil {
 		return x.Id
 	}
 	return ""
 }
 
-//
-//AgentStatus is a message identifying current agent events returned as
-//notifications.
-type AgentStatus struct {
+type Cmd struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	ClientId     *ClientID     `protobuf:"bytes,1,opt,name=client_id,json=clientId,proto3" json:"client_id,omitempty"` // UUID of the client listening
-	Notification *Notification `protobuf:"bytes,3,opt,name=notification,proto3" json:"notification,omitempty"`         // The actual Notification message
+	Type Cmd_Type `protobuf:"varint,1,opt,name=type,proto3,enum=agency.Cmd_Type" json:"type,omitempty"`
+	// Types that are assignable to Request:
+	//	*Cmd_Logging
+	Request isCmd_Request `protobuf_oneof:"Request"`
 }
 
-func (x *AgentStatus) Reset() {
-	*x = AgentStatus{}
+func (x *Cmd) Reset() {
+	*x = Cmd{}
 	if protoimpl.UnsafeEnabled {
 		mi := &file_agency_proto_msgTypes[2]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -336,13 +194,13 @@ func (x *AgentStatus) Reset() {
 	}
 }
 
-func (x *AgentStatus) String() string {
+func (x *Cmd) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*AgentStatus) ProtoMessage() {}
+func (*Cmd) ProtoMessage() {}
 
-func (x *AgentStatus) ProtoReflect() protoreflect.Message {
+func (x *Cmd) ProtoReflect() protoreflect.Message {
 	mi := &file_agency_proto_msgTypes[2]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -354,43 +212,56 @@ func (x *AgentStatus) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use AgentStatus.ProtoReflect.Descriptor instead.
-func (*AgentStatus) Descriptor() ([]byte, []int) {
+// Deprecated: Use Cmd.ProtoReflect.Descriptor instead.
+func (*Cmd) Descriptor() ([]byte, []int) {
 	return file_agency_proto_rawDescGZIP(), []int{2}
 }
 
-func (x *AgentStatus) GetClientId() *ClientID {
+func (x *Cmd) GetType() Cmd_Type {
 	if x != nil {
-		return x.ClientId
+		return x.Type
+	}
+	return Cmd_PING
+}
+
+func (m *Cmd) GetRequest() isCmd_Request {
+	if m != nil {
+		return m.Request
 	}
 	return nil
 }
 
-func (x *AgentStatus) GetNotification() *Notification {
-	if x != nil {
-		return x.Notification
+func (x *Cmd) GetLogging() string {
+	if x, ok := x.GetRequest().(*Cmd_Logging); ok {
+		return x.Logging
 	}
-	return nil
+	return ""
 }
 
-//
-//Notification is a message used to tell meaningful events outside from cloud
-//agent.
-type Notification struct {
+type isCmd_Request interface {
+	isCmd_Request()
+}
+
+type Cmd_Logging struct {
+	Logging string `protobuf:"bytes,2,opt,name=logging,proto3,oneof"`
+}
+
+func (*Cmd_Logging) isCmd_Request() {}
+
+type CmdReturn struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	TypeId         Notification_Type `protobuf:"varint,1,opt,name=type_id,json=typeId,proto3,enum=agency.Notification_Type" json:"type_id,omitempty"` // Notification type, see Type
-	Id             string            `protobuf:"bytes,2,opt,name=id,proto3" json:"id,omitempty"`                                                      // Notification's unique ID
-	ConnectionId   string            `protobuf:"bytes,3,opt,name=connection_id,json=connectionId,proto3" json:"connection_id,omitempty"`              // Current pairwise ID between agents
-	ProtocolId     string            `protobuf:"bytes,4,opt,name=protocol_id,json=protocolId,proto3" json:"protocol_id,omitempty"`                    // Current protocol ID, see Aries Thread ID
-	ProtocolFamily string            `protobuf:"bytes,5,opt,name=protocol_family,json=protocolFamily,proto3" json:"protocol_family,omitempty"`        // Text version of the protocol family/namespace
-	Timestamp      uint64            `protobuf:"varint,6,opt,name=timestamp,proto3" json:"timestamp,omitempty"`                                       // timestamp in ms
+	Type Cmd_Type `protobuf:"varint,1,opt,name=type,proto3,enum=agency.Cmd_Type" json:"type,omitempty"`
+	// Types that are assignable to Response:
+	//	*CmdReturn_Ping
+	//	*CmdReturn_Count
+	Response isCmdReturn_Response `protobuf_oneof:"Response"`
 }
 
-func (x *Notification) Reset() {
-	*x = Notification{}
+func (x *CmdReturn) Reset() {
+	*x = CmdReturn{}
 	if protoimpl.UnsafeEnabled {
 		mi := &file_agency_proto_msgTypes[3]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -398,13 +269,13 @@ func (x *Notification) Reset() {
 	}
 }
 
-func (x *Notification) String() string {
+func (x *CmdReturn) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*Notification) ProtoMessage() {}
+func (*CmdReturn) ProtoMessage() {}
 
-func (x *Notification) ProtoReflect() protoreflect.Message {
+func (x *CmdReturn) ProtoReflect() protoreflect.Message {
 	mi := &file_agency_proto_msgTypes[3]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -416,546 +287,91 @@ func (x *Notification) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use Notification.ProtoReflect.Descriptor instead.
-func (*Notification) Descriptor() ([]byte, []int) {
+// Deprecated: Use CmdReturn.ProtoReflect.Descriptor instead.
+func (*CmdReturn) Descriptor() ([]byte, []int) {
 	return file_agency_proto_rawDescGZIP(), []int{3}
 }
 
-func (x *Notification) GetTypeId() Notification_Type {
+func (x *CmdReturn) GetType() Cmd_Type {
 	if x != nil {
-		return x.TypeId
+		return x.Type
 	}
-	return Notification_STATUS_UPDATE
+	return Cmd_PING
 }
 
-func (x *Notification) GetId() string {
-	if x != nil {
-		return x.Id
-	}
-	return ""
-}
-
-func (x *Notification) GetConnectionId() string {
-	if x != nil {
-		return x.ConnectionId
-	}
-	return ""
-}
-
-func (x *Notification) GetProtocolId() string {
-	if x != nil {
-		return x.ProtocolId
-	}
-	return ""
-}
-
-func (x *Notification) GetProtocolFamily() string {
-	if x != nil {
-		return x.ProtocolFamily
-	}
-	return ""
-}
-
-func (x *Notification) GetTimestamp() uint64 {
-	if x != nil {
-		return x.Timestamp
-	}
-	return 0
-}
-
-//
-//Protocol is the actual DIDComm/Aries protocol.
-type Protocol struct {
-	state         protoimpl.MessageState
-	sizeCache     protoimpl.SizeCache
-	unknownFields protoimpl.UnknownFields
-
-	TypeId       Protocol_Type `protobuf:"varint,1,opt,name=type_id,json=typeId,proto3,enum=agency.Protocol_Type" json:"type_id,omitempty"` // Protocol type
-	PrevThreadId string        `protobuf:"bytes,2,opt,name=prev_thread_id,json=prevThreadId,proto3" json:"prev_thread_id,omitempty"`        // Previous protocol ID if there was any
-	ConnectionId string        `protobuf:"bytes,3,opt,name=connection_id,json=connectionId,proto3" json:"connection_id,omitempty"`          // pairwise ID, this only empty when Type is CONNECT
-	// Protocol type specific data: one of or no one
-	//
-	// Types that are assignable to StartMsg:
-	//	*Protocol_InvitationJson
-	//	*Protocol_CredDef
-	//	*Protocol_ProofAttributesJson
-	StartMsg isProtocol_StartMsg `protobuf_oneof:"StartMsg"`
-}
-
-func (x *Protocol) Reset() {
-	*x = Protocol{}
-	if protoimpl.UnsafeEnabled {
-		mi := &file_agency_proto_msgTypes[4]
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		ms.StoreMessageInfo(mi)
-	}
-}
-
-func (x *Protocol) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*Protocol) ProtoMessage() {}
-
-func (x *Protocol) ProtoReflect() protoreflect.Message {
-	mi := &file_agency_proto_msgTypes[4]
-	if protoimpl.UnsafeEnabled && x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use Protocol.ProtoReflect.Descriptor instead.
-func (*Protocol) Descriptor() ([]byte, []int) {
-	return file_agency_proto_rawDescGZIP(), []int{4}
-}
-
-func (x *Protocol) GetTypeId() Protocol_Type {
-	if x != nil {
-		return x.TypeId
-	}
-	return Protocol_CONNECT
-}
-
-func (x *Protocol) GetPrevThreadId() string {
-	if x != nil {
-		return x.PrevThreadId
-	}
-	return ""
-}
-
-func (x *Protocol) GetConnectionId() string {
-	if x != nil {
-		return x.ConnectionId
-	}
-	return ""
-}
-
-func (m *Protocol) GetStartMsg() isProtocol_StartMsg {
+func (m *CmdReturn) GetResponse() isCmdReturn_Response {
 	if m != nil {
-		return m.StartMsg
+		return m.Response
 	}
 	return nil
 }
 
-func (x *Protocol) GetInvitationJson() string {
-	if x, ok := x.GetStartMsg().(*Protocol_InvitationJson); ok {
-		return x.InvitationJson
+func (x *CmdReturn) GetPing() string {
+	if x, ok := x.GetResponse().(*CmdReturn_Ping); ok {
+		return x.Ping
 	}
 	return ""
 }
 
-func (x *Protocol) GetCredDef() *Protocol_Issuing {
-	if x, ok := x.GetStartMsg().(*Protocol_CredDef); ok {
-		return x.CredDef
-	}
-	return nil
-}
-
-func (x *Protocol) GetProofAttributesJson() string {
-	if x, ok := x.GetStartMsg().(*Protocol_ProofAttributesJson); ok {
-		return x.ProofAttributesJson
+func (x *CmdReturn) GetCount() string {
+	if x, ok := x.GetResponse().(*CmdReturn_Count); ok {
+		return x.Count
 	}
 	return ""
 }
 
-type isProtocol_StartMsg interface {
-	isProtocol_StartMsg()
+type isCmdReturn_Response interface {
+	isCmdReturn_Response()
 }
 
-type Protocol_InvitationJson struct {
-	InvitationJson string `protobuf:"bytes,4,opt,name=invitation_json,json=invitationJson,proto3,oneof"` // Invitation JSON string, only for CONNECT
+type CmdReturn_Ping struct {
+	Ping string `protobuf:"bytes,2,opt,name=ping,proto3,oneof"`
 }
 
-type Protocol_CredDef struct {
-	CredDef *Protocol_Issuing `protobuf:"bytes,5,opt,name=cred_def,json=credDef,proto3,oneof"` // Only for Issuing protocol
+type CmdReturn_Count struct {
+	Count string `protobuf:"bytes,3,opt,name=count,proto3,oneof"`
 }
 
-type Protocol_ProofAttributesJson struct {
-	ProofAttributesJson string `protobuf:"bytes,6,opt,name=proof_attributes_json,json=proofAttributesJson,proto3,oneof"` // Only for Proof protocol
-}
+func (*CmdReturn_Ping) isCmdReturn_Response() {}
 
-func (*Protocol_InvitationJson) isProtocol_StartMsg() {}
-
-func (*Protocol_CredDef) isProtocol_StartMsg() {}
-
-func (*Protocol_ProofAttributesJson) isProtocol_StartMsg() {}
-
-//
-//Protocol ID is a primary minimal identification of the _current_ protocol
-//conversation. Protocol is an elementary concept in SSI. With the protocols we
-//build the trust over the state of the connection (aka pairwise). That's why the
-//connection ID is always the most important thing and we should drive towards
-//reuse of the previous connection when ever it's possible. Still, we operate with
-//protocols.
-type ProtocolID struct {
-	state         protoimpl.MessageState
-	sizeCache     protoimpl.SizeCache
-	unknownFields protoimpl.UnknownFields
-
-	TypeId Protocol_Type `protobuf:"varint,1,opt,name=type_id,json=typeId,proto3,enum=agency.Protocol_Type" json:"type_id,omitempty"` // protocol type
-	Id     string        `protobuf:"bytes,2,opt,name=id,proto3" json:"id,omitempty"`                                                  // UUID of the current protocol
-}
-
-func (x *ProtocolID) Reset() {
-	*x = ProtocolID{}
-	if protoimpl.UnsafeEnabled {
-		mi := &file_agency_proto_msgTypes[5]
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		ms.StoreMessageInfo(mi)
-	}
-}
-
-func (x *ProtocolID) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*ProtocolID) ProtoMessage() {}
-
-func (x *ProtocolID) ProtoReflect() protoreflect.Message {
-	mi := &file_agency_proto_msgTypes[5]
-	if protoimpl.UnsafeEnabled && x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use ProtocolID.ProtoReflect.Descriptor instead.
-func (*ProtocolID) Descriptor() ([]byte, []int) {
-	return file_agency_proto_rawDescGZIP(), []int{5}
-}
-
-func (x *ProtocolID) GetTypeId() Protocol_Type {
-	if x != nil {
-		return x.TypeId
-	}
-	return Protocol_CONNECT
-}
-
-func (x *ProtocolID) GetId() string {
-	if x != nil {
-		return x.Id
-	}
-	return ""
-}
-
-// ProtocolState is lightest and simplest way to tell outside what is going on
-// during a protocol run.
-type ProtocolState struct {
-	state         protoimpl.MessageState
-	sizeCache     protoimpl.SizeCache
-	unknownFields protoimpl.UnknownFields
-
-	ProtocolId *ProtocolID         `protobuf:"bytes,1,opt,name=protocol_id,json=protocolId,proto3" json:"protocol_id,omitempty"`
-	State      ProtocolState_State `protobuf:"varint,2,opt,name=state,proto3,enum=agency.ProtocolState_State" json:"state,omitempty"` // See the State enum, tells whats going on
-	Info       string              `protobuf:"bytes,3,opt,name=info,proto3" json:"info,omitempty"`                                    // Extra information, mostly used for debugging
-}
-
-func (x *ProtocolState) Reset() {
-	*x = ProtocolState{}
-	if protoimpl.UnsafeEnabled {
-		mi := &file_agency_proto_msgTypes[6]
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		ms.StoreMessageInfo(mi)
-	}
-}
-
-func (x *ProtocolState) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*ProtocolState) ProtoMessage() {}
-
-func (x *ProtocolState) ProtoReflect() protoreflect.Message {
-	mi := &file_agency_proto_msgTypes[6]
-	if protoimpl.UnsafeEnabled && x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use ProtocolState.ProtoReflect.Descriptor instead.
-func (*ProtocolState) Descriptor() ([]byte, []int) {
-	return file_agency_proto_rawDescGZIP(), []int{6}
-}
-
-func (x *ProtocolState) GetProtocolId() *ProtocolID {
-	if x != nil {
-		return x.ProtocolId
-	}
-	return nil
-}
-
-func (x *ProtocolState) GetState() ProtocolState_State {
-	if x != nil {
-		return x.State
-	}
-	return ProtocolState_OK
-}
-
-func (x *ProtocolState) GetInfo() string {
-	if x != nil {
-		return x.Info
-	}
-	return ""
-}
-
-// ProtocolStatus is message to include whole status of the protocol. This is
-// UNDER CONSTRUCTION, TODO
-type ProtocolStatus struct {
-	state         protoimpl.MessageState
-	sizeCache     protoimpl.SizeCache
-	unknownFields protoimpl.UnknownFields
-
-	State     *ProtocolState `protobuf:"bytes,1,opt,name=state,proto3" json:"state,omitempty"`
-	Message   string         `protobuf:"bytes,2,opt,name=Message,proto3" json:"Message,omitempty"`
-	Timestamp uint64         `protobuf:"varint,3,opt,name=timestamp,proto3" json:"timestamp,omitempty"`
-}
-
-func (x *ProtocolStatus) Reset() {
-	*x = ProtocolStatus{}
-	if protoimpl.UnsafeEnabled {
-		mi := &file_agency_proto_msgTypes[7]
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		ms.StoreMessageInfo(mi)
-	}
-}
-
-func (x *ProtocolStatus) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*ProtocolStatus) ProtoMessage() {}
-
-func (x *ProtocolStatus) ProtoReflect() protoreflect.Message {
-	mi := &file_agency_proto_msgTypes[7]
-	if protoimpl.UnsafeEnabled && x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use ProtocolStatus.ProtoReflect.Descriptor instead.
-func (*ProtocolStatus) Descriptor() ([]byte, []int) {
-	return file_agency_proto_rawDescGZIP(), []int{7}
-}
-
-func (x *ProtocolStatus) GetState() *ProtocolState {
-	if x != nil {
-		return x.State
-	}
-	return nil
-}
-
-func (x *ProtocolStatus) GetMessage() string {
-	if x != nil {
-		return x.Message
-	}
-	return ""
-}
-
-func (x *ProtocolStatus) GetTimestamp() uint64 {
-	if x != nil {
-		return x.Timestamp
-	}
-	return 0
-}
-
-// Issuing attributes
-type Protocol_Issuing struct {
-	state         protoimpl.MessageState
-	sizeCache     protoimpl.SizeCache
-	unknownFields protoimpl.UnknownFields
-
-	CredDefId      string `protobuf:"bytes,1,opt,name=cred_def_id,json=credDefId,proto3" json:"cred_def_id,omitempty"`
-	AttributesJson string `protobuf:"bytes,2,opt,name=attributes_json,json=attributesJson,proto3" json:"attributes_json,omitempty"`
-}
-
-func (x *Protocol_Issuing) Reset() {
-	*x = Protocol_Issuing{}
-	if protoimpl.UnsafeEnabled {
-		mi := &file_agency_proto_msgTypes[8]
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		ms.StoreMessageInfo(mi)
-	}
-}
-
-func (x *Protocol_Issuing) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*Protocol_Issuing) ProtoMessage() {}
-
-func (x *Protocol_Issuing) ProtoReflect() protoreflect.Message {
-	mi := &file_agency_proto_msgTypes[8]
-	if protoimpl.UnsafeEnabled && x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use Protocol_Issuing.ProtoReflect.Descriptor instead.
-func (*Protocol_Issuing) Descriptor() ([]byte, []int) {
-	return file_agency_proto_rawDescGZIP(), []int{4, 0}
-}
-
-func (x *Protocol_Issuing) GetCredDefId() string {
-	if x != nil {
-		return x.CredDefId
-	}
-	return ""
-}
-
-func (x *Protocol_Issuing) GetAttributesJson() string {
-	if x != nil {
-		return x.AttributesJson
-	}
-	return ""
-}
+func (*CmdReturn_Count) isCmdReturn_Response() {}
 
 var File_agency_proto protoreflect.FileDescriptor
 
 var file_agency_proto_rawDesc = []byte{
 	0x0a, 0x0c, 0x61, 0x67, 0x65, 0x6e, 0x63, 0x79, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x12, 0x06,
-	0x61, 0x67, 0x65, 0x6e, 0x63, 0x79, 0x22, 0x6d, 0x0a, 0x06, 0x41, 0x6e, 0x73, 0x77, 0x65, 0x72,
-	0x12, 0x0e, 0x0a, 0x02, 0x69, 0x64, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x02, 0x69, 0x64,
-	0x12, 0x2d, 0x0a, 0x09, 0x63, 0x6c, 0x69, 0x65, 0x6e, 0x74, 0x5f, 0x69, 0x64, 0x18, 0x02, 0x20,
-	0x01, 0x28, 0x0b, 0x32, 0x10, 0x2e, 0x61, 0x67, 0x65, 0x6e, 0x63, 0x79, 0x2e, 0x43, 0x6c, 0x69,
-	0x65, 0x6e, 0x74, 0x49, 0x44, 0x52, 0x08, 0x63, 0x6c, 0x69, 0x65, 0x6e, 0x74, 0x49, 0x64, 0x12,
-	0x10, 0x0a, 0x03, 0x61, 0x63, 0x6b, 0x18, 0x03, 0x20, 0x01, 0x28, 0x08, 0x52, 0x03, 0x61, 0x63,
-	0x6b, 0x12, 0x12, 0x0a, 0x04, 0x69, 0x6e, 0x66, 0x6f, 0x18, 0x04, 0x20, 0x01, 0x28, 0x09, 0x52,
-	0x04, 0x69, 0x6e, 0x66, 0x6f, 0x22, 0x1a, 0x0a, 0x08, 0x43, 0x6c, 0x69, 0x65, 0x6e, 0x74, 0x49,
-	0x44, 0x12, 0x0e, 0x0a, 0x02, 0x69, 0x64, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x02, 0x69,
-	0x64, 0x22, 0x76, 0x0a, 0x0b, 0x41, 0x67, 0x65, 0x6e, 0x74, 0x53, 0x74, 0x61, 0x74, 0x75, 0x73,
-	0x12, 0x2d, 0x0a, 0x09, 0x63, 0x6c, 0x69, 0x65, 0x6e, 0x74, 0x5f, 0x69, 0x64, 0x18, 0x01, 0x20,
-	0x01, 0x28, 0x0b, 0x32, 0x10, 0x2e, 0x61, 0x67, 0x65, 0x6e, 0x63, 0x79, 0x2e, 0x43, 0x6c, 0x69,
-	0x65, 0x6e, 0x74, 0x49, 0x44, 0x52, 0x08, 0x63, 0x6c, 0x69, 0x65, 0x6e, 0x74, 0x49, 0x64, 0x12,
-	0x38, 0x0a, 0x0c, 0x6e, 0x6f, 0x74, 0x69, 0x66, 0x69, 0x63, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x18,
-	0x03, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x14, 0x2e, 0x61, 0x67, 0x65, 0x6e, 0x63, 0x79, 0x2e, 0x4e,
-	0x6f, 0x74, 0x69, 0x66, 0x69, 0x63, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x52, 0x0c, 0x6e, 0x6f, 0x74,
-	0x69, 0x66, 0x69, 0x63, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x22, 0x88, 0x03, 0x0a, 0x0c, 0x4e, 0x6f,
-	0x74, 0x69, 0x66, 0x69, 0x63, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x12, 0x32, 0x0a, 0x07, 0x74, 0x79,
-	0x70, 0x65, 0x5f, 0x69, 0x64, 0x18, 0x01, 0x20, 0x01, 0x28, 0x0e, 0x32, 0x19, 0x2e, 0x61, 0x67,
-	0x65, 0x6e, 0x63, 0x79, 0x2e, 0x4e, 0x6f, 0x74, 0x69, 0x66, 0x69, 0x63, 0x61, 0x74, 0x69, 0x6f,
-	0x6e, 0x2e, 0x54, 0x79, 0x70, 0x65, 0x52, 0x06, 0x74, 0x79, 0x70, 0x65, 0x49, 0x64, 0x12, 0x0e,
-	0x0a, 0x02, 0x69, 0x64, 0x18, 0x02, 0x20, 0x01, 0x28, 0x09, 0x52, 0x02, 0x69, 0x64, 0x12, 0x23,
-	0x0a, 0x0d, 0x63, 0x6f, 0x6e, 0x6e, 0x65, 0x63, 0x74, 0x69, 0x6f, 0x6e, 0x5f, 0x69, 0x64, 0x18,
-	0x03, 0x20, 0x01, 0x28, 0x09, 0x52, 0x0c, 0x63, 0x6f, 0x6e, 0x6e, 0x65, 0x63, 0x74, 0x69, 0x6f,
-	0x6e, 0x49, 0x64, 0x12, 0x1f, 0x0a, 0x0b, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x63, 0x6f, 0x6c, 0x5f,
-	0x69, 0x64, 0x18, 0x04, 0x20, 0x01, 0x28, 0x09, 0x52, 0x0a, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x63,
-	0x6f, 0x6c, 0x49, 0x64, 0x12, 0x27, 0x0a, 0x0f, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x63, 0x6f, 0x6c,
-	0x5f, 0x66, 0x61, 0x6d, 0x69, 0x6c, 0x79, 0x18, 0x05, 0x20, 0x01, 0x28, 0x09, 0x52, 0x0e, 0x70,
-	0x72, 0x6f, 0x74, 0x6f, 0x63, 0x6f, 0x6c, 0x46, 0x61, 0x6d, 0x69, 0x6c, 0x79, 0x12, 0x1c, 0x0a,
-	0x09, 0x74, 0x69, 0x6d, 0x65, 0x73, 0x74, 0x61, 0x6d, 0x70, 0x18, 0x06, 0x20, 0x01, 0x28, 0x04,
-	0x52, 0x09, 0x74, 0x69, 0x6d, 0x65, 0x73, 0x74, 0x61, 0x6d, 0x70, 0x22, 0xa6, 0x01, 0x0a, 0x04,
-	0x54, 0x79, 0x70, 0x65, 0x12, 0x11, 0x0a, 0x0d, 0x53, 0x54, 0x41, 0x54, 0x55, 0x53, 0x5f, 0x55,
-	0x50, 0x44, 0x41, 0x54, 0x45, 0x10, 0x00, 0x12, 0x11, 0x0a, 0x0d, 0x41, 0x43, 0x54, 0x49, 0x4f,
-	0x4e, 0x5f, 0x4e, 0x45, 0x45, 0x44, 0x45, 0x44, 0x10, 0x01, 0x12, 0x16, 0x0a, 0x12, 0x41, 0x43,
-	0x54, 0x49, 0x4f, 0x4e, 0x5f, 0x4e, 0x45, 0x45, 0x44, 0x45, 0x44, 0x5f, 0x50, 0x49, 0x4e, 0x47,
-	0x10, 0x02, 0x12, 0x1f, 0x0a, 0x1b, 0x41, 0x43, 0x54, 0x49, 0x4f, 0x4e, 0x5f, 0x4e, 0x45, 0x45,
-	0x44, 0x45, 0x44, 0x5f, 0x49, 0x53, 0x53, 0x55, 0x45, 0x5f, 0x50, 0x52, 0x4f, 0x50, 0x4f, 0x53,
-	0x45, 0x10, 0x03, 0x12, 0x1f, 0x0a, 0x1b, 0x41, 0x43, 0x54, 0x49, 0x4f, 0x4e, 0x5f, 0x4e, 0x45,
-	0x45, 0x44, 0x45, 0x44, 0x5f, 0x50, 0x52, 0x4f, 0x4f, 0x46, 0x5f, 0x50, 0x52, 0x4f, 0x50, 0x4f,
-	0x53, 0x45, 0x10, 0x04, 0x12, 0x1e, 0x0a, 0x1a, 0x41, 0x43, 0x54, 0x49, 0x4f, 0x4e, 0x5f, 0x4e,
-	0x45, 0x45, 0x44, 0x45, 0x44, 0x5f, 0x50, 0x52, 0x4f, 0x4f, 0x46, 0x5f, 0x56, 0x45, 0x52, 0x49,
-	0x46, 0x59, 0x10, 0x05, 0x22, 0xfe, 0x03, 0x0a, 0x08, 0x50, 0x72, 0x6f, 0x74, 0x6f, 0x63, 0x6f,
-	0x6c, 0x12, 0x2e, 0x0a, 0x07, 0x74, 0x79, 0x70, 0x65, 0x5f, 0x69, 0x64, 0x18, 0x01, 0x20, 0x01,
-	0x28, 0x0e, 0x32, 0x15, 0x2e, 0x61, 0x67, 0x65, 0x6e, 0x63, 0x79, 0x2e, 0x50, 0x72, 0x6f, 0x74,
-	0x6f, 0x63, 0x6f, 0x6c, 0x2e, 0x54, 0x79, 0x70, 0x65, 0x52, 0x06, 0x74, 0x79, 0x70, 0x65, 0x49,
-	0x64, 0x12, 0x24, 0x0a, 0x0e, 0x70, 0x72, 0x65, 0x76, 0x5f, 0x74, 0x68, 0x72, 0x65, 0x61, 0x64,
-	0x5f, 0x69, 0x64, 0x18, 0x02, 0x20, 0x01, 0x28, 0x09, 0x52, 0x0c, 0x70, 0x72, 0x65, 0x76, 0x54,
-	0x68, 0x72, 0x65, 0x61, 0x64, 0x49, 0x64, 0x12, 0x23, 0x0a, 0x0d, 0x63, 0x6f, 0x6e, 0x6e, 0x65,
-	0x63, 0x74, 0x69, 0x6f, 0x6e, 0x5f, 0x69, 0x64, 0x18, 0x03, 0x20, 0x01, 0x28, 0x09, 0x52, 0x0c,
-	0x63, 0x6f, 0x6e, 0x6e, 0x65, 0x63, 0x74, 0x69, 0x6f, 0x6e, 0x49, 0x64, 0x12, 0x29, 0x0a, 0x0f,
-	0x69, 0x6e, 0x76, 0x69, 0x74, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x5f, 0x6a, 0x73, 0x6f, 0x6e, 0x18,
-	0x04, 0x20, 0x01, 0x28, 0x09, 0x48, 0x00, 0x52, 0x0e, 0x69, 0x6e, 0x76, 0x69, 0x74, 0x61, 0x74,
-	0x69, 0x6f, 0x6e, 0x4a, 0x73, 0x6f, 0x6e, 0x12, 0x35, 0x0a, 0x08, 0x63, 0x72, 0x65, 0x64, 0x5f,
-	0x64, 0x65, 0x66, 0x18, 0x05, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x18, 0x2e, 0x61, 0x67, 0x65, 0x6e,
-	0x63, 0x79, 0x2e, 0x50, 0x72, 0x6f, 0x74, 0x6f, 0x63, 0x6f, 0x6c, 0x2e, 0x49, 0x73, 0x73, 0x75,
-	0x69, 0x6e, 0x67, 0x48, 0x00, 0x52, 0x07, 0x63, 0x72, 0x65, 0x64, 0x44, 0x65, 0x66, 0x12, 0x34,
-	0x0a, 0x15, 0x70, 0x72, 0x6f, 0x6f, 0x66, 0x5f, 0x61, 0x74, 0x74, 0x72, 0x69, 0x62, 0x75, 0x74,
-	0x65, 0x73, 0x5f, 0x6a, 0x73, 0x6f, 0x6e, 0x18, 0x06, 0x20, 0x01, 0x28, 0x09, 0x48, 0x00, 0x52,
-	0x13, 0x70, 0x72, 0x6f, 0x6f, 0x66, 0x41, 0x74, 0x74, 0x72, 0x69, 0x62, 0x75, 0x74, 0x65, 0x73,
-	0x4a, 0x73, 0x6f, 0x6e, 0x1a, 0x52, 0x0a, 0x07, 0x49, 0x73, 0x73, 0x75, 0x69, 0x6e, 0x67, 0x12,
-	0x1e, 0x0a, 0x0b, 0x63, 0x72, 0x65, 0x64, 0x5f, 0x64, 0x65, 0x66, 0x5f, 0x69, 0x64, 0x18, 0x01,
-	0x20, 0x01, 0x28, 0x09, 0x52, 0x09, 0x63, 0x72, 0x65, 0x64, 0x44, 0x65, 0x66, 0x49, 0x64, 0x12,
-	0x27, 0x0a, 0x0f, 0x61, 0x74, 0x74, 0x72, 0x69, 0x62, 0x75, 0x74, 0x65, 0x73, 0x5f, 0x6a, 0x73,
-	0x6f, 0x6e, 0x18, 0x02, 0x20, 0x01, 0x28, 0x09, 0x52, 0x0e, 0x61, 0x74, 0x74, 0x72, 0x69, 0x62,
-	0x75, 0x74, 0x65, 0x73, 0x4a, 0x73, 0x6f, 0x6e, 0x22, 0x7f, 0x0a, 0x04, 0x54, 0x79, 0x70, 0x65,
-	0x12, 0x0b, 0x0a, 0x07, 0x43, 0x4f, 0x4e, 0x4e, 0x45, 0x43, 0x54, 0x10, 0x00, 0x12, 0x09, 0x0a,
-	0x05, 0x49, 0x53, 0x53, 0x55, 0x45, 0x10, 0x01, 0x12, 0x13, 0x0a, 0x0f, 0x50, 0x52, 0x4f, 0x50,
-	0x4f, 0x53, 0x45, 0x5f, 0x49, 0x53, 0x53, 0x55, 0x49, 0x4e, 0x47, 0x10, 0x02, 0x12, 0x11, 0x0a,
-	0x0d, 0x52, 0x45, 0x51, 0x55, 0x45, 0x53, 0x54, 0x5f, 0x50, 0x52, 0x4f, 0x4f, 0x46, 0x10, 0x03,
-	0x12, 0x14, 0x0a, 0x10, 0x50, 0x52, 0x4f, 0x50, 0x4f, 0x53, 0x45, 0x5f, 0x50, 0x52, 0x4f, 0x4f,
-	0x46, 0x49, 0x4e, 0x47, 0x10, 0x04, 0x12, 0x0e, 0x0a, 0x0a, 0x54, 0x52, 0x55, 0x53, 0x54, 0x5f,
-	0x50, 0x49, 0x4e, 0x47, 0x10, 0x05, 0x12, 0x11, 0x0a, 0x0d, 0x42, 0x41, 0x53, 0x49, 0x43, 0x5f,
-	0x4d, 0x45, 0x53, 0x53, 0x41, 0x47, 0x45, 0x10, 0x06, 0x42, 0x0a, 0x0a, 0x08, 0x53, 0x74, 0x61,
-	0x72, 0x74, 0x4d, 0x73, 0x67, 0x22, 0x4c, 0x0a, 0x0a, 0x50, 0x72, 0x6f, 0x74, 0x6f, 0x63, 0x6f,
-	0x6c, 0x49, 0x44, 0x12, 0x2e, 0x0a, 0x07, 0x74, 0x79, 0x70, 0x65, 0x5f, 0x69, 0x64, 0x18, 0x01,
-	0x20, 0x01, 0x28, 0x0e, 0x32, 0x15, 0x2e, 0x61, 0x67, 0x65, 0x6e, 0x63, 0x79, 0x2e, 0x50, 0x72,
-	0x6f, 0x74, 0x6f, 0x63, 0x6f, 0x6c, 0x2e, 0x54, 0x79, 0x70, 0x65, 0x52, 0x06, 0x74, 0x79, 0x70,
-	0x65, 0x49, 0x64, 0x12, 0x0e, 0x0a, 0x02, 0x69, 0x64, 0x18, 0x02, 0x20, 0x01, 0x28, 0x09, 0x52,
-	0x02, 0x69, 0x64, 0x22, 0xb6, 0x01, 0x0a, 0x0d, 0x50, 0x72, 0x6f, 0x74, 0x6f, 0x63, 0x6f, 0x6c,
-	0x53, 0x74, 0x61, 0x74, 0x65, 0x12, 0x33, 0x0a, 0x0b, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x63, 0x6f,
-	0x6c, 0x5f, 0x69, 0x64, 0x18, 0x01, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x12, 0x2e, 0x61, 0x67, 0x65,
-	0x6e, 0x63, 0x79, 0x2e, 0x50, 0x72, 0x6f, 0x74, 0x6f, 0x63, 0x6f, 0x6c, 0x49, 0x44, 0x52, 0x0a,
-	0x70, 0x72, 0x6f, 0x74, 0x6f, 0x63, 0x6f, 0x6c, 0x49, 0x64, 0x12, 0x31, 0x0a, 0x05, 0x73, 0x74,
-	0x61, 0x74, 0x65, 0x18, 0x02, 0x20, 0x01, 0x28, 0x0e, 0x32, 0x1b, 0x2e, 0x61, 0x67, 0x65, 0x6e,
-	0x63, 0x79, 0x2e, 0x50, 0x72, 0x6f, 0x74, 0x6f, 0x63, 0x6f, 0x6c, 0x53, 0x74, 0x61, 0x74, 0x65,
-	0x2e, 0x53, 0x74, 0x61, 0x74, 0x65, 0x52, 0x05, 0x73, 0x74, 0x61, 0x74, 0x65, 0x12, 0x12, 0x0a,
-	0x04, 0x69, 0x6e, 0x66, 0x6f, 0x18, 0x03, 0x20, 0x01, 0x28, 0x09, 0x52, 0x04, 0x69, 0x6e, 0x66,
-	0x6f, 0x22, 0x29, 0x0a, 0x05, 0x53, 0x74, 0x61, 0x74, 0x65, 0x12, 0x06, 0x0a, 0x02, 0x4f, 0x4b,
-	0x10, 0x00, 0x12, 0x07, 0x0a, 0x03, 0x45, 0x52, 0x52, 0x10, 0x01, 0x12, 0x0f, 0x0a, 0x0b, 0x57,
-	0x41, 0x49, 0x54, 0x5f, 0x41, 0x43, 0x54, 0x49, 0x4f, 0x4e, 0x10, 0x02, 0x22, 0x75, 0x0a, 0x0e,
-	0x50, 0x72, 0x6f, 0x74, 0x6f, 0x63, 0x6f, 0x6c, 0x53, 0x74, 0x61, 0x74, 0x75, 0x73, 0x12, 0x2b,
-	0x0a, 0x05, 0x73, 0x74, 0x61, 0x74, 0x65, 0x18, 0x01, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x15, 0x2e,
-	0x61, 0x67, 0x65, 0x6e, 0x63, 0x79, 0x2e, 0x50, 0x72, 0x6f, 0x74, 0x6f, 0x63, 0x6f, 0x6c, 0x53,
-	0x74, 0x61, 0x74, 0x65, 0x52, 0x05, 0x73, 0x74, 0x61, 0x74, 0x65, 0x12, 0x18, 0x0a, 0x07, 0x4d,
-	0x65, 0x73, 0x73, 0x61, 0x67, 0x65, 0x18, 0x02, 0x20, 0x01, 0x28, 0x09, 0x52, 0x07, 0x4d, 0x65,
-	0x73, 0x73, 0x61, 0x67, 0x65, 0x12, 0x1c, 0x0a, 0x09, 0x74, 0x69, 0x6d, 0x65, 0x73, 0x74, 0x61,
-	0x6d, 0x70, 0x18, 0x03, 0x20, 0x01, 0x28, 0x04, 0x52, 0x09, 0x74, 0x69, 0x6d, 0x65, 0x73, 0x74,
-	0x61, 0x6d, 0x70, 0x32, 0xa6, 0x01, 0x0a, 0x07, 0x44, 0x49, 0x44, 0x43, 0x6f, 0x6d, 0x6d, 0x12,
-	0x32, 0x0a, 0x03, 0x52, 0x75, 0x6e, 0x12, 0x10, 0x2e, 0x61, 0x67, 0x65, 0x6e, 0x63, 0x79, 0x2e,
-	0x50, 0x72, 0x6f, 0x74, 0x6f, 0x63, 0x6f, 0x6c, 0x1a, 0x15, 0x2e, 0x61, 0x67, 0x65, 0x6e, 0x63,
-	0x79, 0x2e, 0x50, 0x72, 0x6f, 0x74, 0x6f, 0x63, 0x6f, 0x6c, 0x53, 0x74, 0x61, 0x74, 0x65, 0x22,
-	0x00, 0x30, 0x01, 0x12, 0x2f, 0x0a, 0x05, 0x53, 0x74, 0x61, 0x72, 0x74, 0x12, 0x10, 0x2e, 0x61,
-	0x67, 0x65, 0x6e, 0x63, 0x79, 0x2e, 0x50, 0x72, 0x6f, 0x74, 0x6f, 0x63, 0x6f, 0x6c, 0x1a, 0x12,
-	0x2e, 0x61, 0x67, 0x65, 0x6e, 0x63, 0x79, 0x2e, 0x50, 0x72, 0x6f, 0x74, 0x6f, 0x63, 0x6f, 0x6c,
-	0x49, 0x44, 0x22, 0x00, 0x12, 0x36, 0x0a, 0x06, 0x53, 0x74, 0x61, 0x74, 0x75, 0x73, 0x12, 0x12,
-	0x2e, 0x61, 0x67, 0x65, 0x6e, 0x63, 0x79, 0x2e, 0x50, 0x72, 0x6f, 0x74, 0x6f, 0x63, 0x6f, 0x6c,
-	0x49, 0x44, 0x1a, 0x16, 0x2e, 0x61, 0x67, 0x65, 0x6e, 0x63, 0x79, 0x2e, 0x50, 0x72, 0x6f, 0x74,
-	0x6f, 0x63, 0x6f, 0x6c, 0x53, 0x74, 0x61, 0x74, 0x75, 0x73, 0x22, 0x00, 0x32, 0x68, 0x0a, 0x05,
-	0x41, 0x67, 0x65, 0x6e, 0x74, 0x12, 0x33, 0x0a, 0x06, 0x4c, 0x69, 0x73, 0x74, 0x65, 0x6e, 0x12,
-	0x10, 0x2e, 0x61, 0x67, 0x65, 0x6e, 0x63, 0x79, 0x2e, 0x43, 0x6c, 0x69, 0x65, 0x6e, 0x74, 0x49,
-	0x44, 0x1a, 0x13, 0x2e, 0x61, 0x67, 0x65, 0x6e, 0x63, 0x79, 0x2e, 0x41, 0x67, 0x65, 0x6e, 0x74,
-	0x53, 0x74, 0x61, 0x74, 0x75, 0x73, 0x22, 0x00, 0x30, 0x01, 0x12, 0x2a, 0x0a, 0x04, 0x47, 0x69,
-	0x76, 0x65, 0x12, 0x0e, 0x2e, 0x61, 0x67, 0x65, 0x6e, 0x63, 0x79, 0x2e, 0x41, 0x6e, 0x73, 0x77,
-	0x65, 0x72, 0x1a, 0x10, 0x2e, 0x61, 0x67, 0x65, 0x6e, 0x63, 0x79, 0x2e, 0x43, 0x6c, 0x69, 0x65,
-	0x6e, 0x74, 0x49, 0x44, 0x22, 0x00, 0x42, 0x36, 0x5a, 0x34, 0x67, 0x69, 0x74, 0x68, 0x75, 0x62,
-	0x2e, 0x63, 0x6f, 0x6d, 0x2f, 0x66, 0x69, 0x6e, 0x64, 0x79, 0x2d, 0x6e, 0x65, 0x74, 0x77, 0x6f,
-	0x72, 0x6b, 0x2f, 0x66, 0x69, 0x6e, 0x64, 0x79, 0x2d, 0x61, 0x67, 0x65, 0x6e, 0x74, 0x2d, 0x61,
-	0x70, 0x69, 0x2f, 0x67, 0x72, 0x70, 0x63, 0x2f, 0x61, 0x67, 0x65, 0x6e, 0x63, 0x79, 0x62, 0x06,
-	0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
+	0x61, 0x67, 0x65, 0x6e, 0x63, 0x79, 0x22, 0x32, 0x0a, 0x0c, 0x41, 0x67, 0x65, 0x6e, 0x63, 0x79,
+	0x53, 0x74, 0x61, 0x74, 0x75, 0x73, 0x12, 0x0e, 0x0a, 0x02, 0x69, 0x64, 0x18, 0x01, 0x20, 0x01,
+	0x28, 0x09, 0x52, 0x02, 0x69, 0x64, 0x12, 0x12, 0x0a, 0x04, 0x69, 0x6e, 0x66, 0x6f, 0x18, 0x02,
+	0x20, 0x01, 0x28, 0x09, 0x52, 0x04, 0x69, 0x6e, 0x66, 0x6f, 0x22, 0x1a, 0x0a, 0x08, 0x44, 0x61,
+	0x74, 0x61, 0x48, 0x6f, 0x6f, 0x6b, 0x12, 0x0e, 0x0a, 0x02, 0x69, 0x64, 0x18, 0x01, 0x20, 0x01,
+	0x28, 0x09, 0x52, 0x02, 0x69, 0x64, 0x22, 0x7c, 0x0a, 0x03, 0x43, 0x6d, 0x64, 0x12, 0x24, 0x0a,
+	0x04, 0x74, 0x79, 0x70, 0x65, 0x18, 0x01, 0x20, 0x01, 0x28, 0x0e, 0x32, 0x10, 0x2e, 0x61, 0x67,
+	0x65, 0x6e, 0x63, 0x79, 0x2e, 0x43, 0x6d, 0x64, 0x2e, 0x54, 0x79, 0x70, 0x65, 0x52, 0x04, 0x74,
+	0x79, 0x70, 0x65, 0x12, 0x1a, 0x0a, 0x07, 0x6c, 0x6f, 0x67, 0x67, 0x69, 0x6e, 0x67, 0x18, 0x02,
+	0x20, 0x01, 0x28, 0x09, 0x48, 0x00, 0x52, 0x07, 0x6c, 0x6f, 0x67, 0x67, 0x69, 0x6e, 0x67, 0x22,
+	0x28, 0x0a, 0x04, 0x54, 0x79, 0x70, 0x65, 0x12, 0x08, 0x0a, 0x04, 0x50, 0x49, 0x4e, 0x47, 0x10,
+	0x00, 0x12, 0x0b, 0x0a, 0x07, 0x4c, 0x4f, 0x47, 0x47, 0x49, 0x4e, 0x47, 0x10, 0x01, 0x12, 0x09,
+	0x0a, 0x05, 0x43, 0x4f, 0x55, 0x4e, 0x54, 0x10, 0x02, 0x42, 0x09, 0x0a, 0x07, 0x52, 0x65, 0x71,
+	0x75, 0x65, 0x73, 0x74, 0x22, 0x6b, 0x0a, 0x09, 0x43, 0x6d, 0x64, 0x52, 0x65, 0x74, 0x75, 0x72,
+	0x6e, 0x12, 0x24, 0x0a, 0x04, 0x74, 0x79, 0x70, 0x65, 0x18, 0x01, 0x20, 0x01, 0x28, 0x0e, 0x32,
+	0x10, 0x2e, 0x61, 0x67, 0x65, 0x6e, 0x63, 0x79, 0x2e, 0x43, 0x6d, 0x64, 0x2e, 0x54, 0x79, 0x70,
+	0x65, 0x52, 0x04, 0x74, 0x79, 0x70, 0x65, 0x12, 0x14, 0x0a, 0x04, 0x70, 0x69, 0x6e, 0x67, 0x18,
+	0x02, 0x20, 0x01, 0x28, 0x09, 0x48, 0x00, 0x52, 0x04, 0x70, 0x69, 0x6e, 0x67, 0x12, 0x16, 0x0a,
+	0x05, 0x63, 0x6f, 0x75, 0x6e, 0x74, 0x18, 0x03, 0x20, 0x01, 0x28, 0x09, 0x48, 0x00, 0x52, 0x05,
+	0x63, 0x6f, 0x75, 0x6e, 0x74, 0x42, 0x0a, 0x0a, 0x08, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73,
+	0x65, 0x32, 0x3f, 0x0a, 0x06, 0x41, 0x67, 0x65, 0x6e, 0x63, 0x79, 0x12, 0x35, 0x0a, 0x07, 0x50,
+	0x53, 0x4d, 0x48, 0x6f, 0x6f, 0x6b, 0x12, 0x10, 0x2e, 0x61, 0x67, 0x65, 0x6e, 0x63, 0x79, 0x2e,
+	0x44, 0x61, 0x74, 0x61, 0x48, 0x6f, 0x6f, 0x6b, 0x1a, 0x14, 0x2e, 0x61, 0x67, 0x65, 0x6e, 0x63,
+	0x79, 0x2e, 0x41, 0x67, 0x65, 0x6e, 0x63, 0x79, 0x53, 0x74, 0x61, 0x74, 0x75, 0x73, 0x22, 0x00,
+	0x30, 0x01, 0x32, 0x33, 0x0a, 0x06, 0x44, 0x65, 0x76, 0x4f, 0x70, 0x73, 0x12, 0x29, 0x0a, 0x05,
+	0x45, 0x6e, 0x74, 0x65, 0x72, 0x12, 0x0b, 0x2e, 0x61, 0x67, 0x65, 0x6e, 0x63, 0x79, 0x2e, 0x43,
+	0x6d, 0x64, 0x1a, 0x11, 0x2e, 0x61, 0x67, 0x65, 0x6e, 0x63, 0x79, 0x2e, 0x43, 0x6d, 0x64, 0x52,
+	0x65, 0x74, 0x75, 0x72, 0x6e, 0x22, 0x00, 0x42, 0x36, 0x5a, 0x34, 0x67, 0x69, 0x74, 0x68, 0x75,
+	0x62, 0x2e, 0x63, 0x6f, 0x6d, 0x2f, 0x66, 0x69, 0x6e, 0x64, 0x79, 0x2d, 0x6e, 0x65, 0x74, 0x77,
+	0x6f, 0x72, 0x6b, 0x2f, 0x66, 0x69, 0x6e, 0x64, 0x79, 0x2d, 0x61, 0x67, 0x65, 0x6e, 0x74, 0x2d,
+	0x61, 0x70, 0x69, 0x2f, 0x67, 0x72, 0x70, 0x63, 0x2f, 0x61, 0x67, 0x65, 0x6e, 0x63, 0x79, 0x62,
+	0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
 }
 
 var (
@@ -970,48 +386,27 @@ func file_agency_proto_rawDescGZIP() []byte {
 	return file_agency_proto_rawDescData
 }
 
-var file_agency_proto_enumTypes = make([]protoimpl.EnumInfo, 3)
-var file_agency_proto_msgTypes = make([]protoimpl.MessageInfo, 9)
+var file_agency_proto_enumTypes = make([]protoimpl.EnumInfo, 1)
+var file_agency_proto_msgTypes = make([]protoimpl.MessageInfo, 4)
 var file_agency_proto_goTypes = []interface{}{
-	(Notification_Type)(0),   // 0: agency.Notification.Type
-	(Protocol_Type)(0),       // 1: agency.Protocol.Type
-	(ProtocolState_State)(0), // 2: agency.ProtocolState.State
-	(*Answer)(nil),           // 3: agency.Answer
-	(*ClientID)(nil),         // 4: agency.ClientID
-	(*AgentStatus)(nil),      // 5: agency.AgentStatus
-	(*Notification)(nil),     // 6: agency.Notification
-	(*Protocol)(nil),         // 7: agency.Protocol
-	(*ProtocolID)(nil),       // 8: agency.ProtocolID
-	(*ProtocolState)(nil),    // 9: agency.ProtocolState
-	(*ProtocolStatus)(nil),   // 10: agency.ProtocolStatus
-	(*Protocol_Issuing)(nil), // 11: agency.Protocol.Issuing
+	(Cmd_Type)(0),        // 0: agency.Cmd.Type
+	(*AgencyStatus)(nil), // 1: agency.AgencyStatus
+	(*DataHook)(nil),     // 2: agency.DataHook
+	(*Cmd)(nil),          // 3: agency.Cmd
+	(*CmdReturn)(nil),    // 4: agency.CmdReturn
 }
 var file_agency_proto_depIdxs = []int32{
-	4,  // 0: agency.Answer.client_id:type_name -> agency.ClientID
-	4,  // 1: agency.AgentStatus.client_id:type_name -> agency.ClientID
-	6,  // 2: agency.AgentStatus.notification:type_name -> agency.Notification
-	0,  // 3: agency.Notification.type_id:type_name -> agency.Notification.Type
-	1,  // 4: agency.Protocol.type_id:type_name -> agency.Protocol.Type
-	11, // 5: agency.Protocol.cred_def:type_name -> agency.Protocol.Issuing
-	1,  // 6: agency.ProtocolID.type_id:type_name -> agency.Protocol.Type
-	8,  // 7: agency.ProtocolState.protocol_id:type_name -> agency.ProtocolID
-	2,  // 8: agency.ProtocolState.state:type_name -> agency.ProtocolState.State
-	9,  // 9: agency.ProtocolStatus.state:type_name -> agency.ProtocolState
-	7,  // 10: agency.DIDComm.Run:input_type -> agency.Protocol
-	7,  // 11: agency.DIDComm.Start:input_type -> agency.Protocol
-	8,  // 12: agency.DIDComm.Status:input_type -> agency.ProtocolID
-	4,  // 13: agency.Agent.Listen:input_type -> agency.ClientID
-	3,  // 14: agency.Agent.Give:input_type -> agency.Answer
-	9,  // 15: agency.DIDComm.Run:output_type -> agency.ProtocolState
-	8,  // 16: agency.DIDComm.Start:output_type -> agency.ProtocolID
-	10, // 17: agency.DIDComm.Status:output_type -> agency.ProtocolStatus
-	5,  // 18: agency.Agent.Listen:output_type -> agency.AgentStatus
-	4,  // 19: agency.Agent.Give:output_type -> agency.ClientID
-	15, // [15:20] is the sub-list for method output_type
-	10, // [10:15] is the sub-list for method input_type
-	10, // [10:10] is the sub-list for extension type_name
-	10, // [10:10] is the sub-list for extension extendee
-	0,  // [0:10] is the sub-list for field type_name
+	0, // 0: agency.Cmd.type:type_name -> agency.Cmd.Type
+	0, // 1: agency.CmdReturn.type:type_name -> agency.Cmd.Type
+	2, // 2: agency.Agency.PSMHook:input_type -> agency.DataHook
+	3, // 3: agency.DevOps.Enter:input_type -> agency.Cmd
+	1, // 4: agency.Agency.PSMHook:output_type -> agency.AgencyStatus
+	4, // 5: agency.DevOps.Enter:output_type -> agency.CmdReturn
+	4, // [4:6] is the sub-list for method output_type
+	2, // [2:4] is the sub-list for method input_type
+	2, // [2:2] is the sub-list for extension type_name
+	2, // [2:2] is the sub-list for extension extendee
+	0, // [0:2] is the sub-list for field type_name
 }
 
 func init() { file_agency_proto_init() }
@@ -1021,7 +416,7 @@ func file_agency_proto_init() {
 	}
 	if !protoimpl.UnsafeEnabled {
 		file_agency_proto_msgTypes[0].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*Answer); i {
+			switch v := v.(*AgencyStatus); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -1033,7 +428,7 @@ func file_agency_proto_init() {
 			}
 		}
 		file_agency_proto_msgTypes[1].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*ClientID); i {
+			switch v := v.(*DataHook); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -1045,7 +440,7 @@ func file_agency_proto_init() {
 			}
 		}
 		file_agency_proto_msgTypes[2].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*AgentStatus); i {
+			switch v := v.(*Cmd); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -1057,67 +452,7 @@ func file_agency_proto_init() {
 			}
 		}
 		file_agency_proto_msgTypes[3].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*Notification); i {
-			case 0:
-				return &v.state
-			case 1:
-				return &v.sizeCache
-			case 2:
-				return &v.unknownFields
-			default:
-				return nil
-			}
-		}
-		file_agency_proto_msgTypes[4].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*Protocol); i {
-			case 0:
-				return &v.state
-			case 1:
-				return &v.sizeCache
-			case 2:
-				return &v.unknownFields
-			default:
-				return nil
-			}
-		}
-		file_agency_proto_msgTypes[5].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*ProtocolID); i {
-			case 0:
-				return &v.state
-			case 1:
-				return &v.sizeCache
-			case 2:
-				return &v.unknownFields
-			default:
-				return nil
-			}
-		}
-		file_agency_proto_msgTypes[6].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*ProtocolState); i {
-			case 0:
-				return &v.state
-			case 1:
-				return &v.sizeCache
-			case 2:
-				return &v.unknownFields
-			default:
-				return nil
-			}
-		}
-		file_agency_proto_msgTypes[7].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*ProtocolStatus); i {
-			case 0:
-				return &v.state
-			case 1:
-				return &v.sizeCache
-			case 2:
-				return &v.unknownFields
-			default:
-				return nil
-			}
-		}
-		file_agency_proto_msgTypes[8].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*Protocol_Issuing); i {
+			switch v := v.(*CmdReturn); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -1129,18 +464,20 @@ func file_agency_proto_init() {
 			}
 		}
 	}
-	file_agency_proto_msgTypes[4].OneofWrappers = []interface{}{
-		(*Protocol_InvitationJson)(nil),
-		(*Protocol_CredDef)(nil),
-		(*Protocol_ProofAttributesJson)(nil),
+	file_agency_proto_msgTypes[2].OneofWrappers = []interface{}{
+		(*Cmd_Logging)(nil),
+	}
+	file_agency_proto_msgTypes[3].OneofWrappers = []interface{}{
+		(*CmdReturn_Ping)(nil),
+		(*CmdReturn_Count)(nil),
 	}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: file_agency_proto_rawDesc,
-			NumEnums:      3,
-			NumMessages:   9,
+			NumEnums:      1,
+			NumMessages:   4,
 			NumExtensions: 0,
 			NumServices:   2,
 		},

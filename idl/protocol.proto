@@ -1,0 +1,109 @@
+// Copyright 2020 Harri @ OP Techlab.
+//
+
+syntax = "proto3";
+
+option go_package = "github.com/findy-network/findy-agent-api/grpc/agency";
+
+package agency;
+
+/*
+DIDComm is service to run and monitor DIDComm protocols. The findy agency
+handles protocols as state machines. The protocol state machines are optimized
+for performance and stability on high load. Please remember to call Release
+after protocol is finalized. If state machines aren't released by caller the
+agency will release them by force sooner or later.
+ */
+service DIDComm {
+  // Run is async function to start a protocol and return a stream to listen to
+  // its progress.
+  rpc Run(Protocol) returns (stream ProtocolState) {}
+
+  // Start asks the agency to start a protocol. It immediately returns a
+  // protocol id that allows to monitor protocol with the Status function. If
+  // Agent service's Listen is in use, we get a notification when protocol is
+  // ready.
+  rpc Start(Protocol) returns (ProtocolID) {}
+
+  // Status returns a current ProtocolStatus. ProtocolStatus is under
+  // construction TODO
+  rpc Status(ProtocolID) returns (ProtocolStatus) {}
+
+  // Unpause tells the protocol state machine how to proceed when it's waiting
+  // user action.
+  rpc Unpause(ProtocolState) returns (ProtocolID) {}
+
+  // Release releases the protocol state machine from agency. It can be called
+  // only when protocol is in Ready state. After release you can access the
+  // status information with the others services of your system.
+  rpc Release(ProtocolID) returns (ProtocolState) {}
+}
+
+
+/*
+Protocol is the actual DIDComm/Aries protocol.
+ */
+message Protocol {
+  // Type is enum type to identify the protocol, we aren't tight to Aries strings
+  enum Type {
+    CONNECT = 0;
+    ISSUE = 1;
+    PROPOSE_ISSUING = 2;
+    REQUEST_PROOF = 3;
+    PROPOSE_PROOFING = 4;
+    TRUST_PING = 5;
+    BASIC_MESSAGE = 6;
+  }
+  Type type_id = 1; // Protocol type
+  string prev_thread_id = 2; // Previous protocol ID if there was any
+  string connection_id = 3; // pairwise ID, this only empty when Type is CONNECT
+
+  // Issuing attributes
+  message Issuing {
+    string cred_def_id = 1;
+    string attributes_json = 2;
+  }
+  // Protocol type specific data: one of or no one
+  oneof StartMsg {
+    string invitation_json = 4; // Invitation JSON string, only for CONNECT
+    Issuing cred_def = 5; // Only for Issuing protocol
+    string proof_attributes_json = 6; // Only for Proof protocol
+  }
+}
+
+/*
+Protocol ID is a primary minimal identification of the _current_ protocol
+conversation. Protocol is an elementary concept in SSI. With the protocols we
+build the trust over the state of the connection (aka pairwise). That's why the
+connection ID is always the most important thing and we should drive towards
+reuse of the previous connection when ever it's possible. Still, we operate with
+protocols.
+*/
+message ProtocolID {
+  Protocol.Type type_id = 1; // protocol type
+  string id = 2; // UUID of the current protocol
+}
+
+// ProtocolState is lightest and simplest way to tell outside what is going on
+// during a protocol run.
+message ProtocolState {
+  ProtocolID protocol_id = 1;
+  enum State {
+    OK = 0; // Protocol is finalized successfully
+    ERR = 1; // Protocol is finalized with error or other side NACK
+    WAIT_ACTION = 2; // Protocol is waiting user's action to continue
+
+    ACK = 3; // User tells for the protocol to proceed
+    NACK = 4; // User tells for the protocol not to proceed
+  }
+  State state = 2; // See the State enum, tells whats going on
+  string info = 3; // Extra information, mostly used for debugging
+}
+
+// ProtocolStatus is message to include whole status of the protocol. This is
+// UNDER CONSTRUCTION, TODO
+message ProtocolStatus {
+  ProtocolState state = 1;
+  string Message = 2;
+  uint64 timestamp = 3;
+}
