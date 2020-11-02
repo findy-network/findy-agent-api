@@ -34,7 +34,7 @@ type DIDCommClient interface {
 	// Release releases the protocol state machine from agency. It can be called
 	// only when protocol is in Ready state. After release you can access the
 	// status information with the others services of your system.
-	Release(ctx context.Context, in *ProtocolID, opts ...grpc.CallOption) (*ProtocolState, error)
+	Release(ctx context.Context, in *ProtocolID, opts ...grpc.CallOption) (*ProtocolID, error)
 }
 
 type dIDCommClient struct {
@@ -104,8 +104,8 @@ func (c *dIDCommClient) Unpause(ctx context.Context, in *ProtocolState, opts ...
 	return out, nil
 }
 
-func (c *dIDCommClient) Release(ctx context.Context, in *ProtocolID, opts ...grpc.CallOption) (*ProtocolState, error) {
-	out := new(ProtocolState)
+func (c *dIDCommClient) Release(ctx context.Context, in *ProtocolID, opts ...grpc.CallOption) (*ProtocolID, error) {
+	out := new(ProtocolID)
 	err := c.cc.Invoke(ctx, "/agency.DIDComm/Release", in, out, opts...)
 	if err != nil {
 		return nil, err
@@ -134,7 +134,7 @@ type DIDCommServer interface {
 	// Release releases the protocol state machine from agency. It can be called
 	// only when protocol is in Ready state. After release you can access the
 	// status information with the others services of your system.
-	Release(context.Context, *ProtocolID) (*ProtocolState, error)
+	Release(context.Context, *ProtocolID) (*ProtocolID, error)
 	mustEmbedUnimplementedDIDCommServer()
 }
 
@@ -154,7 +154,7 @@ func (UnimplementedDIDCommServer) Status(context.Context, *ProtocolID) (*Protoco
 func (UnimplementedDIDCommServer) Unpause(context.Context, *ProtocolState) (*ProtocolID, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Unpause not implemented")
 }
-func (UnimplementedDIDCommServer) Release(context.Context, *ProtocolID) (*ProtocolState, error) {
+func (UnimplementedDIDCommServer) Release(context.Context, *ProtocolID) (*ProtocolID, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Release not implemented")
 }
 func (UnimplementedDIDCommServer) mustEmbedUnimplementedDIDCommServer() {}

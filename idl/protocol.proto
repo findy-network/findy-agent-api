@@ -36,7 +36,7 @@ service DIDComm {
   // Release releases the protocol state machine from agency. It can be called
   // only when protocol is in Ready state. After release you can access the
   // status information with the others services of your system.
-  rpc Release(ProtocolID) returns (ProtocolState) {}
+  rpc Release(ProtocolID) returns (ProtocolID) {}
 }
 
 
@@ -53,6 +53,8 @@ message Protocol {
     PROPOSE_PROOFING = 4;
     TRUST_PING = 5;
     BASIC_MESSAGE = 6;
+    CONTINUE_ISSUING = 7;
+    CONTINUE_PROOF = 8;
   }
   Type type_id = 1; // Protocol type
   string prev_thread_id = 2; // Previous protocol ID if there was any
@@ -72,7 +74,7 @@ message Protocol {
 }
 
 /*
-Protocol ID is a primary minimal identification of the _current_ protocol
+ProtocolID is a primary minimal identification of the _current_ protocol
 conversation. Protocol is an elementary concept in SSI. With the protocols we
 build the trust over the state of the connection (aka pairwise). That's why the
 connection ID is always the most important thing and we should drive towards
