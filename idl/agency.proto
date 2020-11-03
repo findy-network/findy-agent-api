@@ -5,9 +5,9 @@ syntax = "proto3";
 
 //import "protocol.proto";
 
-option go_package = "github.com/findy-network/findy-agent-api/grpc/agency";
+option go_package = "github.com/findy-network/findy-agent-api/grpc/ops";
 
-package agency;
+package ops;
 
 /*
 Agency is a service for agency level functionality i.e. multi-tenant features

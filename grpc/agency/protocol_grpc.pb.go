@@ -28,9 +28,9 @@ type DIDCommClient interface {
 	// Status returns a current ProtocolStatus. ProtocolStatus is under
 	// construction TODO
 	Status(ctx context.Context, in *ProtocolID, opts ...grpc.CallOption) (*ProtocolStatus, error)
-	// Unpause tells the protocol state machine how to proceed when it's waiting
+	// Resume tells the protocol state machine how to proceed when it's waiting
 	// user action.
-	Unpause(ctx context.Context, in *ProtocolState, opts ...grpc.CallOption) (*ProtocolID, error)
+	Resume(ctx context.Context, in *ProtocolState, opts ...grpc.CallOption) (*ProtocolID, error)
 	// Release releases the protocol state machine from agency. It can be called
 	// only when protocol is in Ready state. After release you can access the
 	// status information with the others services of your system.
@@ -95,9 +95,9 @@ func (c *dIDCommClient) Status(ctx context.Context, in *ProtocolID, opts ...grpc
 	return out, nil
 }
 
-func (c *dIDCommClient) Unpause(ctx context.Context, in *ProtocolState, opts ...grpc.CallOption) (*ProtocolID, error) {
+func (c *dIDCommClient) Resume(ctx context.Context, in *ProtocolState, opts ...grpc.CallOption) (*ProtocolID, error) {
 	out := new(ProtocolID)
-	err := c.cc.Invoke(ctx, "/agency.DIDComm/Unpause", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/agency.DIDComm/Resume", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -128,9 +128,9 @@ type DIDCommServer interface {
 	// Status returns a current ProtocolStatus. ProtocolStatus is under
 	// construction TODO
 	Status(context.Context, *ProtocolID) (*ProtocolStatus, error)
-	// Unpause tells the protocol state machine how to proceed when it's waiting
+	// Resume tells the protocol state machine how to proceed when it's waiting
 	// user action.
-	Unpause(context.Context, *ProtocolState) (*ProtocolID, error)
+	Resume(context.Context, *ProtocolState) (*ProtocolID, error)
 	// Release releases the protocol state machine from agency. It can be called
 	// only when protocol is in Ready state. After release you can access the
 	// status information with the others services of your system.
@@ -151,8 +151,8 @@ func (UnimplementedDIDCommServer) Start(context.Context, *Protocol) (*ProtocolID
 func (UnimplementedDIDCommServer) Status(context.Context, *ProtocolID) (*ProtocolStatus, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Status not implemented")
 }
-func (UnimplementedDIDCommServer) Unpause(context.Context, *ProtocolState) (*ProtocolID, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method Unpause not implemented")
+func (UnimplementedDIDCommServer) Resume(context.Context, *ProtocolState) (*ProtocolID, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Resume not implemented")
 }
 func (UnimplementedDIDCommServer) Release(context.Context, *ProtocolID) (*ProtocolID, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Release not implemented")
@@ -227,20 +227,20 @@ func _DIDComm_Status_Handler(srv interface{}, ctx context.Context, dec func(inte
 	return interceptor(ctx, in, info, handler)
 }
 
-func _DIDComm_Unpause_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _DIDComm_Resume_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(ProtocolState)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(DIDCommServer).Unpause(ctx, in)
+		return srv.(DIDCommServer).Resume(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/agency.DIDComm/Unpause",
+		FullMethod: "/agency.DIDComm/Resume",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(DIDCommServer).Unpause(ctx, req.(*ProtocolState))
+		return srv.(DIDCommServer).Resume(ctx, req.(*ProtocolState))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -276,8 +276,8 @@ var _DIDComm_serviceDesc = grpc.ServiceDesc{
 			Handler:    _DIDComm_Status_Handler,
 		},
 		{
-			MethodName: "Unpause",
-			Handler:    _DIDComm_Unpause_Handler,
+			MethodName: "Resume",
+			Handler:    _DIDComm_Resume_Handler,
 		},
 		{
 			MethodName: "Release",
