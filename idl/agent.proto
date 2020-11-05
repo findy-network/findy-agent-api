@@ -1,0 +1,66 @@
+// Copyright 2020 Harri @ OP Techlab.
+//
+
+syntax = "proto3";
+
+option go_package = "github.com/findy-network/findy-agent-api/grpc/agency";
+
+package agency;
+
+/*
+Agent is a service to communicate with your cloud agent.
+ */
+service Agent {
+  // Listen is async function to stream AgentStatus. ClientID must be unique.
+  rpc Listen(ClientID) returns (stream AgentStatus) {}
+
+  // Give is function to give answer to ACTION_NEEDED_xx notifications.
+  rpc Give(Answer) returns (ClientID) {}
+}
+
+/*
+Answer is a message send by Give function of Agent service.
+ */
+message Answer {
+  string id = 1; // Same as Notification ID (UUID)
+  ClientID client_id = 2; // Same as your ClientID when Listening was started
+  bool ack = 3; // Your response to the protocol question
+  string info = 4; // General info, mostly used for debugging
+}
+
+// ClientID is UUID. If user has many different client device connected to
+// cloud agent it must identify who is talking to.
+message ClientID {
+  string id = 1; // UUID of the client
+}
+
+/*
+AgentStatus is a message identifying current agent events returned as
+notifications.
+ */
+message AgentStatus {
+  ClientID client_id = 1; // UUID of the client listening
+  Notification notification = 3; // The actual Notification message
+}
+
+/*
+Notification is a message used to tell meaningful events outside from cloud
+agent.
+ */
+message Notification {
+  // Type is enum type to tell what happening
+  enum Type {
+    STATUS_UPDATE = 0; // General status update where no action needed
+    ACTION_NEEDED = 1; // General action needed update notification
+    ACTION_NEEDED_PING = 2; // Your CA controller has been pinged
+    ACTION_NEEDED_ISSUE_PROPOSE = 3; // Issuing is proposed
+    ACTION_NEEDED_PROOF_PROPOSE = 4; // Proof is proposed
+    ACTION_NEEDED_PROOF_VERIFY = 5; // During proof values need to be verified
+  }
+  Type type_id = 1; // Notification type, see Type
+  string id = 2; // Notification's unique ID
+  string connection_id = 3; // Current pairwise ID between agents
+  string protocol_id = 4; // Current protocol ID, see Aries Thread ID
+  string protocol_family = 5; // Text version of the protocol family/namespace
+  uint64 timestamp = 6; // timestamp in ms
+}
