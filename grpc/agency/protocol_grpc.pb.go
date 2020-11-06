@@ -25,8 +25,8 @@ type DIDCommClient interface {
 	// Agent service's Listen is in use, we get a notification when protocol is
 	// ready.
 	Start(ctx context.Context, in *Protocol, opts ...grpc.CallOption) (*ProtocolID, error)
-	// Status returns a current ProtocolStatus. ProtocolStatus is under
-	// construction TODO
+	// Status returns a current ProtocolStatus which offers both typed data fields
+	// and combined JSON string.
 	Status(ctx context.Context, in *ProtocolID, opts ...grpc.CallOption) (*ProtocolStatus, error)
 	// Resume tells the protocol state machine how to proceed when it's waiting
 	// user action.
@@ -125,8 +125,8 @@ type DIDCommServer interface {
 	// Agent service's Listen is in use, we get a notification when protocol is
 	// ready.
 	Start(context.Context, *Protocol) (*ProtocolID, error)
-	// Status returns a current ProtocolStatus. ProtocolStatus is under
-	// construction TODO
+	// Status returns a current ProtocolStatus which offers both typed data fields
+	// and combined JSON string.
 	Status(context.Context, *ProtocolID) (*ProtocolStatus, error)
 	// Resume tells the protocol state machine how to proceed when it's waiting
 	// user action.
