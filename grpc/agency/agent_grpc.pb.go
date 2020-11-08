@@ -21,6 +21,7 @@ type AgentClient interface {
 	Listen(ctx context.Context, in *ClientID, opts ...grpc.CallOption) (Agent_ListenClient, error)
 	// Give is function to give answer to ACTION_NEEDED_xx notifications.
 	Give(ctx context.Context, in *Answer, opts ...grpc.CallOption) (*ClientID, error)
+	CreateInvitation(ctx context.Context, in *InvitationBase, opts ...grpc.CallOption) (*Invitation, error)
 }
 
 type agentClient struct {
@@ -72,6 +73,15 @@ func (c *agentClient) Give(ctx context.Context, in *Answer, opts ...grpc.CallOpt
 	return out, nil
 }
 
+func (c *agentClient) CreateInvitation(ctx context.Context, in *InvitationBase, opts ...grpc.CallOption) (*Invitation, error) {
+	out := new(Invitation)
+	err := c.cc.Invoke(ctx, "/agency.Agent/CreateInvitation", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // AgentServer is the server API for Agent service.
 // All implementations must embed UnimplementedAgentServer
 // for forward compatibility
@@ -80,6 +90,7 @@ type AgentServer interface {
 	Listen(*ClientID, Agent_ListenServer) error
 	// Give is function to give answer to ACTION_NEEDED_xx notifications.
 	Give(context.Context, *Answer) (*ClientID, error)
+	CreateInvitation(context.Context, *InvitationBase) (*Invitation, error)
 	mustEmbedUnimplementedAgentServer()
 }
 
@@ -92,6 +103,9 @@ func (UnimplementedAgentServer) Listen(*ClientID, Agent_ListenServer) error {
 }
 func (UnimplementedAgentServer) Give(context.Context, *Answer) (*ClientID, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Give not implemented")
+}
+func (UnimplementedAgentServer) CreateInvitation(context.Context, *InvitationBase) (*Invitation, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method CreateInvitation not implemented")
 }
 func (UnimplementedAgentServer) mustEmbedUnimplementedAgentServer() {}
 
@@ -145,6 +159,24 @@ func _Agent_Give_Handler(srv interface{}, ctx context.Context, dec func(interfac
 	return interceptor(ctx, in, info, handler)
 }
 
+func _Agent_CreateInvitation_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(InvitationBase)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AgentServer).CreateInvitation(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/agency.Agent/CreateInvitation",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AgentServer).CreateInvitation(ctx, req.(*InvitationBase))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 var _Agent_serviceDesc = grpc.ServiceDesc{
 	ServiceName: "agency.Agent",
 	HandlerType: (*AgentServer)(nil),
@@ -152,6 +184,10 @@ var _Agent_serviceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "Give",
 			Handler:    _Agent_Give_Handler,
+		},
+		{
+			MethodName: "CreateInvitation",
+			Handler:    _Agent_CreateInvitation_Handler,
 		},
 	},
 	Streams: []grpc.StreamDesc{

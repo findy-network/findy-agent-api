@@ -16,6 +16,19 @@ service Agent {
 
   // Give is function to give answer to ACTION_NEEDED_xx notifications.
   rpc Give(Answer) returns (ClientID) {}
+
+  rpc CreateInvitation(InvitationBase) returns (Invitation) {}
+}
+
+message InvitationBase {
+  string label = 1;
+  string id = 2;
+  int64 expiration = 3; // not implemented yet
+}
+
+message Invitation {
+  string json_str = 1;
+  string url = 2; // not implemented yet
 }
 
 /*
