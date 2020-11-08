@@ -79,7 +79,62 @@ func (x Notification_Type) Number() protoreflect.EnumNumber {
 
 // Deprecated: Use Notification_Type.Descriptor instead.
 func (Notification_Type) EnumDescriptor() ([]byte, []int) {
-	return file_agent_proto_rawDescGZIP(), []int{5, 0}
+	return file_agent_proto_rawDescGZIP(), []int{6, 0}
+}
+
+type SAImplementation struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Id       string `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	Endpoint string `protobuf:"bytes,2,opt,name=endpoint,proto3" json:"endpoint,omitempty"`
+}
+
+func (x *SAImplementation) Reset() {
+	*x = SAImplementation{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_agent_proto_msgTypes[0]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *SAImplementation) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*SAImplementation) ProtoMessage() {}
+
+func (x *SAImplementation) ProtoReflect() protoreflect.Message {
+	mi := &file_agent_proto_msgTypes[0]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use SAImplementation.ProtoReflect.Descriptor instead.
+func (*SAImplementation) Descriptor() ([]byte, []int) {
+	return file_agent_proto_rawDescGZIP(), []int{0}
+}
+
+func (x *SAImplementation) GetId() string {
+	if x != nil {
+		return x.Id
+	}
+	return ""
+}
+
+func (x *SAImplementation) GetEndpoint() string {
+	if x != nil {
+		return x.Endpoint
+	}
+	return ""
 }
 
 type InvitationBase struct {
@@ -95,7 +150,7 @@ type InvitationBase struct {
 func (x *InvitationBase) Reset() {
 	*x = InvitationBase{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_agent_proto_msgTypes[0]
+		mi := &file_agent_proto_msgTypes[1]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -108,7 +163,7 @@ func (x *InvitationBase) String() string {
 func (*InvitationBase) ProtoMessage() {}
 
 func (x *InvitationBase) ProtoReflect() protoreflect.Message {
-	mi := &file_agent_proto_msgTypes[0]
+	mi := &file_agent_proto_msgTypes[1]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -121,7 +176,7 @@ func (x *InvitationBase) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use InvitationBase.ProtoReflect.Descriptor instead.
 func (*InvitationBase) Descriptor() ([]byte, []int) {
-	return file_agent_proto_rawDescGZIP(), []int{0}
+	return file_agent_proto_rawDescGZIP(), []int{1}
 }
 
 func (x *InvitationBase) GetLabel() string {
@@ -157,7 +212,7 @@ type Invitation struct {
 func (x *Invitation) Reset() {
 	*x = Invitation{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_agent_proto_msgTypes[1]
+		mi := &file_agent_proto_msgTypes[2]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -170,7 +225,7 @@ func (x *Invitation) String() string {
 func (*Invitation) ProtoMessage() {}
 
 func (x *Invitation) ProtoReflect() protoreflect.Message {
-	mi := &file_agent_proto_msgTypes[1]
+	mi := &file_agent_proto_msgTypes[2]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -183,7 +238,7 @@ func (x *Invitation) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use Invitation.ProtoReflect.Descriptor instead.
 func (*Invitation) Descriptor() ([]byte, []int) {
-	return file_agent_proto_rawDescGZIP(), []int{1}
+	return file_agent_proto_rawDescGZIP(), []int{2}
 }
 
 func (x *Invitation) GetJsonStr() string {
@@ -216,7 +271,7 @@ type Answer struct {
 func (x *Answer) Reset() {
 	*x = Answer{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_agent_proto_msgTypes[2]
+		mi := &file_agent_proto_msgTypes[3]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -229,7 +284,7 @@ func (x *Answer) String() string {
 func (*Answer) ProtoMessage() {}
 
 func (x *Answer) ProtoReflect() protoreflect.Message {
-	mi := &file_agent_proto_msgTypes[2]
+	mi := &file_agent_proto_msgTypes[3]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -242,7 +297,7 @@ func (x *Answer) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use Answer.ProtoReflect.Descriptor instead.
 func (*Answer) Descriptor() ([]byte, []int) {
-	return file_agent_proto_rawDescGZIP(), []int{2}
+	return file_agent_proto_rawDescGZIP(), []int{3}
 }
 
 func (x *Answer) GetId() string {
@@ -286,7 +341,7 @@ type ClientID struct {
 func (x *ClientID) Reset() {
 	*x = ClientID{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_agent_proto_msgTypes[3]
+		mi := &file_agent_proto_msgTypes[4]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -299,7 +354,7 @@ func (x *ClientID) String() string {
 func (*ClientID) ProtoMessage() {}
 
 func (x *ClientID) ProtoReflect() protoreflect.Message {
-	mi := &file_agent_proto_msgTypes[3]
+	mi := &file_agent_proto_msgTypes[4]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -312,7 +367,7 @@ func (x *ClientID) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ClientID.ProtoReflect.Descriptor instead.
 func (*ClientID) Descriptor() ([]byte, []int) {
-	return file_agent_proto_rawDescGZIP(), []int{3}
+	return file_agent_proto_rawDescGZIP(), []int{4}
 }
 
 func (x *ClientID) GetId() string {
@@ -337,7 +392,7 @@ type AgentStatus struct {
 func (x *AgentStatus) Reset() {
 	*x = AgentStatus{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_agent_proto_msgTypes[4]
+		mi := &file_agent_proto_msgTypes[5]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -350,7 +405,7 @@ func (x *AgentStatus) String() string {
 func (*AgentStatus) ProtoMessage() {}
 
 func (x *AgentStatus) ProtoReflect() protoreflect.Message {
-	mi := &file_agent_proto_msgTypes[4]
+	mi := &file_agent_proto_msgTypes[5]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -363,7 +418,7 @@ func (x *AgentStatus) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use AgentStatus.ProtoReflect.Descriptor instead.
 func (*AgentStatus) Descriptor() ([]byte, []int) {
-	return file_agent_proto_rawDescGZIP(), []int{4}
+	return file_agent_proto_rawDescGZIP(), []int{5}
 }
 
 func (x *AgentStatus) GetClientId() *ClientID {
@@ -399,7 +454,7 @@ type Notification struct {
 func (x *Notification) Reset() {
 	*x = Notification{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_agent_proto_msgTypes[5]
+		mi := &file_agent_proto_msgTypes[6]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -412,7 +467,7 @@ func (x *Notification) String() string {
 func (*Notification) ProtoMessage() {}
 
 func (x *Notification) ProtoReflect() protoreflect.Message {
-	mi := &file_agent_proto_msgTypes[5]
+	mi := &file_agent_proto_msgTypes[6]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -425,7 +480,7 @@ func (x *Notification) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use Notification.ProtoReflect.Descriptor instead.
 func (*Notification) Descriptor() ([]byte, []int) {
-	return file_agent_proto_rawDescGZIP(), []int{5}
+	return file_agent_proto_rawDescGZIP(), []int{6}
 }
 
 func (x *Notification) GetTypeId() Notification_Type {
@@ -474,7 +529,11 @@ var File_agent_proto protoreflect.FileDescriptor
 
 var file_agent_proto_rawDesc = []byte{
 	0x0a, 0x0b, 0x61, 0x67, 0x65, 0x6e, 0x74, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x12, 0x06, 0x61,
-	0x67, 0x65, 0x6e, 0x63, 0x79, 0x22, 0x56, 0x0a, 0x0e, 0x49, 0x6e, 0x76, 0x69, 0x74, 0x61, 0x74,
+	0x67, 0x65, 0x6e, 0x63, 0x79, 0x22, 0x3e, 0x0a, 0x10, 0x53, 0x41, 0x49, 0x6d, 0x70, 0x6c, 0x65,
+	0x6d, 0x65, 0x6e, 0x74, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x12, 0x0e, 0x0a, 0x02, 0x69, 0x64, 0x18,
+	0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x02, 0x69, 0x64, 0x12, 0x1a, 0x0a, 0x08, 0x65, 0x6e, 0x64,
+	0x70, 0x6f, 0x69, 0x6e, 0x74, 0x18, 0x02, 0x20, 0x01, 0x28, 0x09, 0x52, 0x08, 0x65, 0x6e, 0x64,
+	0x70, 0x6f, 0x69, 0x6e, 0x74, 0x22, 0x56, 0x0a, 0x0e, 0x49, 0x6e, 0x76, 0x69, 0x74, 0x61, 0x74,
 	0x69, 0x6f, 0x6e, 0x42, 0x61, 0x73, 0x65, 0x12, 0x14, 0x0a, 0x05, 0x6c, 0x61, 0x62, 0x65, 0x6c,
 	0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x05, 0x6c, 0x61, 0x62, 0x65, 0x6c, 0x12, 0x0e, 0x0a,
 	0x02, 0x69, 0x64, 0x18, 0x02, 0x20, 0x01, 0x28, 0x09, 0x52, 0x02, 0x69, 0x64, 0x12, 0x1e, 0x0a,
@@ -524,7 +583,7 @@ var file_agent_proto_rawDesc = []byte{
 	0x4e, 0x45, 0x45, 0x44, 0x45, 0x44, 0x5f, 0x50, 0x52, 0x4f, 0x4f, 0x46, 0x5f, 0x50, 0x52, 0x4f,
 	0x50, 0x4f, 0x53, 0x45, 0x10, 0x04, 0x12, 0x1e, 0x0a, 0x1a, 0x41, 0x4e, 0x53, 0x57, 0x45, 0x52,
 	0x5f, 0x4e, 0x45, 0x45, 0x44, 0x45, 0x44, 0x5f, 0x50, 0x52, 0x4f, 0x4f, 0x46, 0x5f, 0x56, 0x45,
-	0x52, 0x49, 0x46, 0x59, 0x10, 0x05, 0x32, 0xaa, 0x01, 0x0a, 0x05, 0x41, 0x67, 0x65, 0x6e, 0x74,
+	0x52, 0x49, 0x46, 0x59, 0x10, 0x05, 0x32, 0xed, 0x01, 0x0a, 0x05, 0x41, 0x67, 0x65, 0x6e, 0x74,
 	0x12, 0x33, 0x0a, 0x06, 0x4c, 0x69, 0x73, 0x74, 0x65, 0x6e, 0x12, 0x10, 0x2e, 0x61, 0x67, 0x65,
 	0x6e, 0x63, 0x79, 0x2e, 0x43, 0x6c, 0x69, 0x65, 0x6e, 0x74, 0x49, 0x44, 0x1a, 0x13, 0x2e, 0x61,
 	0x67, 0x65, 0x6e, 0x63, 0x79, 0x2e, 0x41, 0x67, 0x65, 0x6e, 0x74, 0x53, 0x74, 0x61, 0x74, 0x75,
@@ -535,11 +594,15 @@ var file_agent_proto_rawDesc = []byte{
 	0x61, 0x74, 0x69, 0x6f, 0x6e, 0x12, 0x16, 0x2e, 0x61, 0x67, 0x65, 0x6e, 0x63, 0x79, 0x2e, 0x49,
 	0x6e, 0x76, 0x69, 0x74, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x42, 0x61, 0x73, 0x65, 0x1a, 0x12, 0x2e,
 	0x61, 0x67, 0x65, 0x6e, 0x63, 0x79, 0x2e, 0x49, 0x6e, 0x76, 0x69, 0x74, 0x61, 0x74, 0x69, 0x6f,
-	0x6e, 0x22, 0x00, 0x42, 0x36, 0x5a, 0x34, 0x67, 0x69, 0x74, 0x68, 0x75, 0x62, 0x2e, 0x63, 0x6f,
-	0x6d, 0x2f, 0x66, 0x69, 0x6e, 0x64, 0x79, 0x2d, 0x6e, 0x65, 0x74, 0x77, 0x6f, 0x72, 0x6b, 0x2f,
-	0x66, 0x69, 0x6e, 0x64, 0x79, 0x2d, 0x61, 0x67, 0x65, 0x6e, 0x74, 0x2d, 0x61, 0x70, 0x69, 0x2f,
-	0x67, 0x72, 0x70, 0x63, 0x2f, 0x61, 0x67, 0x65, 0x6e, 0x63, 0x79, 0x62, 0x06, 0x70, 0x72, 0x6f,
-	0x74, 0x6f, 0x33,
+	0x6e, 0x22, 0x00, 0x12, 0x41, 0x0a, 0x09, 0x53, 0x65, 0x74, 0x49, 0x6d, 0x70, 0x6c, 0x49, 0x64,
+	0x12, 0x18, 0x2e, 0x61, 0x67, 0x65, 0x6e, 0x63, 0x79, 0x2e, 0x53, 0x41, 0x49, 0x6d, 0x70, 0x6c,
+	0x65, 0x6d, 0x65, 0x6e, 0x74, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x1a, 0x18, 0x2e, 0x61, 0x67, 0x65,
+	0x6e, 0x63, 0x79, 0x2e, 0x53, 0x41, 0x49, 0x6d, 0x70, 0x6c, 0x65, 0x6d, 0x65, 0x6e, 0x74, 0x61,
+	0x74, 0x69, 0x6f, 0x6e, 0x22, 0x00, 0x42, 0x36, 0x5a, 0x34, 0x67, 0x69, 0x74, 0x68, 0x75, 0x62,
+	0x2e, 0x63, 0x6f, 0x6d, 0x2f, 0x66, 0x69, 0x6e, 0x64, 0x79, 0x2d, 0x6e, 0x65, 0x74, 0x77, 0x6f,
+	0x72, 0x6b, 0x2f, 0x66, 0x69, 0x6e, 0x64, 0x79, 0x2d, 0x61, 0x67, 0x65, 0x6e, 0x74, 0x2d, 0x61,
+	0x70, 0x69, 0x2f, 0x67, 0x72, 0x70, 0x63, 0x2f, 0x61, 0x67, 0x65, 0x6e, 0x63, 0x79, 0x62, 0x06,
+	0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
 }
 
 var (
@@ -555,29 +618,32 @@ func file_agent_proto_rawDescGZIP() []byte {
 }
 
 var file_agent_proto_enumTypes = make([]protoimpl.EnumInfo, 1)
-var file_agent_proto_msgTypes = make([]protoimpl.MessageInfo, 6)
+var file_agent_proto_msgTypes = make([]protoimpl.MessageInfo, 7)
 var file_agent_proto_goTypes = []interface{}{
-	(Notification_Type)(0), // 0: agency.Notification.Type
-	(*InvitationBase)(nil), // 1: agency.InvitationBase
-	(*Invitation)(nil),     // 2: agency.Invitation
-	(*Answer)(nil),         // 3: agency.Answer
-	(*ClientID)(nil),       // 4: agency.ClientID
-	(*AgentStatus)(nil),    // 5: agency.AgentStatus
-	(*Notification)(nil),   // 6: agency.Notification
+	(Notification_Type)(0),   // 0: agency.Notification.Type
+	(*SAImplementation)(nil), // 1: agency.SAImplementation
+	(*InvitationBase)(nil),   // 2: agency.InvitationBase
+	(*Invitation)(nil),       // 3: agency.Invitation
+	(*Answer)(nil),           // 4: agency.Answer
+	(*ClientID)(nil),         // 5: agency.ClientID
+	(*AgentStatus)(nil),      // 6: agency.AgentStatus
+	(*Notification)(nil),     // 7: agency.Notification
 }
 var file_agent_proto_depIdxs = []int32{
-	4, // 0: agency.Answer.client_id:type_name -> agency.ClientID
-	4, // 1: agency.AgentStatus.client_id:type_name -> agency.ClientID
-	6, // 2: agency.AgentStatus.notification:type_name -> agency.Notification
+	5, // 0: agency.Answer.client_id:type_name -> agency.ClientID
+	5, // 1: agency.AgentStatus.client_id:type_name -> agency.ClientID
+	7, // 2: agency.AgentStatus.notification:type_name -> agency.Notification
 	0, // 3: agency.Notification.type_id:type_name -> agency.Notification.Type
-	4, // 4: agency.Agent.Listen:input_type -> agency.ClientID
-	3, // 5: agency.Agent.Give:input_type -> agency.Answer
-	1, // 6: agency.Agent.CreateInvitation:input_type -> agency.InvitationBase
-	5, // 7: agency.Agent.Listen:output_type -> agency.AgentStatus
-	4, // 8: agency.Agent.Give:output_type -> agency.ClientID
-	2, // 9: agency.Agent.CreateInvitation:output_type -> agency.Invitation
-	7, // [7:10] is the sub-list for method output_type
-	4, // [4:7] is the sub-list for method input_type
+	5, // 4: agency.Agent.Listen:input_type -> agency.ClientID
+	4, // 5: agency.Agent.Give:input_type -> agency.Answer
+	2, // 6: agency.Agent.CreateInvitation:input_type -> agency.InvitationBase
+	1, // 7: agency.Agent.SetImplId:input_type -> agency.SAImplementation
+	6, // 8: agency.Agent.Listen:output_type -> agency.AgentStatus
+	5, // 9: agency.Agent.Give:output_type -> agency.ClientID
+	3, // 10: agency.Agent.CreateInvitation:output_type -> agency.Invitation
+	1, // 11: agency.Agent.SetImplId:output_type -> agency.SAImplementation
+	8, // [8:12] is the sub-list for method output_type
+	4, // [4:8] is the sub-list for method input_type
 	4, // [4:4] is the sub-list for extension type_name
 	4, // [4:4] is the sub-list for extension extendee
 	0, // [0:4] is the sub-list for field type_name
@@ -590,7 +656,7 @@ func file_agent_proto_init() {
 	}
 	if !protoimpl.UnsafeEnabled {
 		file_agent_proto_msgTypes[0].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*InvitationBase); i {
+			switch v := v.(*SAImplementation); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -602,7 +668,7 @@ func file_agent_proto_init() {
 			}
 		}
 		file_agent_proto_msgTypes[1].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*Invitation); i {
+			switch v := v.(*InvitationBase); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -614,7 +680,7 @@ func file_agent_proto_init() {
 			}
 		}
 		file_agent_proto_msgTypes[2].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*Answer); i {
+			switch v := v.(*Invitation); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -626,7 +692,7 @@ func file_agent_proto_init() {
 			}
 		}
 		file_agent_proto_msgTypes[3].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*ClientID); i {
+			switch v := v.(*Answer); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -638,7 +704,7 @@ func file_agent_proto_init() {
 			}
 		}
 		file_agent_proto_msgTypes[4].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*AgentStatus); i {
+			switch v := v.(*ClientID); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -650,6 +716,18 @@ func file_agent_proto_init() {
 			}
 		}
 		file_agent_proto_msgTypes[5].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*AgentStatus); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_agent_proto_msgTypes[6].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*Notification); i {
 			case 0:
 				return &v.state
@@ -668,7 +746,7 @@ func file_agent_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: file_agent_proto_rawDesc,
 			NumEnums:      1,
-			NumMessages:   6,
+			NumMessages:   7,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

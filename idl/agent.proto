@@ -18,6 +18,13 @@ service Agent {
   rpc Give(Answer) returns (ClientID) {}
 
   rpc CreateInvitation(InvitationBase) returns (Invitation) {}
+
+  rpc SetImplId(SAImplementation) returns (SAImplementation) {}
+}
+
+message SAImplementation {
+  string id = 1;
+  string endpoint = 2;
 }
 
 message InvitationBase {
