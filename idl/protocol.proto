@@ -43,6 +43,14 @@ service DIDComm {
 Protocol is the actual DIDComm/Aries protocol.
  */
 message Protocol {
+  message Attribute {
+    string name = 1;
+    string value = 2;
+  }
+  message Attrs {
+    repeated Attribute attrs = 1;
+  }
+
   // Type is enum type to identify the protocol, we aren't tight to Aries strings
   enum Type {
     CONNECT = 0;
@@ -67,13 +75,17 @@ message Protocol {
   // Issuing attributes
   message Issuing {
     string cred_def_id = 1;
-    string attributes_json = 2;
+    oneof Attrs {
+      string attributes_json = 2;
+      Attrs attrs = 3;
+    }
   }
   // Protocol type specific data: one of or no one
   oneof StartMsg {
     string invitation_json = 10; // Invitation JSON string, only for CONNECT
     Issuing cred_def = 11; // Only for Issuing protocol
     string proof_attributes_json = 12; // Only for Proof protocol
+    string basic_message = 13;
   }
 }
 
@@ -125,7 +137,7 @@ message ProtocolStatus {
     string their_label = 5;
   }
   message Issue {
-    message CredAttr {
+    message CredAttr { // todo: replace Protocol.Attrs
       string name = 1;
       string value = 2;
     }
