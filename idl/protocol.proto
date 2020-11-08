@@ -80,11 +80,27 @@ message Protocol {
       Attrs attrs = 3;
     }
   }
+  // Proof attributes
+  message Proof {
+    message Attr {
+      string name = 1;
+      string cred_def_id = 2;
+      string predicate = 3;
+    }
+    repeated Attr attrs = 1;
+  }
+  message ProofRequest {
+    oneof AttrFmt {
+      string attributes_json = 1;
+      Proof attrs = 2;
+    }
+  }
+
   // Protocol type specific data: one of or no one
   oneof StartMsg {
     string invitation_json = 10; // Invitation JSON string, only for CONNECT
     Issuing cred_def = 11; // Only for Issuing protocol
-    string proof_attributes_json = 12; // Only for Proof protocol
+    ProofRequest proof_req = 12; // Only for Proof protocol
     string basic_message = 13;
   }
 }
@@ -145,7 +161,7 @@ message ProtocolStatus {
     string schema_id = 2;
     repeated CredAttr attrs = 3;
   }
-  message Proof {
+  message Proof { // replace from Protocol
     message Attr {
       string name = 1;
       string cred_def_id = 2;
