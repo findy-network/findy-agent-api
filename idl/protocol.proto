@@ -153,21 +153,9 @@ message ProtocolStatus {
     string their_label = 5;
   }
   message Issue {
-    message CredAttr { // todo: replace Protocol.Attrs
-      string name = 1;
-      string value = 2;
-    }
     string cred_def_id = 1;
     string schema_id = 2;
-    repeated CredAttr attrs = 3;
-  }
-  message Proof { // replace from Protocol
-    message Attr {
-      string name = 1;
-      string cred_def_id = 2;
-      string predicate = 3;
-    }
-    repeated Attr attrs = 1;
+    repeated Protocol.Attribute attrs = 3;
   }
   message TrustPing {
     bool replied = 1;
@@ -181,7 +169,7 @@ message ProtocolStatus {
   oneof Status {
     Connection connection = 10;
     Issue issue = 11;
-    Proof proof = 12;
+    Protocol.Proof proof = 12;
     TrustPing trust_ping = 13;
     BasicMessage basic_message = 14;
   }
