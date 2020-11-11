@@ -16,3 +16,6 @@ check_fmt:
 	$(eval GOFILES = $(shell find . -name '*.go'))
 	@gofmt -l $(GOFILES)
 
+lint:
+	@golangci-lint run
+
