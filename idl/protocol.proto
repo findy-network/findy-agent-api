@@ -25,8 +25,8 @@ service DIDComm {
   // ready.
   rpc Start(Protocol) returns (ProtocolID) {}
 
-  // Status returns a current ProtocolStatus. ProtocolStatus is under
-  // construction TODO
+  // Status returns a current ProtocolStatus which offers both typed data fields
+  // and combined JSON string.
   rpc Status(ProtocolID) returns (ProtocolStatus) {}
 
   // Resume tells the protocol state machine how to proceed when it's waiting
@@ -43,6 +43,14 @@ service DIDComm {
 Protocol is the actual DIDComm/Aries protocol.
  */
 message Protocol {
+  message Attribute {
+    string name = 1;
+    string value = 2;
+  }
+  message Attrs {
+    repeated Attribute attrs = 1;
+  }
+
   // Type is enum type to identify the protocol, we aren't tight to Aries strings
   enum Type {
     CONNECT = 0;
@@ -59,21 +67,41 @@ message Protocol {
     ADDRESSEE = 2;
     RESUME = 3; // todo: check if we need another role for this as well
   }
-  Role role = 7; // todo: change this before release
+  Role role = 2;
 
-  string prev_thread_id = 2; // Previous protocol ID if there was any
-  string connection_id = 3; // pairwise ID, this only empty when Type is CONNECT
+  string prev_thread_id = 3; // Previous protocol ID if there was any
+  string connection_id = 4; // pairwise ID, this only empty when Type is CONNECT
 
   // Issuing attributes
   message Issuing {
     string cred_def_id = 1;
-    string attributes_json = 2;
+    oneof Attrs {
+      string attributes_json = 2;
+      Attrs attrs = 3;
+    }
   }
+  // Proof attributes
+  message Proof {
+    message Attr {
+      string name = 1;
+      string cred_def_id = 2;
+      string predicate = 3;
+    }
+    repeated Attr attrs = 1;
+  }
+  message ProofRequest {
+    oneof AttrFmt {
+      string attributes_json = 1;
+      Proof attrs = 2;
+    }
+  }
+
   // Protocol type specific data: one of or no one
   oneof StartMsg {
-    string invitation_json = 4; // Invitation JSON string, only for CONNECT
-    Issuing cred_def = 5; // Only for Issuing protocol
-    string proof_attributes_json = 6; // Only for Proof protocol
+    string invitation_json = 10; // Invitation JSON string, only for CONNECT
+    Issuing cred_def = 11; // Only for Issuing protocol
+    ProofRequest proof_req = 12; // Only for Proof protocol
+    string basic_message = 13;
   }
 }
 
@@ -86,9 +114,9 @@ reuse of the previous connection when ever it's possible. Still, we operate with
 protocols.
 */
 message ProtocolID {
-  Protocol.Type type_id = 1; // protocol type
-  Protocol.Role role = 3; // todo: update order number before release
-  string id = 2; // UUID of the current protocol
+  Protocol.Type type_id = 1; // i.e. what is going on
+  Protocol.Role role = 2; // i.e. did we start this or other end etc.
+  string id = 3; // UUID of the current protocol, note! not the same as conn-id
 }
 
 // ProtocolState is lightest and simplest way to tell outside what is going on
@@ -107,10 +135,42 @@ message ProtocolState {
   string info = 3; // Extra information, mostly used for debugging
 }
 
-// ProtocolStatus is message to include whole status of the protocol. This is
-// UNDER CONSTRUCTION, TODO
+/*
+ProtocolStatus is message to include whole status of the protocol.
+Todo: should we think about Aries thread and decorator structure as well? e.g.
+ BasicMsg
+*/
 message ProtocolStatus {
   ProtocolState state = 1;
-  string Message = 2;
-  uint64 timestamp = 3;
+  int64 timestamp = 2;
+  string status_json = 3;
+
+  message Connection {
+    string id = 1;
+    string my_did = 2;
+    string their_did = 3;
+    string their_endpoint = 4;
+    string their_label = 5;
+  }
+  message Issue {
+    string cred_def_id = 1;
+    string schema_id = 2;
+    repeated Protocol.Attribute attrs = 3;
+  }
+  message TrustPing {
+    bool replied = 1;
+  }
+  message BasicMessage {
+    string content = 1;
+    bool sent_by_me = 2;
+    bool delivered = 3;
+    int64 sent_timestamp = 4;
+  }
+  oneof Status {
+    Connection connection = 10;
+    Issue issue = 11;
+    Protocol.Proof proof = 12;
+    TrustPing trust_ping = 13;
+    BasicMessage basic_message = 14;
+  }
 }

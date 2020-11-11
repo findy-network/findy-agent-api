@@ -16,6 +16,26 @@ service Agent {
 
   // Give is function to give answer to ACTION_NEEDED_xx notifications.
   rpc Give(Answer) returns (ClientID) {}
+
+  rpc CreateInvitation(InvitationBase) returns (Invitation) {}
+
+  rpc SetImplId(SAImplementation) returns (SAImplementation) {}
+}
+
+message SAImplementation {
+  string id = 1;
+  string endpoint = 2;
+}
+
+message InvitationBase {
+  string label = 1;
+  string id = 2;
+  int64 expiration = 3; // not implemented yet
+}
+
+message Invitation {
+  string json_str = 1;
+  string url = 2; // not implemented yet
 }
 
 /*
@@ -52,10 +72,10 @@ message Notification {
   enum Type {
     STATUS_UPDATE = 0; // General status update where no action needed
     ACTION_NEEDED = 1; // General action needed update notification
-    ACTION_NEEDED_PING = 2; // Your CA controller has been pinged
-    ACTION_NEEDED_ISSUE_PROPOSE = 3; // Issuing is proposed
-    ACTION_NEEDED_PROOF_PROPOSE = 4; // Proof is proposed
-    ACTION_NEEDED_PROOF_VERIFY = 5; // During proof values need to be verified
+    ANSWER_NEEDED_PING = 2; // Your CA controller has been pinged
+    ANSWER_NEEDED_ISSUE_PROPOSE = 3; // Issuing is proposed
+    ANSWER_NEEDED_PROOF_PROPOSE = 4; // Proof is proposed
+    ANSWER_NEEDED_PROOF_VERIFY = 5; // During proof values need to be verified
   }
   Type type_id = 1; // Notification type, see Type
   string id = 2; // Notification's unique ID
