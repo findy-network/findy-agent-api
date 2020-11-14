@@ -117,6 +117,7 @@ message ProtocolID {
   Protocol.Type type_id = 1; // i.e. what is going on
   Protocol.Role role = 2; // i.e. did we start this or other end etc.
   string id = 3; // UUID of the current protocol, note! not the same as conn-id
+  int64 notification_time = 4; // part of the key (see notification)
 }
 
 // ProtocolState is lightest and simplest way to tell outside what is going on
