@@ -18,6 +18,7 @@ const _ = grpc.SupportPackageIsVersion7
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type AgencyClient interface {
 	PSMHook(ctx context.Context, in *DataHook, opts ...grpc.CallOption) (Agency_PSMHookClient, error)
+	Onboard(ctx context.Context, in *Onboarding, opts ...grpc.CallOption) (*OnboardResult, error)
 }
 
 type agencyClient struct {
@@ -60,11 +61,21 @@ func (x *agencyPSMHookClient) Recv() (*AgencyStatus, error) {
 	return m, nil
 }
 
+func (c *agencyClient) Onboard(ctx context.Context, in *Onboarding, opts ...grpc.CallOption) (*OnboardResult, error) {
+	out := new(OnboardResult)
+	err := c.cc.Invoke(ctx, "/ops.Agency/Onboard", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // AgencyServer is the server API for Agency service.
 // All implementations must embed UnimplementedAgencyServer
 // for forward compatibility
 type AgencyServer interface {
 	PSMHook(*DataHook, Agency_PSMHookServer) error
+	Onboard(context.Context, *Onboarding) (*OnboardResult, error)
 	mustEmbedUnimplementedAgencyServer()
 }
 
@@ -74,6 +85,9 @@ type UnimplementedAgencyServer struct {
 
 func (UnimplementedAgencyServer) PSMHook(*DataHook, Agency_PSMHookServer) error {
 	return status.Errorf(codes.Unimplemented, "method PSMHook not implemented")
+}
+func (UnimplementedAgencyServer) Onboard(context.Context, *Onboarding) (*OnboardResult, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Onboard not implemented")
 }
 func (UnimplementedAgencyServer) mustEmbedUnimplementedAgencyServer() {}
 
@@ -109,10 +123,33 @@ func (x *agencyPSMHookServer) Send(m *AgencyStatus) error {
 	return x.ServerStream.SendMsg(m)
 }
 
+func _Agency_Onboard_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(Onboarding)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AgencyServer).Onboard(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/ops.Agency/Onboard",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AgencyServer).Onboard(ctx, req.(*Onboarding))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 var _Agency_serviceDesc = grpc.ServiceDesc{
 	ServiceName: "ops.Agency",
 	HandlerType: (*AgencyServer)(nil),
-	Methods:     []grpc.MethodDesc{},
+	Methods: []grpc.MethodDesc{
+		{
+			MethodName: "Onboard",
+			Handler:    _Agency_Onboard_Handler,
+		},
+	},
 	Streams: []grpc.StreamDesc{
 		{
 			StreamName:    "PSMHook",
