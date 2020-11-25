@@ -3,8 +3,6 @@
 
 syntax = "proto3";
 
-//import "protocol.proto";
-
 option go_package = "github.com/findy-network/findy-agent-api/grpc/ops";
 
 package ops;
@@ -15,6 +13,21 @@ like data migrations, etc.
  */
 service Agency {
   rpc PSMHook(DataHook) returns (stream AgencyStatus) {}
+  rpc Onboard(Onboarding) returns (OnboardResult) {}
+}
+
+message Onboarding {
+  string email = 1;
+}
+
+message OnboardResult {
+  bool ok = 1;
+  message OkResult {
+    string JWT = 1;
+    string CADID = 2;
+    string invitation_json = 3;
+  }
+  OkResult result = 2;
 }
 
 message AgencyStatus {

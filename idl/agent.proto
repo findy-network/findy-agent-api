@@ -3,6 +3,8 @@
 
 syntax = "proto3";
 
+import "protocol.proto";
+
 option go_package = "github.com/findy-network/findy-agent-api/grpc/agency";
 
 package agency;
@@ -82,5 +84,6 @@ message Notification {
   string connection_id = 3; // Current pairwise ID between agents
   string protocol_id = 4; // Current protocol ID, see Aries Thread ID
   string protocol_family = 5; // Text version of the protocol family/namespace
-  uint64 timestamp = 6; // timestamp in ms
+  int64 timestamp = 6; // timestamp in nano because this is part of the key
+  Protocol.Type protocol_type = 7;
 }
