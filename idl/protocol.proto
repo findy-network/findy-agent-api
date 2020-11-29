@@ -53,11 +53,12 @@ message Protocol {
 
   // Type is enum type to identify the protocol, we aren't tight to Aries strings
   enum Type {
-    CONNECT = 0;
-    ISSUE = 1;
-    PROOF = 2;
-    TRUST_PING = 3;
-    BASIC_MESSAGE = 4;
+    NONE = 0;
+    CONNECT = 1;
+    ISSUE = 2;
+    PROOF = 3;
+    TRUST_PING = 4;
+    BASIC_MESSAGE = 5;
   }
   Type type_id = 1; // Protocol type
 
@@ -65,7 +66,7 @@ message Protocol {
     UNKNOWN = 0;
     INITIATOR = 1;
     ADDRESSEE = 2;
-    RESUME = 3; // todo: check if we need another role for this as well
+    RESUME = 3; // todo: check if we need another role for this as well, seems that NO
   }
   Role role = 2;
 
