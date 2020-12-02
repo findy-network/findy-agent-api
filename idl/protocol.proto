@@ -73,6 +73,12 @@ message Protocol {
   string prev_thread_id = 3; // Previous protocol ID if there was any
   string connection_id = 4; // pairwise ID, this only empty when Type is CONNECT
 
+  // Connection attributes
+  message Connection {
+    string Label = 1;
+    string invitation_json = 2; // Invitation JSON string
+  }
+
   // Issuing attributes
   message Issuing {
     string cred_def_id = 1;
@@ -99,7 +105,7 @@ message Protocol {
 
   // Protocol type specific data: one of or no one
   oneof StartMsg {
-    string invitation_json = 10; // Invitation JSON string, only for CONNECT
+    Connection conn_attr = 10; //
     Issuing cred_def = 11; // Only for Issuing protocol
     ProofRequest proof_req = 12; // Only for Proof protocol
     string basic_message = 13;
