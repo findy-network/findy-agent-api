@@ -3,6 +3,8 @@
 
 syntax = "proto3";
 
+import "protocol.proto";
+
 option go_package = "github.com/findy-network/findy-agent-api/grpc/ops";
 
 package ops;
@@ -12,7 +14,10 @@ Agency is a service for agency level functionality i.e. multi-tenant features
 like data migrations, etc.
  */
 service Agency {
+  // PMSHook listens realtime stream of archived protocol state machines
   rpc PSMHook(DataHook) returns (stream AgencyStatus) {}
+
+  // Onboard allocates cloud agent and wallet from Agency
   rpc Onboard(Onboarding) returns (OnboardResult) {}
 }
 
@@ -32,11 +37,11 @@ message OnboardResult {
 
 message AgencyStatus {
   string id = 1;
-  string info = 2;
+  agency.ProtocolStatus protocol_status = 2;
 }
 
 message DataHook {
-  string id = 1;
+  string id = 1; // UUID to uniquely identify the hook
 }
 
 service DevOps {
