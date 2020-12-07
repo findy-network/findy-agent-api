@@ -62,11 +62,12 @@ message Protocol {
   }
   Type type_id = 1; // Protocol type
 
+  // Role tells in what role we are starting a protocol
   enum Role {
     UNKNOWN = 0;
     INITIATOR = 1;
     ADDRESSEE = 2;
-    RESUME = 3; // todo: check if we need another role for this as well, seems that NO
+    RESUME = 3; // To tell what to do with a paused protocol, waiting user action
   }
   Role role = 2;
 
@@ -131,13 +132,15 @@ message ProtocolID {
 // during a protocol run.
 message ProtocolState {
   ProtocolID protocol_id = 1;
+  // State tells protocol machine's state at the API level
   enum State {
-    OK = 0; // Protocol is finalized successfully
-    ERR = 1; // Protocol is finalized with error or other side NACK
-    WAIT_ACTION = 2; // Protocol is waiting user's action to continue
+    RUNNING = 0; // Protocol is just started or it's still running
+    OK = 1; // Protocol is finalized successfully
+    ERR = 2; // Protocol is stopped with an error, Not other end's NACK!
+    WAIT_ACTION = 3; // Protocol is waiting user's action to continue
 
-    ACK = 3; // User tells for the protocol to proceed
-    NACK = 4; // User tells for the protocol not to proceed
+    ACK = 4; // Input only: currently API caller can tell to proceed
+    NACK = 5; // In&out: we or other agent can decline the protocol execution
   }
   State state = 2; // See the State enum, tells whats going on
   string info = 3; // Extra information, mostly used for debugging
