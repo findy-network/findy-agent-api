@@ -38,6 +38,7 @@ message OnboardResult {
 message AgencyStatus {
   string id = 1;
   agency.ProtocolStatus protocol_status = 2;
+  string DID = 3; // Agent DID // todo we can check protobuf id later
 }
 
 message DataHook {
