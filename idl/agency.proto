@@ -14,7 +14,7 @@ Agency is a service for agency level functionality i.e. multi-tenant features
 like data migrations, etc.
  */
 service Agency {
-  // PMSHook listens realtime stream of archived protocol state machines
+  // PSMHook listens realtime stream of archived protocol state machines
   rpc PSMHook(DataHook) returns (stream AgencyStatus) {}
 
   // Onboard allocates cloud agent and wallet from Agency
@@ -35,10 +35,18 @@ message OnboardResult {
   OkResult result = 2;
 }
 
+/*
+AgencyStatus is message returned by PSMHook. These status messages encapsulates
+protocol state machine information. The message has its own id. The protocol
+specific information comes in ProtocolStatus. Outside of the actual protocol but
+relevant information are current agent DID and Connection ID which arrives in
+own fields.
+ */
 message AgencyStatus {
   string id = 1;
-  agency.ProtocolStatus protocol_status = 2;
-  string DID = 3; // Agent DID // todo we can check protobuf id later
+  agency.ProtocolStatus protocol_status = 2; // Detailed protocol information
+  string DID = 3; // Agent DID if available
+  string connection_id = 4; // Connection (pairwise) ID if available
 }
 
 message DataHook {
