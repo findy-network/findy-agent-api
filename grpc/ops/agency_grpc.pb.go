@@ -17,7 +17,7 @@ const _ = grpc.SupportPackageIsVersion7
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type AgencyClient interface {
-	// PMSHook listens realtime stream of archived protocol state machines
+	// PSMHook listens realtime stream of archived protocol state machines
 	PSMHook(ctx context.Context, in *DataHook, opts ...grpc.CallOption) (Agency_PSMHookClient, error)
 	// Onboard allocates cloud agent and wallet from Agency
 	Onboard(ctx context.Context, in *Onboarding, opts ...grpc.CallOption) (*OnboardResult, error)
@@ -76,7 +76,7 @@ func (c *agencyClient) Onboard(ctx context.Context, in *Onboarding, opts ...grpc
 // All implementations must embed UnimplementedAgencyServer
 // for forward compatibility
 type AgencyServer interface {
-	// PMSHook listens realtime stream of archived protocol state machines
+	// PSMHook listens realtime stream of archived protocol state machines
 	PSMHook(*DataHook, Agency_PSMHookServer) error
 	// Onboard allocates cloud agent and wallet from Agency
 	Onboard(context.Context, *Onboarding) (*OnboardResult, error)
