@@ -5,8 +5,9 @@ This documentation describes the API of how [findy-agent](https://github.com/fin
 **Note! This is the initial beta version of the API and it is likely to change with no backward compatibility in the coming findy-agent versions.**
 
 **Update! We have started to development of a new gRPC API. Please note:**
+
 - The gRPC API is still under development, and **you shouldn't use it before it's released**.
-- Both APIs can be used same time after gRPC API release. 
+- Both APIs can be used same time after gRPC API release.
 - We will continue to offer the existing JSON/DIDComm based client API described in this documentation until it's officially deprecated.
 - The gRPC API will be totally new one; we will refactor concepts and conventions according the feedback and experience we have had with the exiting one.
 - By bringing the API here offers an opportunity to review and comment it during the process.
@@ -25,10 +26,20 @@ API requests and message packaging are described as more detailed [here](docs/ap
 
 The notifications from findy-agent to edge can be received either with a webhook or a socket. The same message protocol is utilized in the notifications.
 
-
 ## Reference implementations
 
-* findy-api-test (rust)
-* [findy-agent-cli](https://github.com/findy-network/findy-agent-cli) (golang)
-* [findy-issuer-api](https://github.com/findy-network/findy-issuer-api) (node.js)
-* [findy-wallet-ios](https://github.com/findy-network/findy-wallet-ios) (swift)
+- findy-api-test (rust)
+- [findy-agent-cli](https://github.com/findy-network/findy-agent-cli) (golang)
+- [findy-issuer-api](https://github.com/findy-network/findy-issuer-api) (node.js)
+- [findy-wallet-ios](https://github.com/findy-network/findy-wallet-ios) (swift)
+
+## Publishing new version
+
+Release script will tag the current version and push the tag to remote. This will trigger e2e-tests in CI automatically and if they succeed, the tag is merged to master.
+
+Release script assumes it is triggered from dev branch. It takes one parameter, the next working version. E.g. if current working version is 0.1.0, following will release version 0.1.0 and update working version to 0.2.0.
+
+```bash
+git checkout dev
+./release 0.2.0
+```
