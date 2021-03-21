@@ -22,6 +22,48 @@ service Agent {
   rpc CreateInvitation(InvitationBase) returns (Invitation) {}
 
   rpc SetImplId(SAImplementation) returns (SAImplementation) {}
+
+  rpc Ping(PingMsg) returns (PingMsg) {}
+
+  rpc CreateSchema(SchemaCreate) returns (Schema) {}
+  rpc CreateCredDef(CredDefCreate) returns (CredDef) {}
+
+  rpc GetSchema(Schema) returns (SchemaData) {}
+  rpc GetCredDef(CredDef) returns (CredDefData) {}
+}
+
+message SchemaData {
+  string id = 1;
+  string data = 2;
+}
+
+message CredDefData {
+  string id = 1;
+  string data = 2;
+}
+
+message SchemaCreate {
+  string name = 1;
+  string version = 2;
+  repeated string attrs = 3;
+}
+
+message Schema {
+  string id = 1;
+}
+
+message CredDefCreate {
+  string schema_id = 1;
+  string tag = 2;
+}
+
+message CredDef {
+  string id = 1;
+}
+
+message PingMsg {
+  int32 id = 1;
+  bool ping_controller = 2;
 }
 
 message SAImplementation {
