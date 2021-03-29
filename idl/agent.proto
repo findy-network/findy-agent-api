@@ -122,6 +122,7 @@ message Notification {
     ANSWER_NEEDED_ISSUE_PROPOSE = 3; // Issuing is proposed
     ANSWER_NEEDED_PROOF_PROPOSE = 4; // Proof is proposed
     ANSWER_NEEDED_PROOF_VERIFY = 5; // During proof values need to be verified
+    KEEPALIVE = 6; // To prevent network idle to shut us down 
   }
   Type type_id = 1; // Notification type, see Type
 
