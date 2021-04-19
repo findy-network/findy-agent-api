@@ -5,9 +5,9 @@ syntax = "proto3";
 
 import "protocol.proto";
 
-option go_package = "github.com/findy-network/findy-agent-api/grpc/ops";
+option go_package = "github.com/findy-network/findy-agent-api/grpc/ops/v1";
 
-package ops;
+package ops.v1;
 
 /*
 Agency is a service for agency level functionality i.e. multi-tenant features
@@ -44,7 +44,7 @@ own fields.
  */
 message AgencyStatus {
   string id = 1;
-  agency.ProtocolStatus protocol_status = 2; // Detailed protocol information
+  agency.v1.ProtocolStatus protocol_status = 2; // Detailed protocol information
   string DID = 3; // Agent DID if available
   string connection_id = 4; // Connection (pairwise) ID if available
 }
