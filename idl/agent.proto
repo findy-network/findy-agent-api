@@ -5,22 +5,29 @@ syntax = "proto3";
 
 import "protocol.proto";
 
-option go_package = "github.com/findy-network/findy-agent-api/grpc/agency";
+option go_package = "github.com/findy-network/findy-agent-api/grpc/agency/v1";
 
-package agency;
+package agency.v1;
 
 /*
-Agent is a service to communicate with your cloud agent.
+Agent is a service to communicate with your cloud agent. With the cloud agent
+you can Listen your agent's status, Answer to its requests and questions,
+create invitations, manage its running environment, and create schemas and
+credentials.
  */
 service Agent {
-  // Listen is async function to stream AgentStatus. ClientID must be unique.
+  // Listen is bidirectional function to stream AgentStatus. ClientID must be
+  // unique.
   rpc Listen(ClientID) returns (stream AgentStatus) {}
 
   // Give is function to give answer to ACTION_NEEDED_xx notifications.
   rpc Give(Answer) returns (ClientID) {}
 
+  // CreateInvitation returns an invitation according to InvitationBase.
   rpc CreateInvitation(InvitationBase) returns (Invitation) {}
 
+  // SetImplId sets implementation ID for the clould agent. It should be "grpc".
+  // 
   rpc SetImplId(SAImplementation) returns (SAImplementation) {}
 
   rpc Ping(PingMsg) returns (PingMsg) {}
@@ -144,7 +151,6 @@ message Notification {
       string value = 1;
       string name = 2;
       string cred_def_id = 3;
-      string predicate = 4;
     }
     repeated Attr attrs = 1;
   }
