@@ -6,8 +6,16 @@ deps:
 update-deps:
 	go get -u ./...
 
-protoc:
-	protoc --proto_path=idl --go_out=$(SRC_ROOT) --go-grpc_out=$(SRC_ROOT) agency.proto agent.proto protocol.proto
+protoc_protocol:
+	protoc --proto_path=idl --go_out=$(SRC_ROOT) --go-grpc_out=$(SRC_ROOT) protocol.proto
+
+protoc_agency:
+	protoc --proto_path=idl --go_out=$(SRC_ROOT) --go-grpc_out=$(SRC_ROOT) agency.proto
+
+protoc_agent:
+	protoc --proto_path=idl --go_out=$(SRC_ROOT) --go-grpc_out=$(SRC_ROOT) agent.proto
+
+protoc:	protoc_protocol protoc_agency protoc_agent
 
 install:
 	@echo "Not implemented"
