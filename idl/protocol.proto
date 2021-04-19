@@ -3,26 +3,27 @@
 
 syntax = "proto3";
 
-option go_package = "github.com/findy-network/findy-agent-api/grpc/agency";
+option go_package = "github.com/findy-network/findy-agent-api/grpc/agency/v1";
 
-package agency;
+package agency.v1;
 
 /*
-DIDComm is service to run and monitor DIDComm protocols. The findy agency
-handles protocols as state machines. The protocol state machines are optimized
-for performance and stability on high load. Please remember to call Release
-after protocol is finalized. If state machines aren't released by caller the
+ProtocolService runs and monitors DIDComm protocols. The service handles
+protocols as a protocol state machines (PSM). The PSMs are optimized for
+performance and stability on high load. They are presistent and consume
+resources. Please remember to call Release after protocol is (totally) finalized
+i.e. as soon as it's Ready. If state machines aren't released by caller the
 agency will release them by force sooner or later.
  */
-service DIDComm {
-  // Run is async function to start a protocol and return a stream to listen to
+service ProtocolService {
+  // Run is function to start a protocol and return a stream to listen to
   // its progress.
   rpc Run(Protocol) returns (stream ProtocolState) {}
 
   // Start asks the agency to start a protocol. It immediately returns a
-  // protocol id that allows to monitor protocol with the Status function. If
-  // Agent service's Listen is in use, we get a notification when protocol is
-  // ready.
+  // protocol ID that allows to monitor the protocol with Status function.
+  // When Agent service's Listen is in use, we get notifications how protocol
+  // proceeds and when it's ready.
   rpc Start(Protocol) returns (ProtocolID) {}
 
   // Status returns a current ProtocolStatus which offers both typed data fields
@@ -30,17 +31,33 @@ service DIDComm {
   rpc Status(ProtocolID) returns (ProtocolStatus) {}
 
   // Resume tells the protocol state machine how to proceed when it's waiting
-  // user action.
+  // user action e.g. permission to send response to proof request.
   rpc Resume(ProtocolState) returns (ProtocolID) {}
 
   // Release releases the protocol state machine from agency. It can be called
   // only when protocol is in Ready state. After release you can access the
-  // status information with the others services of your system.
+  // status information of your DIDComm with the others services of your system.
   rpc Release(ProtocolID) returns (ProtocolID) {}
 }
 
 /*
-Protocol is the actual DIDComm/Aries protocol.
+Protocol is a interface message for ProtocolService.Start/Run. The protocol
+message complements e.g. Start function to the following pseudo code:
+   ProtocolService.Start(Protocol{TypeId: DIDEXCHANGE, Role: INITIATOR})
+which can be read as:
+   // Start DIDEXCHANGE Protocol as INITIATOR 
+The DIDComm/Aries protocol is always defined with the protocol's type_id and
+together with the role they define how the protocol will be started. The table
+below lists few examples.
+   Protocol.Type_id        (as)  Role              Meaning
+   ------------------------------------------------------------------------
+   DIDEXCHANGE                   INITIATOR         connect to other agent 
+   ISSUE_CREDENTIAL              ADDRESSEE         request credential 
+   PRESENT_PROOF                 RESUMER           accept proof request
+   BASIC_MESSAGE                 INITIATOR         send basic message 
+
+The rest of the fields in Protocol include prev_thread_id and connection_id. The
+StartMsg fields include type_id specific data.
  */
 message Protocol {
   message Attribute {
@@ -51,12 +68,13 @@ message Protocol {
     repeated Attribute attrs = 1;
   }
 
-  // Type is enum type to identify the protocol, we aren't tight to Aries strings
+  // Type is enum type to identify the protocol, we aren't tight to Aries
+  // strings
   enum Type {
     NONE = 0;
-    CONNECT = 1;
-    ISSUE = 2;
-    PROOF = 3;
+    DIDEXCHANGE = 1;
+    ISSUE_CREDENTIAL = 2;
+    PRESENT_PROOF = 3;
     TRUST_PING = 4;
     BASIC_MESSAGE = 5;
   }
@@ -67,7 +85,7 @@ message Protocol {
     UNKNOWN = 0;
     INITIATOR = 1;
     ADDRESSEE = 2;
-    RESUME = 3; // To tell what to do with a paused protocol, waiting user action
+    RESUMER = 3; // Tells what to do with a paused protocol, waiting user action
   }
   Role role = 2;
 
@@ -93,7 +111,6 @@ message Protocol {
     message Attr {
       string name = 1;
       string cred_def_id = 2;
-      string predicate = 3;
     }
     repeated Attr attrs = 1;
   }
@@ -106,9 +123,9 @@ message Protocol {
 
   // Protocol type specific data: one of or no one
   oneof StartMsg {
-    Connection conn_attr = 10; //
-    Issuing cred_def = 11; // Only for Issuing protocol
-    ProofRequest proof_req = 12; // Only for Proof protocol
+    Connection DID_exchange = 10;
+    Issuing IssueCredential = 11;
+    ProofRequest PresentProof = 12;
     string basic_message = 13;
   }
 }
@@ -123,7 +140,7 @@ protocols.
 */
 message ProtocolID {
   Protocol.Type type_id = 1; // i.e. what is going on
-  Protocol.Role role = 2; // i.e. did we start this or other end etc.
+  Protocol.Role role = 2; // i.e. did we start this or the other end etc.
   string id = 3; // UUID of the current protocol, note! not the same as conn-id
   int64 notification_time = 4; // part of the key (see notification)
 }
