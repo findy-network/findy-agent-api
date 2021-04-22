@@ -25,7 +25,7 @@ type AgentClient interface {
 	// CreateInvitation returns an invitation according to InvitationBase.
 	CreateInvitation(ctx context.Context, in *InvitationBase, opts ...grpc.CallOption) (*Invitation, error)
 	// SetImplId sets implementation ID for the clould agent. It should be "grpc".
-	//
+	// TODO: REMOVE!! Check Agency implementation first.
 	SetImplId(ctx context.Context, in *SAImplementation, opts ...grpc.CallOption) (*SAImplementation, error)
 	Ping(ctx context.Context, in *PingMsg, opts ...grpc.CallOption) (*PingMsg, error)
 	CreateSchema(ctx context.Context, in *SchemaCreate, opts ...grpc.CallOption) (*Schema, error)
@@ -158,7 +158,7 @@ type AgentServer interface {
 	// CreateInvitation returns an invitation according to InvitationBase.
 	CreateInvitation(context.Context, *InvitationBase) (*Invitation, error)
 	// SetImplId sets implementation ID for the clould agent. It should be "grpc".
-	//
+	// TODO: REMOVE!! Check Agency implementation first.
 	SetImplId(context.Context, *SAImplementation) (*SAImplementation, error)
 	Ping(context.Context, *PingMsg) (*PingMsg, error)
 	CreateSchema(context.Context, *SchemaCreate) (*Schema, error)
