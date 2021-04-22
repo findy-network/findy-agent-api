@@ -11,6 +11,22 @@ jobs:
         uses: actions/checkout@v2
       - name: test
         run: echo "implement e2e tests"
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Release
+        uses: softprops/action-gh-release@v1
+        if: startsWith(github.ref, 'refs/tags/')
+        with:
+          files: |
+            idl/agency.proto
+            idl/agent.proto
+            idl/protocol.proto
+            LICENSE
+        env:
+          GITHUB_TOKEN: ${{ secrets.REPOSITORY_TOKEN }}
   merge:
     needs: e2e
     runs-on: ubuntu-latest
