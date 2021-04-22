@@ -46,18 +46,18 @@ message complements e.g. Start function to the following pseudo code:
    ProtocolService.Start(Protocol{TypeId: DIDEXCHANGE, Role: INITIATOR})
 which can be read as:
    // Start DIDEXCHANGE Protocol as INITIATOR 
-The DIDComm/Aries protocol is always defined with the protocol's type_id and
+The DIDComm/Aries protocol is always defined with the protocol's type_ID and
 together with the role they define how the protocol will be started. The table
 below lists few examples.
-   Protocol.Type_id        (as)  Role              Meaning
+   Protocol.Type_ID        (as)  Role              Meaning
    ------------------------------------------------------------------------
    DIDEXCHANGE                   INITIATOR         connect to other agent 
    ISSUE_CREDENTIAL              ADDRESSEE         request credential 
    PRESENT_PROOF                 RESUMER           accept proof request
    BASIC_MESSAGE                 INITIATOR         send basic message 
 
-The rest of the fields in Protocol include prev_thread_id and connection_id. The
-StartMsg fields include type_id specific data.
+The rest of the fields in Protocol include prev_thread_ID and connection_ID. The
+StartMsg fields include type_ID specific data.
  */
 message Protocol {
   message Attribute {
@@ -78,7 +78,7 @@ message Protocol {
     TRUST_PING = 4;
     BASIC_MESSAGE = 5;
   }
-  Type type_id = 1; // Protocol type
+  Type type_ID = 1; // Protocol type
 
   // Role tells in what role we are starting a protocol
   enum Role {
@@ -89,18 +89,18 @@ message Protocol {
   }
   Role role = 2;
 
-  string prev_thread_id = 3; // Previous protocol ID if there was any
-  string connection_id = 4; // pairwise ID, this only empty when Type is CONNECT
+  string prev_thread_ID = 3; // Previous protocol ID if there was any
+  string connection_ID = 4; // pairwise ID, this only empty when Type is CONNECT
 
   // Connection attributes
-  message Connection {
+  message DIDExchangeMsg {
     string Label = 1;
     string invitation_json = 2; // Invitation JSON string
   }
 
   // Issuing attributes
   message Issuing {
-    string cred_def_id = 1;
+    string cred_def_ID = 1;
     oneof Attrs {
       string attributes_json = 2;
       Attrs attrs = 3;
@@ -110,11 +110,11 @@ message Protocol {
   message Proof {
     message Attr {
       string name = 1;
-      string cred_def_id = 2;
+      string cred_def_ID = 2;
     }
     repeated Attr attrs = 1;
   }
-  message ProofRequest {
+  message PresentProofMsg {
     oneof AttrFmt {
       string attributes_json = 1;
       Proof attrs = 2;
@@ -123,10 +123,10 @@ message Protocol {
 
   // Protocol type specific data: one of or no one
   oneof StartMsg {
-    Connection DID_exchange = 10;
-    Issuing IssueCredential = 11;
-    ProofRequest PresentProof = 12;
-    string basic_message = 13;
+DIDExchangeMsg DID_exchange = 10;
+    Issuing issue_credential = 11;
+    PresentProofMsg present_proof = 12;
+    string basic_message = 13; // todo own struct 
   }
 }
 
@@ -139,16 +139,16 @@ reuse of the previous connection when ever it's possible. Still, we operate with
 protocols.
 */
 message ProtocolID {
-  Protocol.Type type_id = 1; // i.e. what is going on
+  Protocol.Type type_ID = 1; // i.e. what is going on
   Protocol.Role role = 2; // i.e. did we start this or the other end etc.
-  string id = 3; // UUID of the current protocol, note! not the same as conn-id
+  string ID = 3; // UUID of the current protocol, note! not the same as conn-id
   int64 notification_time = 4; // part of the key (see notification)
 }
 
 // ProtocolState is lightest and simplest way to tell outside what is going on
 // during a protocol run.
 message ProtocolState {
-  ProtocolID protocol_id = 1;
+  ProtocolID protocol_ID = 1;
   // State tells protocol machine's state at the API level
   enum State {
     RUNNING = 0; // Protocol is just started or it's still running
@@ -165,7 +165,7 @@ message ProtocolState {
 
 /*
 ProtocolStatus is message to include whole status of the protocol.
-Todo: should we think about Aries thread and decorator structure as well? e.g.
+TODO: should we think about Aries thread and decorator structure as well? e.g.
  BasicMsg
 */
 message ProtocolStatus {
@@ -174,15 +174,15 @@ message ProtocolStatus {
   string status_json = 3;
 
   message Connection {
-    string id = 1;
+    string ID = 1;
     string my_did = 2;
     string their_did = 3;
     string their_endpoint = 4;
     string their_label = 5;
   }
   message Issue {
-    string cred_def_id = 1;
-    string schema_id = 2;
+    string cred_def_ID = 1;
+    string schema_ID = 2;
     repeated Protocol.Attribute attrs = 3;
   }
   message TrustPing {

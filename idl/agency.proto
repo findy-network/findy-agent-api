@@ -43,14 +43,14 @@ relevant information are current agent DID and Connection ID which arrives in
 own fields.
  */
 message AgencyStatus {
-  string id = 1;
+  string ID = 1;
   agency.v1.ProtocolStatus protocol_status = 2; // Detailed protocol information
   string DID = 3; // Agent DID if available
-  string connection_id = 4; // Connection (pairwise) ID if available
+  string connection_ID = 4; // Connection (pairwise) ID if available
 }
 
 message DataHook {
-  string id = 1; // UUID to uniquely identify the hook
+  string ID = 1; // UUID to uniquely identify the hook
 }
 
 service DevOps {
