@@ -13,13 +13,13 @@ import (
 // is compatible with the grpc package it is being compiled against.
 const _ = grpc.SupportPackageIsVersion7
 
-// AgentClient is the client API for Agent service.
+// AgentServiceClient is the client API for AgentService service.
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
-type AgentClient interface {
+type AgentServiceClient interface {
 	// Listen is bidirectional function to stream AgentStatus. ClientID must be
 	// unique.
-	Listen(ctx context.Context, in *ClientID, opts ...grpc.CallOption) (Agent_ListenClient, error)
+	Listen(ctx context.Context, in *ClientID, opts ...grpc.CallOption) (AgentService_ListenClient, error)
 	// Give is function to give answer to ACTION_NEEDED_xx notifications.
 	Give(ctx context.Context, in *Answer, opts ...grpc.CallOption) (*ClientID, error)
 	// CreateInvitation returns an invitation according to InvitationBase.
@@ -34,20 +34,20 @@ type AgentClient interface {
 	GetCredDef(ctx context.Context, in *CredDef, opts ...grpc.CallOption) (*CredDefData, error)
 }
 
-type agentClient struct {
+type agentServiceClient struct {
 	cc grpc.ClientConnInterface
 }
 
-func NewAgentClient(cc grpc.ClientConnInterface) AgentClient {
-	return &agentClient{cc}
+func NewAgentServiceClient(cc grpc.ClientConnInterface) AgentServiceClient {
+	return &agentServiceClient{cc}
 }
 
-func (c *agentClient) Listen(ctx context.Context, in *ClientID, opts ...grpc.CallOption) (Agent_ListenClient, error) {
-	stream, err := c.cc.NewStream(ctx, &_Agent_serviceDesc.Streams[0], "/agency.v1.Agent/Listen", opts...)
+func (c *agentServiceClient) Listen(ctx context.Context, in *ClientID, opts ...grpc.CallOption) (AgentService_ListenClient, error) {
+	stream, err := c.cc.NewStream(ctx, &_AgentService_serviceDesc.Streams[0], "/agency.v1.AgentService/Listen", opts...)
 	if err != nil {
 		return nil, err
 	}
-	x := &agentListenClient{stream}
+	x := &agentServiceListenClient{stream}
 	if err := x.ClientStream.SendMsg(in); err != nil {
 		return nil, err
 	}
@@ -57,16 +57,16 @@ func (c *agentClient) Listen(ctx context.Context, in *ClientID, opts ...grpc.Cal
 	return x, nil
 }
 
-type Agent_ListenClient interface {
+type AgentService_ListenClient interface {
 	Recv() (*AgentStatus, error)
 	grpc.ClientStream
 }
 
-type agentListenClient struct {
+type agentServiceListenClient struct {
 	grpc.ClientStream
 }
 
-func (x *agentListenClient) Recv() (*AgentStatus, error) {
+func (x *agentServiceListenClient) Recv() (*AgentStatus, error) {
 	m := new(AgentStatus)
 	if err := x.ClientStream.RecvMsg(m); err != nil {
 		return nil, err
@@ -74,85 +74,85 @@ func (x *agentListenClient) Recv() (*AgentStatus, error) {
 	return m, nil
 }
 
-func (c *agentClient) Give(ctx context.Context, in *Answer, opts ...grpc.CallOption) (*ClientID, error) {
+func (c *agentServiceClient) Give(ctx context.Context, in *Answer, opts ...grpc.CallOption) (*ClientID, error) {
 	out := new(ClientID)
-	err := c.cc.Invoke(ctx, "/agency.v1.Agent/Give", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/agency.v1.AgentService/Give", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *agentClient) CreateInvitation(ctx context.Context, in *InvitationBase, opts ...grpc.CallOption) (*Invitation, error) {
+func (c *agentServiceClient) CreateInvitation(ctx context.Context, in *InvitationBase, opts ...grpc.CallOption) (*Invitation, error) {
 	out := new(Invitation)
-	err := c.cc.Invoke(ctx, "/agency.v1.Agent/CreateInvitation", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/agency.v1.AgentService/CreateInvitation", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *agentClient) SetImplId(ctx context.Context, in *SAImplementation, opts ...grpc.CallOption) (*SAImplementation, error) {
+func (c *agentServiceClient) SetImplId(ctx context.Context, in *SAImplementation, opts ...grpc.CallOption) (*SAImplementation, error) {
 	out := new(SAImplementation)
-	err := c.cc.Invoke(ctx, "/agency.v1.Agent/SetImplId", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/agency.v1.AgentService/SetImplId", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *agentClient) Ping(ctx context.Context, in *PingMsg, opts ...grpc.CallOption) (*PingMsg, error) {
+func (c *agentServiceClient) Ping(ctx context.Context, in *PingMsg, opts ...grpc.CallOption) (*PingMsg, error) {
 	out := new(PingMsg)
-	err := c.cc.Invoke(ctx, "/agency.v1.Agent/Ping", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/agency.v1.AgentService/Ping", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *agentClient) CreateSchema(ctx context.Context, in *SchemaCreate, opts ...grpc.CallOption) (*Schema, error) {
+func (c *agentServiceClient) CreateSchema(ctx context.Context, in *SchemaCreate, opts ...grpc.CallOption) (*Schema, error) {
 	out := new(Schema)
-	err := c.cc.Invoke(ctx, "/agency.v1.Agent/CreateSchema", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/agency.v1.AgentService/CreateSchema", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *agentClient) CreateCredDef(ctx context.Context, in *CredDefCreate, opts ...grpc.CallOption) (*CredDef, error) {
+func (c *agentServiceClient) CreateCredDef(ctx context.Context, in *CredDefCreate, opts ...grpc.CallOption) (*CredDef, error) {
 	out := new(CredDef)
-	err := c.cc.Invoke(ctx, "/agency.v1.Agent/CreateCredDef", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/agency.v1.AgentService/CreateCredDef", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *agentClient) GetSchema(ctx context.Context, in *Schema, opts ...grpc.CallOption) (*SchemaData, error) {
+func (c *agentServiceClient) GetSchema(ctx context.Context, in *Schema, opts ...grpc.CallOption) (*SchemaData, error) {
 	out := new(SchemaData)
-	err := c.cc.Invoke(ctx, "/agency.v1.Agent/GetSchema", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/agency.v1.AgentService/GetSchema", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *agentClient) GetCredDef(ctx context.Context, in *CredDef, opts ...grpc.CallOption) (*CredDefData, error) {
+func (c *agentServiceClient) GetCredDef(ctx context.Context, in *CredDef, opts ...grpc.CallOption) (*CredDefData, error) {
 	out := new(CredDefData)
-	err := c.cc.Invoke(ctx, "/agency.v1.Agent/GetCredDef", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/agency.v1.AgentService/GetCredDef", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-// AgentServer is the server API for Agent service.
-// All implementations must embed UnimplementedAgentServer
+// AgentServiceServer is the server API for AgentService service.
+// All implementations must embed UnimplementedAgentServiceServer
 // for forward compatibility
-type AgentServer interface {
+type AgentServiceServer interface {
 	// Listen is bidirectional function to stream AgentStatus. ClientID must be
 	// unique.
-	Listen(*ClientID, Agent_ListenServer) error
+	Listen(*ClientID, AgentService_ListenServer) error
 	// Give is function to give answer to ACTION_NEEDED_xx notifications.
 	Give(context.Context, *Answer) (*ClientID, error)
 	// CreateInvitation returns an invitation according to InvitationBase.
@@ -165,259 +165,259 @@ type AgentServer interface {
 	CreateCredDef(context.Context, *CredDefCreate) (*CredDef, error)
 	GetSchema(context.Context, *Schema) (*SchemaData, error)
 	GetCredDef(context.Context, *CredDef) (*CredDefData, error)
-	mustEmbedUnimplementedAgentServer()
+	mustEmbedUnimplementedAgentServiceServer()
 }
 
-// UnimplementedAgentServer must be embedded to have forward compatible implementations.
-type UnimplementedAgentServer struct {
+// UnimplementedAgentServiceServer must be embedded to have forward compatible implementations.
+type UnimplementedAgentServiceServer struct {
 }
 
-func (UnimplementedAgentServer) Listen(*ClientID, Agent_ListenServer) error {
+func (UnimplementedAgentServiceServer) Listen(*ClientID, AgentService_ListenServer) error {
 	return status.Errorf(codes.Unimplemented, "method Listen not implemented")
 }
-func (UnimplementedAgentServer) Give(context.Context, *Answer) (*ClientID, error) {
+func (UnimplementedAgentServiceServer) Give(context.Context, *Answer) (*ClientID, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Give not implemented")
 }
-func (UnimplementedAgentServer) CreateInvitation(context.Context, *InvitationBase) (*Invitation, error) {
+func (UnimplementedAgentServiceServer) CreateInvitation(context.Context, *InvitationBase) (*Invitation, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method CreateInvitation not implemented")
 }
-func (UnimplementedAgentServer) SetImplId(context.Context, *SAImplementation) (*SAImplementation, error) {
+func (UnimplementedAgentServiceServer) SetImplId(context.Context, *SAImplementation) (*SAImplementation, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method SetImplId not implemented")
 }
-func (UnimplementedAgentServer) Ping(context.Context, *PingMsg) (*PingMsg, error) {
+func (UnimplementedAgentServiceServer) Ping(context.Context, *PingMsg) (*PingMsg, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Ping not implemented")
 }
-func (UnimplementedAgentServer) CreateSchema(context.Context, *SchemaCreate) (*Schema, error) {
+func (UnimplementedAgentServiceServer) CreateSchema(context.Context, *SchemaCreate) (*Schema, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method CreateSchema not implemented")
 }
-func (UnimplementedAgentServer) CreateCredDef(context.Context, *CredDefCreate) (*CredDef, error) {
+func (UnimplementedAgentServiceServer) CreateCredDef(context.Context, *CredDefCreate) (*CredDef, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method CreateCredDef not implemented")
 }
-func (UnimplementedAgentServer) GetSchema(context.Context, *Schema) (*SchemaData, error) {
+func (UnimplementedAgentServiceServer) GetSchema(context.Context, *Schema) (*SchemaData, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetSchema not implemented")
 }
-func (UnimplementedAgentServer) GetCredDef(context.Context, *CredDef) (*CredDefData, error) {
+func (UnimplementedAgentServiceServer) GetCredDef(context.Context, *CredDef) (*CredDefData, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetCredDef not implemented")
 }
-func (UnimplementedAgentServer) mustEmbedUnimplementedAgentServer() {}
+func (UnimplementedAgentServiceServer) mustEmbedUnimplementedAgentServiceServer() {}
 
-// UnsafeAgentServer may be embedded to opt out of forward compatibility for this service.
-// Use of this interface is not recommended, as added methods to AgentServer will
+// UnsafeAgentServiceServer may be embedded to opt out of forward compatibility for this service.
+// Use of this interface is not recommended, as added methods to AgentServiceServer will
 // result in compilation errors.
-type UnsafeAgentServer interface {
-	mustEmbedUnimplementedAgentServer()
+type UnsafeAgentServiceServer interface {
+	mustEmbedUnimplementedAgentServiceServer()
 }
 
-func RegisterAgentServer(s *grpc.Server, srv AgentServer) {
-	s.RegisterService(&_Agent_serviceDesc, srv)
+func RegisterAgentServiceServer(s *grpc.Server, srv AgentServiceServer) {
+	s.RegisterService(&_AgentService_serviceDesc, srv)
 }
 
-func _Agent_Listen_Handler(srv interface{}, stream grpc.ServerStream) error {
+func _AgentService_Listen_Handler(srv interface{}, stream grpc.ServerStream) error {
 	m := new(ClientID)
 	if err := stream.RecvMsg(m); err != nil {
 		return err
 	}
-	return srv.(AgentServer).Listen(m, &agentListenServer{stream})
+	return srv.(AgentServiceServer).Listen(m, &agentServiceListenServer{stream})
 }
 
-type Agent_ListenServer interface {
+type AgentService_ListenServer interface {
 	Send(*AgentStatus) error
 	grpc.ServerStream
 }
 
-type agentListenServer struct {
+type agentServiceListenServer struct {
 	grpc.ServerStream
 }
 
-func (x *agentListenServer) Send(m *AgentStatus) error {
+func (x *agentServiceListenServer) Send(m *AgentStatus) error {
 	return x.ServerStream.SendMsg(m)
 }
 
-func _Agent_Give_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _AgentService_Give_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(Answer)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(AgentServer).Give(ctx, in)
+		return srv.(AgentServiceServer).Give(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/agency.v1.Agent/Give",
+		FullMethod: "/agency.v1.AgentService/Give",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(AgentServer).Give(ctx, req.(*Answer))
+		return srv.(AgentServiceServer).Give(ctx, req.(*Answer))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _Agent_CreateInvitation_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _AgentService_CreateInvitation_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(InvitationBase)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(AgentServer).CreateInvitation(ctx, in)
+		return srv.(AgentServiceServer).CreateInvitation(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/agency.v1.Agent/CreateInvitation",
+		FullMethod: "/agency.v1.AgentService/CreateInvitation",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(AgentServer).CreateInvitation(ctx, req.(*InvitationBase))
+		return srv.(AgentServiceServer).CreateInvitation(ctx, req.(*InvitationBase))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _Agent_SetImplId_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _AgentService_SetImplId_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(SAImplementation)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(AgentServer).SetImplId(ctx, in)
+		return srv.(AgentServiceServer).SetImplId(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/agency.v1.Agent/SetImplId",
+		FullMethod: "/agency.v1.AgentService/SetImplId",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(AgentServer).SetImplId(ctx, req.(*SAImplementation))
+		return srv.(AgentServiceServer).SetImplId(ctx, req.(*SAImplementation))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _Agent_Ping_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _AgentService_Ping_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(PingMsg)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(AgentServer).Ping(ctx, in)
+		return srv.(AgentServiceServer).Ping(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/agency.v1.Agent/Ping",
+		FullMethod: "/agency.v1.AgentService/Ping",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(AgentServer).Ping(ctx, req.(*PingMsg))
+		return srv.(AgentServiceServer).Ping(ctx, req.(*PingMsg))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _Agent_CreateSchema_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _AgentService_CreateSchema_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(SchemaCreate)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(AgentServer).CreateSchema(ctx, in)
+		return srv.(AgentServiceServer).CreateSchema(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/agency.v1.Agent/CreateSchema",
+		FullMethod: "/agency.v1.AgentService/CreateSchema",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(AgentServer).CreateSchema(ctx, req.(*SchemaCreate))
+		return srv.(AgentServiceServer).CreateSchema(ctx, req.(*SchemaCreate))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _Agent_CreateCredDef_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _AgentService_CreateCredDef_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(CredDefCreate)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(AgentServer).CreateCredDef(ctx, in)
+		return srv.(AgentServiceServer).CreateCredDef(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/agency.v1.Agent/CreateCredDef",
+		FullMethod: "/agency.v1.AgentService/CreateCredDef",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(AgentServer).CreateCredDef(ctx, req.(*CredDefCreate))
+		return srv.(AgentServiceServer).CreateCredDef(ctx, req.(*CredDefCreate))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _Agent_GetSchema_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _AgentService_GetSchema_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(Schema)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(AgentServer).GetSchema(ctx, in)
+		return srv.(AgentServiceServer).GetSchema(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/agency.v1.Agent/GetSchema",
+		FullMethod: "/agency.v1.AgentService/GetSchema",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(AgentServer).GetSchema(ctx, req.(*Schema))
+		return srv.(AgentServiceServer).GetSchema(ctx, req.(*Schema))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _Agent_GetCredDef_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _AgentService_GetCredDef_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(CredDef)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(AgentServer).GetCredDef(ctx, in)
+		return srv.(AgentServiceServer).GetCredDef(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/agency.v1.Agent/GetCredDef",
+		FullMethod: "/agency.v1.AgentService/GetCredDef",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(AgentServer).GetCredDef(ctx, req.(*CredDef))
+		return srv.(AgentServiceServer).GetCredDef(ctx, req.(*CredDef))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-var _Agent_serviceDesc = grpc.ServiceDesc{
-	ServiceName: "agency.v1.Agent",
-	HandlerType: (*AgentServer)(nil),
+var _AgentService_serviceDesc = grpc.ServiceDesc{
+	ServiceName: "agency.v1.AgentService",
+	HandlerType: (*AgentServiceServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
 			MethodName: "Give",
-			Handler:    _Agent_Give_Handler,
+			Handler:    _AgentService_Give_Handler,
 		},
 		{
 			MethodName: "CreateInvitation",
-			Handler:    _Agent_CreateInvitation_Handler,
+			Handler:    _AgentService_CreateInvitation_Handler,
 		},
 		{
 			MethodName: "SetImplId",
-			Handler:    _Agent_SetImplId_Handler,
+			Handler:    _AgentService_SetImplId_Handler,
 		},
 		{
 			MethodName: "Ping",
-			Handler:    _Agent_Ping_Handler,
+			Handler:    _AgentService_Ping_Handler,
 		},
 		{
 			MethodName: "CreateSchema",
-			Handler:    _Agent_CreateSchema_Handler,
+			Handler:    _AgentService_CreateSchema_Handler,
 		},
 		{
 			MethodName: "CreateCredDef",
-			Handler:    _Agent_CreateCredDef_Handler,
+			Handler:    _AgentService_CreateCredDef_Handler,
 		},
 		{
 			MethodName: "GetSchema",
-			Handler:    _Agent_GetSchema_Handler,
+			Handler:    _AgentService_GetSchema_Handler,
 		},
 		{
 			MethodName: "GetCredDef",
-			Handler:    _Agent_GetCredDef_Handler,
+			Handler:    _AgentService_GetCredDef_Handler,
 		},
 	},
 	Streams: []grpc.StreamDesc{
 		{
 			StreamName:    "Listen",
-			Handler:       _Agent_Listen_Handler,
+			Handler:       _AgentService_Listen_Handler,
 			ServerStreams: true,
 		},
 	},

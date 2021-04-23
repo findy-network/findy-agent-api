@@ -13,30 +13,30 @@ import (
 // is compatible with the grpc package it is being compiled against.
 const _ = grpc.SupportPackageIsVersion7
 
-// AgencyClient is the client API for Agency service.
+// AgencyServiceClient is the client API for AgencyService service.
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
-type AgencyClient interface {
+type AgencyServiceClient interface {
 	// PSMHook listens realtime stream of archived protocol state machines
-	PSMHook(ctx context.Context, in *DataHook, opts ...grpc.CallOption) (Agency_PSMHookClient, error)
+	PSMHook(ctx context.Context, in *DataHook, opts ...grpc.CallOption) (AgencyService_PSMHookClient, error)
 	// Onboard allocates cloud agent and wallet from Agency
 	Onboard(ctx context.Context, in *Onboarding, opts ...grpc.CallOption) (*OnboardResult, error)
 }
 
-type agencyClient struct {
+type agencyServiceClient struct {
 	cc grpc.ClientConnInterface
 }
 
-func NewAgencyClient(cc grpc.ClientConnInterface) AgencyClient {
-	return &agencyClient{cc}
+func NewAgencyServiceClient(cc grpc.ClientConnInterface) AgencyServiceClient {
+	return &agencyServiceClient{cc}
 }
 
-func (c *agencyClient) PSMHook(ctx context.Context, in *DataHook, opts ...grpc.CallOption) (Agency_PSMHookClient, error) {
-	stream, err := c.cc.NewStream(ctx, &_Agency_serviceDesc.Streams[0], "/ops.v1.Agency/PSMHook", opts...)
+func (c *agencyServiceClient) PSMHook(ctx context.Context, in *DataHook, opts ...grpc.CallOption) (AgencyService_PSMHookClient, error) {
+	stream, err := c.cc.NewStream(ctx, &_AgencyService_serviceDesc.Streams[0], "/ops.v1.AgencyService/PSMHook", opts...)
 	if err != nil {
 		return nil, err
 	}
-	x := &agencyPSMHookClient{stream}
+	x := &agencyServicePSMHookClient{stream}
 	if err := x.ClientStream.SendMsg(in); err != nil {
 		return nil, err
 	}
@@ -46,16 +46,16 @@ func (c *agencyClient) PSMHook(ctx context.Context, in *DataHook, opts ...grpc.C
 	return x, nil
 }
 
-type Agency_PSMHookClient interface {
+type AgencyService_PSMHookClient interface {
 	Recv() (*AgencyStatus, error)
 	grpc.ClientStream
 }
 
-type agencyPSMHookClient struct {
+type agencyServicePSMHookClient struct {
 	grpc.ClientStream
 }
 
-func (x *agencyPSMHookClient) Recv() (*AgencyStatus, error) {
+func (x *agencyServicePSMHookClient) Recv() (*AgencyStatus, error) {
 	m := new(AgencyStatus)
 	if err := x.ClientStream.RecvMsg(m); err != nil {
 		return nil, err
@@ -63,101 +63,101 @@ func (x *agencyPSMHookClient) Recv() (*AgencyStatus, error) {
 	return m, nil
 }
 
-func (c *agencyClient) Onboard(ctx context.Context, in *Onboarding, opts ...grpc.CallOption) (*OnboardResult, error) {
+func (c *agencyServiceClient) Onboard(ctx context.Context, in *Onboarding, opts ...grpc.CallOption) (*OnboardResult, error) {
 	out := new(OnboardResult)
-	err := c.cc.Invoke(ctx, "/ops.v1.Agency/Onboard", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/ops.v1.AgencyService/Onboard", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-// AgencyServer is the server API for Agency service.
-// All implementations must embed UnimplementedAgencyServer
+// AgencyServiceServer is the server API for AgencyService service.
+// All implementations must embed UnimplementedAgencyServiceServer
 // for forward compatibility
-type AgencyServer interface {
+type AgencyServiceServer interface {
 	// PSMHook listens realtime stream of archived protocol state machines
-	PSMHook(*DataHook, Agency_PSMHookServer) error
+	PSMHook(*DataHook, AgencyService_PSMHookServer) error
 	// Onboard allocates cloud agent and wallet from Agency
 	Onboard(context.Context, *Onboarding) (*OnboardResult, error)
-	mustEmbedUnimplementedAgencyServer()
+	mustEmbedUnimplementedAgencyServiceServer()
 }
 
-// UnimplementedAgencyServer must be embedded to have forward compatible implementations.
-type UnimplementedAgencyServer struct {
+// UnimplementedAgencyServiceServer must be embedded to have forward compatible implementations.
+type UnimplementedAgencyServiceServer struct {
 }
 
-func (UnimplementedAgencyServer) PSMHook(*DataHook, Agency_PSMHookServer) error {
+func (UnimplementedAgencyServiceServer) PSMHook(*DataHook, AgencyService_PSMHookServer) error {
 	return status.Errorf(codes.Unimplemented, "method PSMHook not implemented")
 }
-func (UnimplementedAgencyServer) Onboard(context.Context, *Onboarding) (*OnboardResult, error) {
+func (UnimplementedAgencyServiceServer) Onboard(context.Context, *Onboarding) (*OnboardResult, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Onboard not implemented")
 }
-func (UnimplementedAgencyServer) mustEmbedUnimplementedAgencyServer() {}
+func (UnimplementedAgencyServiceServer) mustEmbedUnimplementedAgencyServiceServer() {}
 
-// UnsafeAgencyServer may be embedded to opt out of forward compatibility for this service.
-// Use of this interface is not recommended, as added methods to AgencyServer will
+// UnsafeAgencyServiceServer may be embedded to opt out of forward compatibility for this service.
+// Use of this interface is not recommended, as added methods to AgencyServiceServer will
 // result in compilation errors.
-type UnsafeAgencyServer interface {
-	mustEmbedUnimplementedAgencyServer()
+type UnsafeAgencyServiceServer interface {
+	mustEmbedUnimplementedAgencyServiceServer()
 }
 
-func RegisterAgencyServer(s *grpc.Server, srv AgencyServer) {
-	s.RegisterService(&_Agency_serviceDesc, srv)
+func RegisterAgencyServiceServer(s *grpc.Server, srv AgencyServiceServer) {
+	s.RegisterService(&_AgencyService_serviceDesc, srv)
 }
 
-func _Agency_PSMHook_Handler(srv interface{}, stream grpc.ServerStream) error {
+func _AgencyService_PSMHook_Handler(srv interface{}, stream grpc.ServerStream) error {
 	m := new(DataHook)
 	if err := stream.RecvMsg(m); err != nil {
 		return err
 	}
-	return srv.(AgencyServer).PSMHook(m, &agencyPSMHookServer{stream})
+	return srv.(AgencyServiceServer).PSMHook(m, &agencyServicePSMHookServer{stream})
 }
 
-type Agency_PSMHookServer interface {
+type AgencyService_PSMHookServer interface {
 	Send(*AgencyStatus) error
 	grpc.ServerStream
 }
 
-type agencyPSMHookServer struct {
+type agencyServicePSMHookServer struct {
 	grpc.ServerStream
 }
 
-func (x *agencyPSMHookServer) Send(m *AgencyStatus) error {
+func (x *agencyServicePSMHookServer) Send(m *AgencyStatus) error {
 	return x.ServerStream.SendMsg(m)
 }
 
-func _Agency_Onboard_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _AgencyService_Onboard_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(Onboarding)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(AgencyServer).Onboard(ctx, in)
+		return srv.(AgencyServiceServer).Onboard(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/ops.v1.Agency/Onboard",
+		FullMethod: "/ops.v1.AgencyService/Onboard",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(AgencyServer).Onboard(ctx, req.(*Onboarding))
+		return srv.(AgencyServiceServer).Onboard(ctx, req.(*Onboarding))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-var _Agency_serviceDesc = grpc.ServiceDesc{
-	ServiceName: "ops.v1.Agency",
-	HandlerType: (*AgencyServer)(nil),
+var _AgencyService_serviceDesc = grpc.ServiceDesc{
+	ServiceName: "ops.v1.AgencyService",
+	HandlerType: (*AgencyServiceServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
 			MethodName: "Onboard",
-			Handler:    _Agency_Onboard_Handler,
+			Handler:    _AgencyService_Onboard_Handler,
 		},
 	},
 	Streams: []grpc.StreamDesc{
 		{
 			StreamName:    "PSMHook",
-			Handler:       _Agency_PSMHook_Handler,
+			Handler:       _AgencyService_PSMHook_Handler,
 			ServerStreams: true,
 		},
 	},

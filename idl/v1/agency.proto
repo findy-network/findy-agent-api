@@ -10,10 +10,10 @@ option go_package = "github.com/findy-network/findy-agent-api/grpc/ops/v1";
 package ops.v1;
 
 /*
-Agency is a service for agency level functionality i.e. multi-tenant features
+AgencyService offers for agency level functionality i.e. multi-tenant features
 like data migrations, etc.
  */
-service Agency {
+service AgencyService {
   // PSMHook listens realtime stream of archived protocol state machines
   rpc PSMHook(DataHook) returns (stream AgencyStatus) {}
 
@@ -27,12 +27,12 @@ message Onboarding {
 
 message OnboardResult {
   bool ok = 1;
-  message OkResult {
+  message OKResult {
     string JWT = 1;
     string CADID = 2;
     string invitation_json = 3;
   }
-  OkResult result = 2;
+  OKResult result = 2;
 }
 
 /*
@@ -46,7 +46,7 @@ message AgencyStatus {
   string ID = 1;
   agency.v1.ProtocolStatus protocol_status = 2; // Detailed protocol information
   string DID = 3; // Agent DID if available
-  string connection_ID = 4; // Connection (pairwise) ID if available
+  string connectionID = 4; // Connection (pairwise) ID if available
 }
 
 message DataHook {

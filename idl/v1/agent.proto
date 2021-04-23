@@ -10,18 +10,19 @@ option go_package = "github.com/findy-network/findy-agent-api/grpc/agency/v1";
 package agency.v1;
 
 /*
-Agent is a service to communicate with your cloud agent. With the cloud agent
+AgentService is to communicate with your cloud agent. With the cloud agent
 you can Listen your agent's status, Answer to its requests and questions,
 create invitations, manage its running environment, and create schemas and
 credentials.
  */
-service Agent {
+service AgentService {
   // Listen is bidirectional function to stream AgentStatus. ClientID must be
   // unique.
   rpc Listen(ClientID) returns (stream AgentStatus) {}
 
   // Give is function to give answer to ACTION_NEEDED_xx notifications.
   rpc Give(Answer) returns (ClientID) {}
+  //rpc Wait(ClientID) returns (stream Question) {}
 
   // CreateInvitation returns an invitation according to InvitationBase.
   rpc CreateInvitation(InvitationBase) returns (Invitation) {}
@@ -52,7 +53,7 @@ message CredDefData {
 message SchemaCreate {
   string name = 1;
   string version = 2;
-  repeated string attrs = 3;
+  repeated string attributes = 3;
 }
 
 message Schema {
@@ -60,7 +61,7 @@ message Schema {
 }
 
 message CredDefCreate {
-  string schema_ID = 1;
+  string schemaID = 1;
   string tag = 2;
 }
 
@@ -96,7 +97,7 @@ Answer is a message send by Give function of Agent service.
  */
 message Answer {
   string ID = 1; // Same as Notification ID (UUID)
-  ClientID client_ID = 2; // Same as your ClientID when Listening was started
+  ClientID clientID = 2; // Same as your ClientID when Listening was started
   bool ack = 3; // Your response to the protocol question
   string info = 4; // General info, mostly used for debugging
 }
@@ -112,7 +113,7 @@ AgentStatus is a message identifying current agent events returned as
 notifications.
  */
 message AgentStatus {
-  ClientID client_ID = 1; // UUID of the client listening
+  ClientID clientID = 1; // UUID of the client listening
   Notification notification = 3; // The actual Notification message
 }
 
@@ -125,37 +126,44 @@ message Notification {
   enum Type {
     STATUS_UPDATE = 0; // General status update where no action needed
     ACTION_NEEDED = 1; // General action needed update notification
-    ANSWER_NEEDED_PING = 2; // Your CA controller has been pinged
-    ANSWER_NEEDED_ISSUE_PROPOSE = 3; // Issuing is proposed
-    ANSWER_NEEDED_PROOF_PROPOSE = 4; // Proof is proposed
-    ANSWER_NEEDED_PROOF_VERIFY = 5; // During proof values need to be verified
-    KEEPALIVE = 6; // To prevent network idle to shut us down 
+    KEEPALIVE = 2; // To prevent network idle to shut us down 
+    QUESTION = 3; // Agency has sent as a blocking question and needs answer now
   }
-  Type type_ID = 1; // Notification type, see Type
+  Type typeID = 1; // Notification type, see Type
 
   string ID = 2; // Notification's unique ID
-  string connection_ID = 3; // Current pairwise ID between agents
-  string protocol_ID = 4; // Current protocol ID, see Aries Thread ID
+  string connectionID = 3; // Current pairwise ID between agents
+  string protocolID = 4; // Current protocol ID, see Aries Thread ID
   string protocol_family = 5; // Text version of the protocol family/namespace
-  int64 timestamp = 6; // timestamp in nano because this is part of the key
+  int64 timestamp = 6; // timestamp in nano because this is part of the key TODO check!!!
   Protocol.Type protocol_type = 7;
   Protocol.Role role = 8;
   string PID = 9;
 
-  message IssuePropose {
-    string cred_def_ID = 2;
+  // QuestionType is enum type to tell what the question was
+  enum QuestionType {
+    NONE = 0; // No question 
+    PING = 1; // Your CA controller has been pinged
+    ISSUE_PROPOSE = 2; // Issuing is proposed
+    PROOF_PROPOSE = 3; // Proof is proposed
+    PROOF_VERIFY = 4; // During proof values need to be verified
+  }
+  QuestionType questionID = 10; // Notification type, see Type
+
+  message IssueProposeMsg {
+    string cred_defID = 2;
     string values_json = 3;
   }
-  message ProofVerify {
-    message Attr {
+  message ProofVerifyMsg {
+    message Attribute {
       string value = 1;
       string name = 2;
-      string cred_def_ID = 3;
+      string cred_defID = 3;
     }
-    repeated Attr attrs = 1;
+    repeated Attribute attributes = 1;
   }
   oneof Question {
-    IssuePropose issue_propose = 10;
-    ProofVerify proof_verify = 11;
+    IssueProposeMsg issue_propose = 11;
+    ProofVerifyMsg proof_verify = 12;
   }
 }

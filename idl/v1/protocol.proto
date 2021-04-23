@@ -46,28 +46,20 @@ message complements e.g. Start function to the following pseudo code:
    ProtocolService.Start(Protocol{TypeId: DIDEXCHANGE, Role: INITIATOR})
 which can be read as:
    // Start DIDEXCHANGE Protocol as INITIATOR 
-The DIDComm/Aries protocol is always defined with the protocol's type_ID and
+The DIDComm/Aries protocol is always defined with the protocol's typeID and
 together with the role they define how the protocol will be started. The table
 below lists few examples.
-   Protocol.Type_ID        (as)  Role              Meaning
+   Protocol.TypeID        (as)  Role              Meaning
    ------------------------------------------------------------------------
    DIDEXCHANGE                   INITIATOR         connect to other agent 
    ISSUE_CREDENTIAL              ADDRESSEE         request credential 
    PRESENT_PROOF                 RESUMER           accept proof request
    BASIC_MESSAGE                 INITIATOR         send basic message 
 
-The rest of the fields in Protocol include prev_thread_ID and connection_ID. The
-StartMsg fields include type_ID specific data.
+The rest of the fields in Protocol include prev_threadID and connectionID. The
+StartMsg fields include typeID specific data.
  */
 message Protocol {
-  message Attribute {
-    string name = 1;
-    string value = 2;
-  }
-  message Attrs {
-    repeated Attribute attrs = 1;
-  }
-
   // Type is enum type to identify the protocol, we aren't tight to Aries
   // strings
   enum Type {
@@ -78,7 +70,7 @@ message Protocol {
     TRUST_PING = 4;
     BASIC_MESSAGE = 5;
   }
-  Type type_ID = 1; // Protocol type
+  Type typeID = 1; // Protocol type
 
   // Role tells in what role we are starting a protocol
   enum Role {
@@ -89,44 +81,53 @@ message Protocol {
   }
   Role role = 2;
 
-  string prev_thread_ID = 3; // Previous protocol ID if there was any
-  string connection_ID = 4; // pairwise ID, this only empty when Type is CONNECT
+  string prev_threadID = 3; // Previous protocol ID if there was any
+  string connectionID = 4; // pairwise ID, this only empty when Type is CONNECT
 
-  // Connection attributes
+  // Sub-message types for gathering new types from them
+
+  message Attribute {
+    string name = 1;
+    string value = 2;
+  }
+  message Attributes {
+    repeated Attribute attrs = 1;
+  }
+
+  // Message types for each protocol typeID, see StartMsg 
   message DIDExchangeMsg {
     string Label = 1;
     string invitation_json = 2; // Invitation JSON string
   }
-
-  // Issuing attributes
-  message Issuing {
-    string cred_def_ID = 1;
-    oneof Attrs {
+  message IssueCredentialMsg {
+    string cred_defID = 1;
+    oneof AttrFmt {
       string attributes_json = 2;
-      Attrs attrs = 3;
+      Attributes attributes = 3;
     }
   }
-  // Proof attributes
   message Proof {
-    message Attr {
+    message Attribute {
       string name = 1;
-      string cred_def_ID = 2;
+      string cred_defID = 2;
     }
-    repeated Attr attrs = 1;
+    repeated Attribute attributes = 1;
   }
   message PresentProofMsg {
     oneof AttrFmt {
       string attributes_json = 1;
-      Proof attrs = 2;
+      Proof attributes = 2;
     }
   }
-
-  // Protocol type specific data: one of or no one
+  message BasicMessageMsg {
+    string text = 1;
+  }
+  // Protocol typeID specific data
   oneof StartMsg {
-DIDExchangeMsg DID_exchange = 10;
-    Issuing issue_credential = 11;
+    DIDExchangeMsg DID_exchange = 10;
+    IssueCredentialMsg issue_credential = 11;
     PresentProofMsg present_proof = 12;
-    string basic_message = 13; // todo own struct 
+    BasicMessageMsg basic_message = 13;
   }
 }
 
@@ -139,16 +140,16 @@ reuse of the previous connection when ever it's possible. Still, we operate with
 protocols.
 */
 message ProtocolID {
-  Protocol.Type type_ID = 1; // i.e. what is going on
+  Protocol.Type typeID = 1; // i.e. what is going on
   Protocol.Role role = 2; // i.e. did we start this or the other end etc.
   string ID = 3; // UUID of the current protocol, note! not the same as conn-id
-  int64 notification_time = 4; // part of the key (see notification)
+  int64 notification_time = 4; // part of the key (see notification) TODO check!
 }
 
 // ProtocolState is lightest and simplest way to tell outside what is going on
 // during a protocol run.
 message ProtocolState {
-  ProtocolID protocol_ID = 1;
+  ProtocolID protocolID = 1;
   // State tells protocol machine's state at the API level
   enum State {
     RUNNING = 0; // Protocol is just started or it's still running
@@ -181,8 +182,8 @@ message ProtocolStatus {
     string their_label = 5;
   }
   message Issue {
-    string cred_def_ID = 1;
-    string schema_ID = 2;
+    string cred_defID = 1;
+    string schemaID = 2;
     repeated Protocol.Attribute attrs = 3;
   }
   message TrustPing {
