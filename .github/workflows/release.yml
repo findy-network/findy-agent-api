@@ -24,7 +24,7 @@ jobs:
             idl/agency.proto
             idl/agent.proto
             idl/protocol.proto
-            LICENSE
+            VERSION
         env:
           GITHUB_TOKEN: ${{ secrets.REPOSITORY_TOKEN }}
   merge:
