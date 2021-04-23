@@ -20,9 +20,10 @@ service AgentService {
   // unique.
   rpc Listen(ClientID) returns (stream AgentStatus) {}
 
+  // Wait is bidirectional function to stream service agent Questions.
+  rpc Wait(ClientID) returns (stream Question) {}
   // Give is function to give answer to ACTION_NEEDED_xx notifications.
   rpc Give(Answer) returns (ClientID) {}
-  //rpc Wait(ClientID) returns (stream Question) {}
 
   // CreateInvitation returns an invitation according to InvitationBase.
   rpc CreateInvitation(InvitationBase) returns (Invitation) {}
@@ -126,8 +127,11 @@ message Notification {
   enum Type {
     STATUS_UPDATE = 0; // General status update where no action needed
     ACTION_NEEDED = 1; // General action needed update notification
-    KEEPALIVE = 2; // To prevent network idle to shut us down 
-    QUESTION = 3; // Agency has sent as a blocking question and needs answer now
+    ANSWER_NEEDED_PING = 2; // Your CA controller has been pinged
+    ANSWER_NEEDED_ISSUE_PROPOSE = 3; // Issuing is proposed
+    ANSWER_NEEDED_PROOF_PROPOSE = 4; // Proof is proposed
+    ANSWER_NEEDED_PROOF_VERIFY = 5; // During proof values need to be verified
+    KEEPALIVE = 6; // To prevent network idle to shut us down 
   }
   Type typeID = 1; // Notification type, see Type
 
@@ -139,16 +143,6 @@ message Notification {
   Protocol.Type protocol_type = 7;
   Protocol.Role role = 8;
   string PID = 9;
-
-  // QuestionType is enum type to tell what the question was
-  enum QuestionType {
-    NONE = 0; // No question 
-    PING = 1; // Your CA controller has been pinged
-    ISSUE_PROPOSE = 2; // Issuing is proposed
-    PROOF_PROPOSE = 3; // Proof is proposed
-    PROOF_VERIFY = 4; // During proof values need to be verified
-  }
-  QuestionType questionID = 10; // Notification type, see Type
 
   message IssueProposeMsg {
     string cred_defID = 2;
