@@ -125,13 +125,10 @@ agent.
 message Notification {
   // Type is enum type to tell what happening
   enum Type {
-    STATUS_UPDATE = 0; // General status update where no action needed
-    ACTION_NEEDED = 1; // General action needed update notification
-    ANSWER_NEEDED_PING = 2; // Your CA controller has been pinged
-    ANSWER_NEEDED_ISSUE_PROPOSE = 3; // Issuing is proposed
-    ANSWER_NEEDED_PROOF_PROPOSE = 4; // Proof is proposed
-    ANSWER_NEEDED_PROOF_VERIFY = 5; // During proof values need to be verified
-    KEEPALIVE = 6; // To prevent network idle to shut us down 
+    NONE = 0;
+    KEEPALIVE = 1; // To prevent network idle to shut us down 
+    STATUS_UPDATE = 2; // General status update where no action needed
+    ACTION_NEEDED = 3; // General action needed update notification
   }
   Type typeID = 1; // Notification type, see Type
 
@@ -143,10 +140,27 @@ message Notification {
   Protocol.Type protocol_type = 7;
   Protocol.Role role = 8;
   string PID = 9;
+}
+
+// Question is a message for questions sent by cloud agent to its controller aka
+// service agent. Current API uses bidirectional streams for immetiate questions
+// araised during the protocol execution.
+message Question {
+  AgentStatus Status = 1;
+  // Type is enum type to tell what happening
+  enum Type {
+    NONE = 0;
+    KEEPALIVE = 1; // To prevent network idle to shut us down 
+    ANSWER_NEEDED_PING = 2; // Your CA controller has been pinged
+    ANSWER_NEEDED_ISSUE_PROPOSE = 3; // Issuing is proposed
+    ANSWER_NEEDED_PROOF_PROPOSE = 4; // Proof is proposed
+    ANSWER_NEEDED_PROOF_VERIFY = 5; // During proof values need to be verified
+  }
+  Type typeID = 2; // Question type, see Type
 
   message IssueProposeMsg {
-    string cred_defID = 2;
-    string values_json = 3;
+    string cred_defID = 1;
+    string values_json = 2;
   }
   message ProofVerifyMsg {
     message Attribute {
@@ -157,7 +171,7 @@ message Notification {
     repeated Attribute attributes = 1;
   }
   oneof Question {
-    IssueProposeMsg issue_propose = 11;
-    ProofVerifyMsg proof_verify = 12;
+    IssueProposeMsg issue_propose = 3;
+    ProofVerifyMsg proof_verify = 4;
   }
 }
