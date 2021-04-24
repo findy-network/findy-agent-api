@@ -20,6 +20,8 @@ type AgentServiceClient interface {
 	// Listen is bidirectional function to stream AgentStatus. ClientID must be
 	// unique.
 	Listen(ctx context.Context, in *ClientID, opts ...grpc.CallOption) (AgentService_ListenClient, error)
+	// Wait is bidirectional function to stream service agent Questions.
+	Wait(ctx context.Context, in *ClientID, opts ...grpc.CallOption) (AgentService_WaitClient, error)
 	// Give is function to give answer to ACTION_NEEDED_xx notifications.
 	Give(ctx context.Context, in *Answer, opts ...grpc.CallOption) (*ClientID, error)
 	// CreateInvitation returns an invitation according to InvitationBase.
@@ -68,6 +70,38 @@ type agentServiceListenClient struct {
 
 func (x *agentServiceListenClient) Recv() (*AgentStatus, error) {
 	m := new(AgentStatus)
+	if err := x.ClientStream.RecvMsg(m); err != nil {
+		return nil, err
+	}
+	return m, nil
+}
+
+func (c *agentServiceClient) Wait(ctx context.Context, in *ClientID, opts ...grpc.CallOption) (AgentService_WaitClient, error) {
+	stream, err := c.cc.NewStream(ctx, &_AgentService_serviceDesc.Streams[1], "/agency.v1.AgentService/Wait", opts...)
+	if err != nil {
+		return nil, err
+	}
+	x := &agentServiceWaitClient{stream}
+	if err := x.ClientStream.SendMsg(in); err != nil {
+		return nil, err
+	}
+	if err := x.ClientStream.CloseSend(); err != nil {
+		return nil, err
+	}
+	return x, nil
+}
+
+type AgentService_WaitClient interface {
+	Recv() (*Question, error)
+	grpc.ClientStream
+}
+
+type agentServiceWaitClient struct {
+	grpc.ClientStream
+}
+
+func (x *agentServiceWaitClient) Recv() (*Question, error) {
+	m := new(Question)
 	if err := x.ClientStream.RecvMsg(m); err != nil {
 		return nil, err
 	}
@@ -153,6 +187,8 @@ type AgentServiceServer interface {
 	// Listen is bidirectional function to stream AgentStatus. ClientID must be
 	// unique.
 	Listen(*ClientID, AgentService_ListenServer) error
+	// Wait is bidirectional function to stream service agent Questions.
+	Wait(*ClientID, AgentService_WaitServer) error
 	// Give is function to give answer to ACTION_NEEDED_xx notifications.
 	Give(context.Context, *Answer) (*ClientID, error)
 	// CreateInvitation returns an invitation according to InvitationBase.
@@ -174,6 +210,9 @@ type UnimplementedAgentServiceServer struct {
 
 func (UnimplementedAgentServiceServer) Listen(*ClientID, AgentService_ListenServer) error {
 	return status.Errorf(codes.Unimplemented, "method Listen not implemented")
+}
+func (UnimplementedAgentServiceServer) Wait(*ClientID, AgentService_WaitServer) error {
+	return status.Errorf(codes.Unimplemented, "method Wait not implemented")
 }
 func (UnimplementedAgentServiceServer) Give(context.Context, *Answer) (*ClientID, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Give not implemented")
@@ -230,6 +269,27 @@ type agentServiceListenServer struct {
 }
 
 func (x *agentServiceListenServer) Send(m *AgentStatus) error {
+	return x.ServerStream.SendMsg(m)
+}
+
+func _AgentService_Wait_Handler(srv interface{}, stream grpc.ServerStream) error {
+	m := new(ClientID)
+	if err := stream.RecvMsg(m); err != nil {
+		return err
+	}
+	return srv.(AgentServiceServer).Wait(m, &agentServiceWaitServer{stream})
+}
+
+type AgentService_WaitServer interface {
+	Send(*Question) error
+	grpc.ServerStream
+}
+
+type agentServiceWaitServer struct {
+	grpc.ServerStream
+}
+
+func (x *agentServiceWaitServer) Send(m *Question) error {
 	return x.ServerStream.SendMsg(m)
 }
 
@@ -418,6 +478,11 @@ var _AgentService_serviceDesc = grpc.ServiceDesc{
 		{
 			StreamName:    "Listen",
 			Handler:       _AgentService_Listen_Handler,
+			ServerStreams: true,
+		},
+		{
+			StreamName:    "Wait",
+			Handler:       _AgentService_Wait_Handler,
 			ServerStreams: true,
 		},
 	},
