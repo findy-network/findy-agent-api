@@ -53,7 +53,7 @@ message DataHook {
   string ID = 1; // UUID to uniquely identify the hook
 }
 
-service DevOps {
+service DevOpsService {
   rpc Enter(Cmd) returns (CmdReturn) {}
 }
 

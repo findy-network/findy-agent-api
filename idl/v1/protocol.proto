@@ -96,7 +96,7 @@ message Protocol {
 
   // Message types for each protocol typeID, see StartMsg 
   message DIDExchangeMsg {
-    string Label = 1;
+    string label = 1;
     string invitation_json = 2; // Invitation JSON string
   }
   message IssueCredentialMsg {

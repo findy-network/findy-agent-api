@@ -17,12 +17,21 @@ credentials.
  */
 service AgentService {
   // Listen is bidirectional function to stream AgentStatus. ClientID must be
-  // unique.
+  // unique. AgentStatus includes only enough information to access the actual
+  // PSM and DIDComm connection with the ProtocolService.Status function.
+  // Summary: you listen your agent but work with our protocols.
   rpc Listen(ClientID) returns (stream AgentStatus) {}
 
-  // Wait is bidirectional function to stream service agent Questions.
+  // Wait is bidirectional function to stream service agent Questions. With 
+  // Wait you listen your agent and if it's Issuing or Verifying VC it needs 
+  // more information and immetiate answers e.g. proof can be validated. Note!
+  // if your agent is only casual Holder it doesn't need to answer any of these
+  // questions. Holder communicate goes with ProtocolService.Resume(). Please
+  // see Give for more information.
   rpc Wait(ClientID) returns (stream Question) {}
-  // Give is function to give answer to ACTION_NEEDED_xx notifications.
+  // Give is function to give answer to ANSWER_NEEDED_xx Questions arived from
+  // Wait function. Questions have ID and clientID which should be used when
+  // answering the questions.
   rpc Give(Answer) returns (ClientID) {}
 
   // CreateInvitation returns an invitation according to InvitationBase.
@@ -97,9 +106,9 @@ message Invitation {
 Answer is a message send by Give function of Agent service.
  */
 message Answer {
-  string ID = 1; // Same as Notification ID (UUID)
-  ClientID clientID = 2; // Same as your ClientID when Listening was started
-  bool ack = 3; // Your response to the protocol question
+  string ID = 1; // Same as Question ID (UUID)
+  ClientID clientID = 2; // Same as your ClientID when Wait was started
+  bool ack = 3; // Response to the protocol question: true = ACK, false = NACK
   string info = 4; // General info, mostly used for debugging
 }
 
@@ -111,7 +120,7 @@ message ClientID {
 
 /*
 AgentStatus is a message identifying current agent events returned as
-notifications.
+notifications. It's also a base message for Question.
  */
 message AgentStatus {
   ClientID clientID = 1; // UUID of the client listening
@@ -120,12 +129,14 @@ message AgentStatus {
 
 /*
 Notification is a message used to tell meaningful events outside from cloud
-agent.
+agent. It includes only header information. If more detailed information about
+the Protocol is needed ProtocolService.Status should be called. Notification is
+a base message for AgentStatus.
  */
 message Notification {
   // Type is enum type to tell what happening
   enum Type {
-    NONE = 0;
+    NONE = 0; // This is set when Question is the actual message
     KEEPALIVE = 1; // To prevent network idle to shut us down 
     STATUS_UPDATE = 2; // General status update where no action needed
     ACTION_NEEDED = 3; // General action needed update notification
@@ -149,8 +160,8 @@ message Question {
   AgentStatus Status = 1;
   // Type is enum type to tell what happening
   enum Type {
-    NONE = 0;
-    KEEPALIVE = 1; // To prevent network idle to shut us down 
+    NONE = 0; // This is set when AgentStatus.Notification is set.
+    KEEPALIVE = 1; // To prevent network idle to shut us down, no answer needed
     ANSWER_NEEDED_PING = 2; // Your CA controller has been pinged
     ANSWER_NEEDED_ISSUE_PROPOSE = 3; // Issuing is proposed
     ANSWER_NEEDED_PROOF_PROPOSE = 4; // Proof is proposed
