@@ -18,11 +18,20 @@ const _ = grpc.SupportPackageIsVersion7
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type AgentServiceClient interface {
 	// Listen is bidirectional function to stream AgentStatus. ClientID must be
-	// unique.
+	// unique. AgentStatus includes only enough information to access the actual
+	// PSM and DIDComm connection with the ProtocolService.Status function.
+	// Summary: you listen your agent but work with our protocols.
 	Listen(ctx context.Context, in *ClientID, opts ...grpc.CallOption) (AgentService_ListenClient, error)
-	// Wait is bidirectional function to stream service agent Questions.
+	// Wait is bidirectional function to stream service agent Questions. With
+	// Wait you listen your agent and if it's Issuing or Verifying VC it needs
+	// more information and immetiate answers e.g. proof can be validated. Note!
+	// if your agent is only casual Holder it doesn't need to answer any of these
+	// questions. Holder communicate goes with ProtocolService.Resume(). Please
+	// see Give for more information.
 	Wait(ctx context.Context, in *ClientID, opts ...grpc.CallOption) (AgentService_WaitClient, error)
-	// Give is function to give answer to ACTION_NEEDED_xx notifications.
+	// Give is function to give answer to ANSWER_NEEDED_xx Questions arived from
+	// Wait function. Questions have ID and clientID which should be used when
+	// answering the questions.
 	Give(ctx context.Context, in *Answer, opts ...grpc.CallOption) (*ClientID, error)
 	// CreateInvitation returns an invitation according to InvitationBase.
 	CreateInvitation(ctx context.Context, in *InvitationBase, opts ...grpc.CallOption) (*Invitation, error)
@@ -185,11 +194,20 @@ func (c *agentServiceClient) GetCredDef(ctx context.Context, in *CredDef, opts .
 // for forward compatibility
 type AgentServiceServer interface {
 	// Listen is bidirectional function to stream AgentStatus. ClientID must be
-	// unique.
+	// unique. AgentStatus includes only enough information to access the actual
+	// PSM and DIDComm connection with the ProtocolService.Status function.
+	// Summary: you listen your agent but work with our protocols.
 	Listen(*ClientID, AgentService_ListenServer) error
-	// Wait is bidirectional function to stream service agent Questions.
+	// Wait is bidirectional function to stream service agent Questions. With
+	// Wait you listen your agent and if it's Issuing or Verifying VC it needs
+	// more information and immetiate answers e.g. proof can be validated. Note!
+	// if your agent is only casual Holder it doesn't need to answer any of these
+	// questions. Holder communicate goes with ProtocolService.Resume(). Please
+	// see Give for more information.
 	Wait(*ClientID, AgentService_WaitServer) error
-	// Give is function to give answer to ACTION_NEEDED_xx notifications.
+	// Give is function to give answer to ANSWER_NEEDED_xx Questions arived from
+	// Wait function. Questions have ID and clientID which should be used when
+	// answering the questions.
 	Give(context.Context, *Answer) (*ClientID, error)
 	// CreateInvitation returns an invitation according to InvitationBase.
 	CreateInvitation(context.Context, *InvitationBase) (*Invitation, error)

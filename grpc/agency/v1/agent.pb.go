@@ -27,7 +27,7 @@ const (
 type Notification_Type int32
 
 const (
-	Notification_NONE          Notification_Type = 0
+	Notification_NONE          Notification_Type = 0 // This is set when Question is the actual message
 	Notification_KEEPALIVE     Notification_Type = 1 // To prevent network idle to shut us down
 	Notification_STATUS_UPDATE Notification_Type = 2 // General status update where no action needed
 	Notification_ACTION_NEEDED Notification_Type = 3 // General action needed update notification
@@ -80,8 +80,8 @@ func (Notification_Type) EnumDescriptor() ([]byte, []int) {
 type Question_Type int32
 
 const (
-	Question_NONE                        Question_Type = 0
-	Question_KEEPALIVE                   Question_Type = 1 // To prevent network idle to shut us down
+	Question_NONE                        Question_Type = 0 // This is set when AgentStatus.Notification is set.
+	Question_KEEPALIVE                   Question_Type = 1 // To prevent network idle to shut us down, no answer needed
 	Question_ANSWER_NEEDED_PING          Question_Type = 2 // Your CA controller has been pinged
 	Question_ANSWER_NEEDED_ISSUE_PROPOSE Question_Type = 3 // Issuing is proposed
 	Question_ANSWER_NEEDED_PROOF_PROPOSE Question_Type = 4 // Proof is proposed
@@ -708,9 +708,9 @@ type Answer struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	ID       string    `protobuf:"bytes,1,opt,name=ID,proto3" json:"ID,omitempty"`             // Same as Notification ID (UUID)
-	ClientID *ClientID `protobuf:"bytes,2,opt,name=clientID,proto3" json:"clientID,omitempty"` // Same as your ClientID when Listening was started
-	Ack      bool      `protobuf:"varint,3,opt,name=ack,proto3" json:"ack,omitempty"`          // Your response to the protocol question
+	ID       string    `protobuf:"bytes,1,opt,name=ID,proto3" json:"ID,omitempty"`             // Same as Question ID (UUID)
+	ClientID *ClientID `protobuf:"bytes,2,opt,name=clientID,proto3" json:"clientID,omitempty"` // Same as your ClientID when Wait was started
+	Ack      bool      `protobuf:"varint,3,opt,name=ack,proto3" json:"ack,omitempty"`          // Response to the protocol question: true = ACK, false = NACK
 	Info     string    `protobuf:"bytes,4,opt,name=info,proto3" json:"info,omitempty"`         // General info, mostly used for debugging
 }
 
@@ -825,7 +825,7 @@ func (x *ClientID) GetID() string {
 
 //
 //AgentStatus is a message identifying current agent events returned as
-//notifications.
+//notifications. It's also a base message for Question.
 type AgentStatus struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
@@ -883,7 +883,9 @@ func (x *AgentStatus) GetNotification() *Notification {
 
 //
 //Notification is a message used to tell meaningful events outside from cloud
-//agent.
+//agent. It includes only header information. If more detailed information about
+//the Protocol is needed ProtocolService.Status should be called. Notification is
+//a base message for AgentStatus.
 type Notification struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache

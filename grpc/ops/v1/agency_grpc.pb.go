@@ -164,83 +164,83 @@ var _AgencyService_serviceDesc = grpc.ServiceDesc{
 	Metadata: "agency.proto",
 }
 
-// DevOpsClient is the client API for DevOps service.
+// DevOpsServiceClient is the client API for DevOpsService service.
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
-type DevOpsClient interface {
+type DevOpsServiceClient interface {
 	Enter(ctx context.Context, in *Cmd, opts ...grpc.CallOption) (*CmdReturn, error)
 }
 
-type devOpsClient struct {
+type devOpsServiceClient struct {
 	cc grpc.ClientConnInterface
 }
 
-func NewDevOpsClient(cc grpc.ClientConnInterface) DevOpsClient {
-	return &devOpsClient{cc}
+func NewDevOpsServiceClient(cc grpc.ClientConnInterface) DevOpsServiceClient {
+	return &devOpsServiceClient{cc}
 }
 
-func (c *devOpsClient) Enter(ctx context.Context, in *Cmd, opts ...grpc.CallOption) (*CmdReturn, error) {
+func (c *devOpsServiceClient) Enter(ctx context.Context, in *Cmd, opts ...grpc.CallOption) (*CmdReturn, error) {
 	out := new(CmdReturn)
-	err := c.cc.Invoke(ctx, "/ops.v1.DevOps/Enter", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/ops.v1.DevOpsService/Enter", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-// DevOpsServer is the server API for DevOps service.
-// All implementations must embed UnimplementedDevOpsServer
+// DevOpsServiceServer is the server API for DevOpsService service.
+// All implementations must embed UnimplementedDevOpsServiceServer
 // for forward compatibility
-type DevOpsServer interface {
+type DevOpsServiceServer interface {
 	Enter(context.Context, *Cmd) (*CmdReturn, error)
-	mustEmbedUnimplementedDevOpsServer()
+	mustEmbedUnimplementedDevOpsServiceServer()
 }
 
-// UnimplementedDevOpsServer must be embedded to have forward compatible implementations.
-type UnimplementedDevOpsServer struct {
+// UnimplementedDevOpsServiceServer must be embedded to have forward compatible implementations.
+type UnimplementedDevOpsServiceServer struct {
 }
 
-func (UnimplementedDevOpsServer) Enter(context.Context, *Cmd) (*CmdReturn, error) {
+func (UnimplementedDevOpsServiceServer) Enter(context.Context, *Cmd) (*CmdReturn, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Enter not implemented")
 }
-func (UnimplementedDevOpsServer) mustEmbedUnimplementedDevOpsServer() {}
+func (UnimplementedDevOpsServiceServer) mustEmbedUnimplementedDevOpsServiceServer() {}
 
-// UnsafeDevOpsServer may be embedded to opt out of forward compatibility for this service.
-// Use of this interface is not recommended, as added methods to DevOpsServer will
+// UnsafeDevOpsServiceServer may be embedded to opt out of forward compatibility for this service.
+// Use of this interface is not recommended, as added methods to DevOpsServiceServer will
 // result in compilation errors.
-type UnsafeDevOpsServer interface {
-	mustEmbedUnimplementedDevOpsServer()
+type UnsafeDevOpsServiceServer interface {
+	mustEmbedUnimplementedDevOpsServiceServer()
 }
 
-func RegisterDevOpsServer(s *grpc.Server, srv DevOpsServer) {
-	s.RegisterService(&_DevOps_serviceDesc, srv)
+func RegisterDevOpsServiceServer(s *grpc.Server, srv DevOpsServiceServer) {
+	s.RegisterService(&_DevOpsService_serviceDesc, srv)
 }
 
-func _DevOps_Enter_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _DevOpsService_Enter_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(Cmd)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(DevOpsServer).Enter(ctx, in)
+		return srv.(DevOpsServiceServer).Enter(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/ops.v1.DevOps/Enter",
+		FullMethod: "/ops.v1.DevOpsService/Enter",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(DevOpsServer).Enter(ctx, req.(*Cmd))
+		return srv.(DevOpsServiceServer).Enter(ctx, req.(*Cmd))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-var _DevOps_serviceDesc = grpc.ServiceDesc{
-	ServiceName: "ops.v1.DevOps",
-	HandlerType: (*DevOpsServer)(nil),
+var _DevOpsService_serviceDesc = grpc.ServiceDesc{
+	ServiceName: "ops.v1.DevOpsService",
+	HandlerType: (*DevOpsServiceServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
 			MethodName: "Enter",
-			Handler:    _DevOps_Enter_Handler,
+			Handler:    _DevOpsService_Enter_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
