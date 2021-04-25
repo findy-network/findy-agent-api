@@ -3,7 +3,7 @@
 
 syntax = "proto3";
 
-option go_package = "github.com/findy-network/findy-agent-api/grpc/agency/v1";
+option go_package = "github.com/findy-network/findy-common-go/grpc/agency/v1";
 
 package agency.v1;
 
