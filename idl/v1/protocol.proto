@@ -45,16 +45,16 @@ Protocol is a interface message for ProtocolService.Start/Run. The protocol
 message complements e.g. Start function to the following pseudo code:
    ProtocolService.Start(Protocol{TypeId: DIDEXCHANGE, Role: INITIATOR})
 which can be read as:
-   // Start DIDEXCHANGE Protocol as INITIATOR 
+   Start DIDEXCHANGE Protocol as INITIATOR
 The DIDComm/Aries protocol is always defined with the protocol's typeID and
 together with the role they define how the protocol will be started. The table
 below lists few examples.
    Protocol.TypeID        (as)  Role              Meaning
    ------------------------------------------------------------------------
-   DIDEXCHANGE                   INITIATOR         connect to other agent 
-   ISSUE_CREDENTIAL              ADDRESSEE         request credential 
+   DIDEXCHANGE                   INITIATOR         connect to other agent
+   ISSUE_CREDENTIAL              ADDRESSEE         request credential
    PRESENT_PROOF                 RESUMER           accept proof request
-   BASIC_MESSAGE                 INITIATOR         send basic message 
+   BASIC_MESSAGE                 INITIATOR         send basic message
 
 The rest of the fields in Protocol include prev_threadID and connectionID. The
 StartMsg fields include typeID specific data.
@@ -94,7 +94,7 @@ message Protocol {
     repeated Attribute attrs = 1;
   }
 
-  // Message types for each protocol typeID, see StartMsg 
+  // Message types for each protocol typeID, see StartMsg
   message DIDExchangeMsg {
     string label = 1;
     string invitation_json = 2; // Invitation JSON string

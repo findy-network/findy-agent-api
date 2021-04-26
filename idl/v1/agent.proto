@@ -39,7 +39,7 @@ service AgentService {
 
   // SetImplId sets implementation ID for the clould agent. It should be "grpc".
   // TODO: REMOVE!! Check Agency implementation first. We still need something
-  // for this. At least the autoaccept mode for now. 
+  // for this. At least the autoaccept mode for now.
   // TODO: Rename? Rethink logic: SetSAMode(), etc.?
   rpc SetImplId(SAImplementation) returns (SAImplementation) {}
 
@@ -61,7 +61,7 @@ service AgentService {
 
 // SchemaData is structure to fetch schema information from the ledger.
 message SchemaData {
-  string ID = 1; // ID is schema ID 
+  string ID = 1; // ID is schema ID
   string data = 2; // data is a schema JSON string from the ledger.
 }
 
@@ -118,7 +118,7 @@ message InvitationBase {
 
 // Invitation is structure for ready invitation.
 message Invitation {
-  string json_str = 1; // Actual invitation to be shown to other end. 
+  string json_str = 1; // Actual invitation to be shown to other end.
   string url = 2; // Shor URL, not implemented yet
 }
 
@@ -157,7 +157,7 @@ message Notification {
   // Type is enum type to tell what happening
   enum Type {
     NONE = 0; // This is set when Question is the actual message
-    KEEPALIVE = 1; // To prevent network idle to shut us down 
+    KEEPALIVE = 1; // To prevent network idle to shut us down
     STATUS_UPDATE = 2; // General status update where no action needed
     ACTION_NEEDED = 3; // General action needed update notification
   }
