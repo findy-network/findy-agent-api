@@ -5,6 +5,17 @@ syntax = "proto3";
 
 option go_package = "github.com/findy-network/findy-common-go/grpc/agency/v1";
 
+// Package ops.v1 is the first version of findy gRPC API. As long as we'll not
+// have changes that aren't backward compatible, we can just update the API.
+// The gRPC itself will take care off that, like adding a new fields to
+// messages. We just need to follow the gRPC practises and rules.
+//
+// As said, as long as we can maintain backward compatibility, we are working
+// with version 1.0.  The version 2.0 will be introduced when we cannot solve
+// something only with the version 1.0. The 2.0 will include all the current
+// APIs of 1.0 and we support them both together until the decision shall be
+// made to depracate 1.0 totally. The deprecation rules will be specified
+// later.
 package agency.v1;
 
 /*
@@ -61,7 +72,8 @@ StartMsg fields include typeID specific data.
  */
 message Protocol {
   // Type is enum type to identify the protocol, we aren't tight to Aries
-  // strings
+  // strings, but protocols are Aries compatible and specific. See more info
+  // from Aries docs.
   enum Type {
     NONE = 0;
     DIDEXCHANGE = 1;
@@ -72,7 +84,8 @@ message Protocol {
   }
   Type typeID = 1; // Protocol type
 
-  // Role tells in what role we are starting a protocol
+  // Role tells in what role we are starting a protocol. See more info from
+  // Protocol message.
   enum Role {
     UNKNOWN = 0;
     INITIATOR = 1;
@@ -86,19 +99,22 @@ message Protocol {
 
   // Sub-message types for gathering new types from them
 
+  // Attribute is struct to present VC attributes by its name and value.
   message Attribute {
     string name = 1;
     string value = 2;
   }
+  // AttributesMsg is a type to present attribute lists.
   message Attributes {
-    repeated Attribute attrs = 1;
+    repeated Attribute attrs = 1; // Attributes is the list itself.
   }
 
-  // Message types for each protocol typeID, see StartMsg
+  // Protocol specific message type.
   message DIDExchangeMsg {
-    string label = 1;
+    string label = 1; // The pairwise can be labeled.
     string invitation_json = 2; // Invitation JSON string
   }
+  // Protocol specific message type.
   message IssueCredentialMsg {
     string cred_defID = 1;
     oneof AttrFmt {
@@ -106,6 +122,8 @@ message Protocol {
       Attributes attributes = 3;
     }
   }
+  // Proof is helper type for proof request attribute lists are presented:
+  // with the attribute name and attribute source VC (=cred_defID).
   message Proof {
     message Attribute {
       string name = 1;
@@ -113,16 +131,18 @@ message Protocol {
     }
     repeated Attribute attributes = 1;
   }
+  // Protocol specific message type.
   message PresentProofMsg {
     oneof AttrFmt {
       string attributes_json = 1;
       Proof attributes = 2;
     }
   }
+  // Protocol specific message type.
   message BasicMessageMsg {
-    string text = 1;
+    string text = 1; // TODO, content!
   }
-  // Protocol typeID specific data
+  // Protocol typeID specific data.
   oneof StartMsg {
     DIDExchangeMsg DID_exchange = 10;
     IssueCredentialMsg issue_credential = 11;
@@ -165,7 +185,8 @@ message ProtocolState {
 }
 
 /*
-ProtocolStatus is message to include whole status of the protocol.
+ProtocolStatus is message to include whole status of the protocol. It's used
+to present protocol state at API level when protocol is already started.
 TODO: should we think about Aries thread and decorator structure as well? e.g.
  BasicMsg
 */
