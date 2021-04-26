@@ -17,22 +17,24 @@ service AgencyService {
   // PSMHook listens realtime stream of archived protocol state machines
   rpc PSMHook(DataHook) returns (stream AgencyStatus) {}
 
-  // Onboard allocates cloud agent and wallet from Agency
+  // Onboard allocates cloud agent and its wallet from Agency
   rpc Onboard(Onboarding) returns (OnboardResult) {}
 }
 
+// Onboarding is structure for cloud agent (CA) onboarding.
 message Onboarding {
-  string email = 1;
+  string email = 1; // email is then name or handle used for pointing the CA.
 }
 
+// OnboardResult is structure to transport Onboarding result.
 message OnboardResult {
-  bool ok = 1;
+  bool ok = 1; // result if Onboarding was successful.
   message OKResult {
-    string JWT = 1;
-    string CADID = 2;
-    string invitation_json = 3;
+    string JWT = 1; // pregenerated JWT token, mostly usefull for development.
+    string CADID = 2; // Cloud Agent DID. The UID for CA.
+    string invitation_json = 3; // pregenerated Invitation, mostly in dev use.
   }
-  OKResult result = 2;
+  OKResult result = 2; // Instance of the OK result.
 }
 
 /*
@@ -49,14 +51,18 @@ message AgencyStatus {
   string connectionID = 4; // Connection (pairwise) ID if available
 }
 
+// DataHook is structure identify data hook.
 message DataHook {
   string ID = 1; // UUID to uniquely identify the hook
 }
 
+// DevOpsService is Cmd-based interface to run DevOps cmds in agency.
 service DevOpsService {
+  // Enter is the cmd exec interface.
   rpc Enter(Cmd) returns (CmdReturn) {}
 }
 
+// Cmd is structure to transport agency cmds.
 message Cmd {
   enum Type {
     PING = 0;
@@ -64,15 +70,17 @@ message Cmd {
     COUNT = 2;
   }
   Type type = 1;
+  // Request is the structure to gather cmd specific arguments to type fields.
   oneof Request {
-    string logging = 2;
+    string logging = 2; // Type is LOGGING includes argument string.
   }
 }
 
+// CmdReturn is structure to return cmd results.
 message CmdReturn {
   Cmd.Type type = 1;
   oneof Response {
-    string ping = 2;
-    string count = 3;
+    string ping = 2; // Ping cmd's result.
+    string count = 3; // Count cmd's result.
   }
 }
