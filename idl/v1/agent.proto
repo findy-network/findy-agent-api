@@ -22,84 +22,104 @@ service AgentService {
   // Summary: you listen your agent but work with our protocols.
   rpc Listen(ClientID) returns (stream AgentStatus) {}
 
-  // Wait is bidirectional function to stream service agent Questions. With 
-  // Wait you listen your agent and if it's Issuing or Verifying VC it needs 
-  // more information and immetiate answers e.g. proof can be validated. Note!
-  // if your agent is only casual Holder it doesn't need to answer any of these
-  // questions. Holder communicate goes with ProtocolService.Resume(). Please
-  // see Give for more information.
+  // Wait is bidirectional function to stream service agent Questions. With
+  // Wait you listen your agent and if it's Issuing or Verifying VC it needs
+  // more information and immetiate answers from you. For instance, if a proof
+  // can be validated. Note! if your agent is only casual Holder it doesn't
+  // need to answer any of these questions. Holder communicate goes with
+  // ProtocolService.Resume(). Please see Give for more information.
   rpc Wait(ClientID) returns (stream Question) {}
-  // Give is function to give answer to ANSWER_NEEDED_xx Questions arived from
-  // Wait function. Questions have ID and clientID which should be used when
-  // answering the questions.
+  // Give is function to give answer to ANSWER_NEEDED_xx(TODO name!) Questions
+  // arived from Wait function. Questions have ID and clientID which should be
+  // used when answering the questions.
   rpc Give(Answer) returns (ClientID) {}
 
   // CreateInvitation returns an invitation according to InvitationBase.
   rpc CreateInvitation(InvitationBase) returns (Invitation) {}
 
   // SetImplId sets implementation ID for the clould agent. It should be "grpc".
-  // TODO: REMOVE!! Check Agency implementation first.
+  // TODO: REMOVE!! Check Agency implementation first. We still need something
+  // for this. At least the autoaccept mode for now. 
+  // TODO: Rename? Rethink logic: SetSAMode(), etc.?
   rpc SetImplId(SAImplementation) returns (SAImplementation) {}
 
+  // Ping pings the cloud agent.
   rpc Ping(PingMsg) returns (PingMsg) {}
 
+  // CreateSchema creates a new schema and writes it to ledger.
   rpc CreateSchema(SchemaCreate) returns (Schema) {}
+  // CreateCredDef creates a new credential definition to wallet and writes it
+  // to the ledger. Note! With current indysdk VC structure the running time is
+  // long, like 10-20 seconds.
   rpc CreateCredDef(CredDefCreate) returns (CredDef) {}
 
+  // GetSchema returns a schema structure.
   rpc GetSchema(Schema) returns (SchemaData) {}
+  // GetCredDef returns a credential definition.
   rpc GetCredDef(CredDef) returns (CredDefData) {}
 }
 
+// SchemaData is structure to fetch schema information from the ledger.
 message SchemaData {
-  string ID = 1;
-  string data = 2;
+  string ID = 1; // ID is schema ID 
+  string data = 2; // data is a schema JSON string from the ledger.
 }
 
+// CredDefData is structure to fetch credential definition from the ledger.
 message CredDefData {
-  string ID = 1;
-  string data = 2;
+  string ID = 1; // ID is CredDef ID.
+  string data = 2; // data is a cred def JSON string from the ledger.
 }
 
+// SchemaCreate is structure for schema creation.
 message SchemaCreate {
-  string name = 1;
-  string version = 2;
-  repeated string attributes = 3;
+  string name = 1; // name is the name of the schema.
+  string version = 2; // version is the schema version.
+  repeated string attributes = 3; // attributes is JSON array string.
 }
 
+// Schema is structure to transport schema ID.
 message Schema {
-  string ID = 1;
+  string ID = 1; // ID is a schema ID.
 }
 
+// CredDefCreate is structure to transport credential definition identity.
 message CredDefCreate {
-  string schemaID = 1;
-  string tag = 2;
+  string schemaID = 1; // schemaID is ID of the schema.
+  string tag = 2; // tag is schema tag.
 }
 
+// CredDef is structure to transport credential definition ID.
 message CredDef {
   string ID = 1;
 }
 
+// PingMsg is structure to indentify ping messages.
 message PingMsg {
-  int32 ID = 1;
-  bool ping_controller = 2;
+  int32 ID = 1; // ID is ping message ID.
+  bool ping_controller = 2; // Tells if CA's controller should pinged once.
 }
 
+// SAImplementation is structure to specify SA implementation. TODO: refactor.
 message SAImplementation {
-  string ID = 1;
-  string endpoint = 2;
-  string key = 3;
-  bool persistent = 4;
+  string ID = 1; // Implementation ID.
+  string endpoint = 2; // For old API, was a web hook address.
+  string key = 3; // For old API, was VerKey, see indy sdk.
+  bool persistent = 4; // Tells if information should be saved to wallet.
 }
 
+// InvitationBase is structure to create actual Aries invitations. See more info
+// from Aries documentation about the fields.
 message InvitationBase {
-  string label = 1;
-  string ID = 2;
+  string label = 1; // Gives a human readable name for this end of the pairwise.
+  string ID = 2; // Pairwise ID, must be unique, and no collition w/ previous.
   int64 expiration = 3; // not implemented yet
 }
 
+// Invitation is structure for ready invitation.
 message Invitation {
-  string json_str = 1;
-  string url = 2; // not implemented yet
+  string json_str = 1; // Actual invitation to be shown to other end. 
+  string url = 2; // Shor URL, not implemented yet
 }
 
 /*
