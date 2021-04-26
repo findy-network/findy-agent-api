@@ -105,8 +105,8 @@ message Protocol {
     string value = 2;
   }
   // AttributesMsg is a type to present attribute lists.
-  message Attributes {
-    repeated Attribute attrs = 1; // Attributes is the list itself.
+  message AttributesMsg {
+    repeated Attribute attributes = 1; // Attributes is the list itself.
   }
 
   // Protocol specific message type.
@@ -119,7 +119,7 @@ message Protocol {
     string cred_defID = 1;
     oneof AttrFmt {
       string attributes_json = 2;
-      Attributes attributes = 3;
+      AttributesMsg attributes = 3;
     }
   }
   // Proof is helper type for proof request attribute lists are presented:
