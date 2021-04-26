@@ -217,9 +217,9 @@ message ProtocolStatus {
     int64 sent_timestamp = 4;
   }
   oneof Status {
-    Connection connection = 10;
-    Issue issue = 11;
-    Protocol.Proof proof = 12;
+    Connection DID_exchange = 10;
+    Issue issue_credential = 11;
+    Protocol.Proof present_proof = 12;
     TrustPing trust_ping = 13;
     BasicMessage basic_message = 14;
   }
