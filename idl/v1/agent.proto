@@ -189,7 +189,7 @@ message Notification {
 // araised during the protocol execution.
 message Question {
   AgentStatus Status = 1;
-  // Type is enum type to tell what happening
+  // Type is enum type to tell what happening. TODO naming? How explicit?
   enum Type {
     NONE = 0; // This is set when AgentStatus.Notification is set.
     KEEPALIVE = 1; // To prevent network idle to shut us down, no answer needed

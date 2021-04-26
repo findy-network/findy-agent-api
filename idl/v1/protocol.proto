@@ -191,36 +191,43 @@ Aries offers thread and decorator structures as well. We bring API for them when
 we have use case for that.
 */
 message ProtocolStatus {
-  ProtocolState state = 1;
-  int64 timestamp = 2;
-  string status_json = 3;
+  ProtocolState state = 1; // Protocol state header.
+  int64 timestamp = 2; // Status'es timestamp (UNIX).
+  string status_json = 3; // Protocol status in JSON string from previous API.
 
-  message Connection {
+  // DIDExchangeStatus is structure telling what's going on with DID exchange
+  // protocol.
+  message DIDExchangeStatus {
     string ID = 1;
     string my_did = 2;
     string their_did = 3;
     string their_endpoint = 4;
     string their_label = 5;
   }
-  message Issue {
+  // IssueCredentialStatus is structure telling what's going on with issue
+  // credential protocol.
+  message IssueCredentialStatus {
     string cred_defID = 1;
     string schemaID = 2;
     repeated Protocol.Attribute attrs = 3;
   }
-  message TrustPing {
+  // TrustPingStatus is structure telling its status.
+  message TrustPingStatus {
     bool replied = 1;
   }
-  message BasicMessage {
+  // BasicMessageStatus telling its protocol status.
+  message BasicMessageStatus {
     string content = 1;
     bool sent_by_me = 2;
     bool delivered = 3;
     int64 sent_timestamp = 4;
   }
+  // Status is one of these. Protocol.State.TypeID tells which.
   oneof Status {
-    Connection DID_exchange = 10;
-    Issue issue_credential = 11;
+    DIDExchangeStatus DID_exchange = 10;
+    IssueCredentialStatus issue_credential = 11;
     Protocol.Proof present_proof = 12;
-    TrustPing trust_ping = 13;
-    BasicMessage basic_message = 14;
+    rrustPingStatus trust_ping = 13;
+    BasicMessageStatus basic_message = 14;
   }
 }
