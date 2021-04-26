@@ -2,3 +2,5 @@
 .idea/
 *.vim
 
+.grpc-out/
+
