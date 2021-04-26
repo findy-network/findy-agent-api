@@ -7,6 +7,17 @@ import "protocol.proto";
 
 option go_package = "github.com/findy-network/findy-common-go/grpc/agency/v1";
 
+// Package ops.v1 is the first version of findy gRPC API. As long as we'll not
+// have changes that aren't backward compatible, we can just update the API.
+// The gRPC itself will take care off that, like adding a new fields to
+// messages. We just need to follow the gRPC practises and rules.
+//
+// As said, as long as we can maintain backward compatibility, we are working
+// with version 1.0.  The version 2.0 will be introduced when we cannot solve
+// something only with the version 1.0. The 2.0 will include all the current
+// APIs of 1.0 and we support them both together until the decision shall be
+// made to depracate 1.0 totally. The deprecation rules will be specified
+// later.
 package agency.v1;
 
 /*
