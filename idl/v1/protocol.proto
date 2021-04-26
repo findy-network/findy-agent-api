@@ -140,7 +140,7 @@ message Protocol {
   }
   // Protocol specific message type.
   message BasicMessageMsg {
-    string content = 1; // TODO, content!
+    string content = 1; // Content text.
   }
   // Protocol typeID specific data.
   oneof StartMsg {
@@ -187,8 +187,8 @@ message ProtocolState {
 /*
 ProtocolStatus is message to include whole status of the protocol. It's used
 to present protocol state at API level when protocol is already started.
-TODO: should we think about Aries thread and decorator structure as well? e.g.
- BasicMsg
+Aries offers thread and decorator structures as well. We bring API for them when
+we have use case for that.
 */
 message ProtocolStatus {
   ProtocolState state = 1;
