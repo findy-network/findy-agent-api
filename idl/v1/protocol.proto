@@ -140,7 +140,7 @@ message Protocol {
   }
   // Protocol specific message type.
   message BasicMessageMsg {
-    string text = 1; // TODO, content!
+    string content = 1; // TODO, content!
   }
   // Protocol typeID specific data.
   oneof StartMsg {
