@@ -227,7 +227,7 @@ message ProtocolStatus {
     DIDExchangeStatus DID_exchange = 10;
     IssueCredentialStatus issue_credential = 11;
     Protocol.Proof present_proof = 12;
-    rrustPingStatus trust_ping = 13;
+    TrustPingStatus trust_ping = 13;
     BasicMessageStatus basic_message = 14;
   }
 }
