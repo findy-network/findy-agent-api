@@ -178,7 +178,7 @@ message Notification {
   string connectionID = 3; // Current pairwise ID between agents
   string protocolID = 4; // Current protocol ID, see Aries Thread ID
   string protocol_family = 5; // Text version of the protocol family/namespace
-  int64 timestamp = 6; // timestamp in nano because this is part of the key TODO check!!!
+  int64 timestamp = 6; // timestamp in nano because this is part of the key
   Protocol.Type protocol_type = 7;
   Protocol.Role role = 8;
   string PID = 9;

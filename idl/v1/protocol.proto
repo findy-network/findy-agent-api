@@ -216,7 +216,7 @@ message ProtocolStatus {
   message IssueCredentialStatus {
     string cred_defID = 1;
     string schemaID = 2;
-    Protocol.IssuingAttributes attrs = 3;
+    Protocol.IssuingAttributes attributes = 3;
   }
   // PresentProofStatus is structure telling present_proof status.
   message PresentProofStatus {
