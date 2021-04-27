@@ -43,7 +43,7 @@ message OnboardResult {
   message OKResult {
     string JWT = 1; // pregenerated JWT token, mostly usefull for development.
     string CADID = 2; // Cloud Agent DID. The UID for CA.
-    string invitation_json = 3; // pregenerated Invitation, mostly in dev use.
+    string invitationJSON = 3; // pregenerated Invitation, mostly in dev use.
   }
   OKResult result = 2; // Instance of the OK result.
 }

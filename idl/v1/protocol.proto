@@ -5,9 +5,9 @@ syntax = "proto3";
 
 option go_package = "github.com/findy-network/findy-common-go/grpc/agency/v1";
 
-// Package ops.v1 is the first version of findy gRPC API. As long as we'll not
-// have changes that aren't backward compatible, we can just update the API.
-// The gRPC itself will take care off that, like adding a new fields to
+// Package agency.v1 is the first version of findy gRPC API. As long as we'll
+// not have changes that aren't backward compatible, we can just update the
+// API.  The gRPC itself will take care off that, like adding a new fields to
 // messages. We just need to follow the gRPC practises and rules.
 //
 // As said, as long as we can maintain backward compatibility, we are working
@@ -100,25 +100,25 @@ message Protocol {
   // Sub-message types for gathering new types from them
 
   // Attribute is struct to present VC attributes by its name and value.
-  message Attribute {
+  message Attribute { // move TODO below
     string name = 1;
     string value = 2;
   }
   // AttributesMsg is a type to present attribute lists.
-  message AttributesMsg {
+  message AttributesMsg { // TODO rename & reuse in all Credential Msgs
     repeated Attribute attributes = 1; // Attributes is the list itself.
   }
 
   // Protocol specific message type.
   message DIDExchangeMsg {
     string label = 1; // The pairwise can be labeled.
-    string invitation_json = 2; // Invitation JSON string
+    string invitationJSON = 2; // Invitation JSON string
   }
   // Protocol specific message type.
   message IssueCredentialMsg {
     string cred_defID = 1;
     oneof AttrFmt {
-      string attributes_json = 2;
+      string attributesJSON = 2; // TODO 
       AttributesMsg attributes = 3;
     }
   }
@@ -133,8 +133,8 @@ message Protocol {
   }
   // Protocol specific message type.
   message PresentProofMsg {
-    oneof AttrFmt {
-      string attributes_json = 1;
+    oneof AttrFmt { // TODO remove
+      string attributesJSON = 1;
       Proof attributes = 2;
     }
   }
@@ -193,7 +193,7 @@ we have use case for that.
 message ProtocolStatus {
   ProtocolState state = 1; // Protocol state header.
   int64 timestamp = 2; // Status'es timestamp (UNIX).
-  string status_json = 3; // Protocol status in JSON string from previous API.
+  string statusJSON = 3; // Protocol status in JSON string from previous API.
 
   // DIDExchangeStatus is structure telling what's going on with DID exchange
   // protocol.
@@ -209,7 +209,7 @@ message ProtocolStatus {
   message IssueCredentialStatus {
     string cred_defID = 1;
     string schemaID = 2;
-    repeated Protocol.Attribute attrs = 3;
+    repeated Protocol.Attribute attrs = 3; // TODO
   }
   // TrustPingStatus is structure telling its status.
   message TrustPingStatus {
@@ -226,7 +226,7 @@ message ProtocolStatus {
   oneof Status {
     DIDExchangeStatus DID_exchange = 10;
     IssueCredentialStatus issue_credential = 11;
-    Protocol.Proof present_proof = 12;
+    Protocol.Proof present_proof = 12; // TODO check Protocol.Proof type!
     TrustPingStatus trust_ping = 13;
     BasicMessageStatus basic_message = 14;
   }
