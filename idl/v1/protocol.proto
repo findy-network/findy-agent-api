@@ -100,12 +100,12 @@ message Protocol {
   // Sub-message types for gathering new types from them
 
   // Attribute is struct to present VC attributes by its name and value.
-  message Attribute { // move TODO below
+  message Attribute {
     string name = 1;
     string value = 2;
   }
   // AttributesMsg is a type to present attribute lists.
-  message AttributesMsg { // TODO rename & reuse in all Credential Msgs
+  message AttributesMsg {
     repeated Attribute attributes = 1; // Attributes is the list itself.
   }
 
@@ -118,7 +118,7 @@ message Protocol {
   message IssueCredentialMsg {
     string cred_defID = 1;
     oneof AttrFmt {
-      string attributesJSON = 2; // TODO 
+      string attributesJSON = 2;
       AttributesMsg attributes = 3;
     }
   }
@@ -133,7 +133,7 @@ message Protocol {
   }
   // Protocol specific message type.
   message PresentProofMsg {
-    oneof AttrFmt { // TODO remove
+    oneof AttrFmt {
       string attributesJSON = 1;
       Proof attributes = 2;
     }
@@ -163,7 +163,7 @@ message ProtocolID {
   Protocol.Type typeID = 1; // i.e. what is going on
   Protocol.Role role = 2; // i.e. did we start this or the other end etc.
   string ID = 3; // UUID of the current protocol, note! not the same as conn-id
-  int64 notification_time = 4; // part of the key (see notification) TODO check!
+  int64 notification_time = 4; // part of the key (see notification)
 }
 
 // ProtocolState is lightest and simplest way to tell outside what is going on
@@ -193,7 +193,11 @@ we have use case for that.
 message ProtocolStatus {
   ProtocolState state = 1; // Protocol state header.
   int64 timestamp = 2; // Status'es timestamp (UNIX).
-  string statusJSON = 3; // Protocol status in JSON string from previous API.
+
+  // statusJSON is a protocol status in JSON format from previous API. That's
+  // the reason why the individual status sub-messages don't include JSON
+  // strings
+  string statusJSON = 3; 
 
   // DIDExchangeStatus is structure telling what's going on with DID exchange
   // protocol.
@@ -209,7 +213,7 @@ message ProtocolStatus {
   message IssueCredentialStatus {
     string cred_defID = 1;
     string schemaID = 2;
-    repeated Protocol.Attribute attrs = 3; // TODO
+    repeated Protocol.Attribute attrs = 3;
   }
   // TrustPingStatus is structure telling its status.
   message TrustPingStatus {
@@ -226,7 +230,7 @@ message ProtocolStatus {
   oneof Status {
     DIDExchangeStatus DID_exchange = 10;
     IssueCredentialStatus issue_credential = 11;
-    Protocol.Proof present_proof = 12; // TODO check Protocol.Proof type!
+    Protocol.Proof present_proof = 12;
     TrustPingStatus trust_ping = 13;
     BasicMessageStatus basic_message = 14;
   }
