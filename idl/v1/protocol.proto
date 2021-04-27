@@ -99,16 +99,15 @@ message Protocol {
 
   // Sub-message types for gathering new types from them
 
-  // Attribute is struct to present VC attributes by its name and value.
-  message Attribute {
-    string name = 1;
-    string value = 2;
-  }
-  // AttributesMsg is a type to present attribute lists.
-  message AttributesMsg {
+  // IssuingAttributes is a helper type for IssueCredential protocols.
+  message IssuingAttributes {
+    // Attribute is struct to present VC attributes by its name and value.
+    message Attribute {
+      string name = 1;
+      string value = 2;
+    }
     repeated Attribute attributes = 1; // Attributes is the list itself.
   }
-
   // Protocol specific message type.
   message DIDExchangeMsg {
     string label = 1; // The pairwise can be labeled.
@@ -119,7 +118,7 @@ message Protocol {
     string cred_defID = 1;
     oneof AttrFmt {
       string attributesJSON = 2;
-      AttributesMsg attributes = 3;
+      IssuingAttributes attributes = 3;
     }
   }
   // Proof is helper type for proof request attribute lists are presented:
@@ -213,7 +212,11 @@ message ProtocolStatus {
   message IssueCredentialStatus {
     string cred_defID = 1;
     string schemaID = 2;
-    repeated Protocol.Attribute attrs = 3;
+    Protocol.IssuingAttributes attrs = 3;
+  }
+  // PresentProofStatus is structure telling present_proof status.
+  message PresentProofStatus {
+    Protocol.Proof proof = 1; // Protocol.Proof more information
   }
   // TrustPingStatus is structure telling its status.
   message TrustPingStatus {
@@ -230,7 +233,7 @@ message ProtocolStatus {
   oneof Status {
     DIDExchangeStatus DID_exchange = 10;
     IssueCredentialStatus issue_credential = 11;
-    Protocol.Proof present_proof = 12;
+    PresentProofStatus present_proof = 12;
     TrustPingStatus trust_ping = 13;
     BasicMessageStatus basic_message = 14;
   }
