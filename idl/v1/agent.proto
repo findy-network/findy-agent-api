@@ -205,7 +205,11 @@ message Question {
   // credential. The Holder defines the cred_defID and values to VC attributes.
   message IssueProposeMsg {
     string cred_defID = 1; // The ID of the credential to issue.
-    string valuesJSON = 2; // TODO check why json is here and if it's used.
+
+    // valuesJSON is currently used for PreviewCredentialToCodedVales (see
+    // findy-agent) and for that reason the excat format or layot is not clear.
+    // TODO: we refactor this later.
+    string valuesJSON = 2; 
   }
   // ProofVerifyMsg is sent 1) when a Holder wants to present a proof before
   // Verifier is sent a proof request OR 2) when proof values need to be
