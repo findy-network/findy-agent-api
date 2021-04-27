@@ -1,6 +1,5 @@
 .DS_Store
 .idea/
 *.vim
-
 .grpc-out/
-
+.envrc
