@@ -116,6 +116,8 @@ message Protocol {
   // Protocol specific message type.
   message IssueCredentialMsg {
     string cred_defID = 1;
+    // AttrFmt includes attributes either in JSON (previous API format, and
+    // used by Aries) or in normal array of attributes.
     oneof AttrFmt {
       string attributesJSON = 2;
       IssuingAttributes attributes = 3;
@@ -132,6 +134,8 @@ message Protocol {
   }
   // Protocol specific message type.
   message PresentProofMsg {
+    // AttrFmt includes attributes either in JSON (previous API format, and
+    // used by Aries) or in normal array of attributes.
     oneof AttrFmt {
       string attributesJSON = 1;
       Proof attributes = 2;
