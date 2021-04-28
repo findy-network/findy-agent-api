@@ -206,8 +206,8 @@ message ProtocolStatus {
   // protocol.
   message DIDExchangeStatus {
     string ID = 1;
-    string my_did = 2;
-    string their_did = 3;
+    string myDID = 2;
+    string theirDID = 3;
     string their_endpoint = 4;
     string their_label = 5;
   }
