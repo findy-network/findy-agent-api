@@ -12,6 +12,12 @@ This documentation describes the API of how [findy-agent](https://github.com/fin
 - The gRPC API will be totally new one; we will refactor concepts and conventions according the feedback and experience we have had with the exiting one.
 - By bringing the API here offers an opportunity to review and comment it during the process.
 
+## gRPC Style Guide
+
+We follow [the style guide](https://developers.google.com/protocol-buffers/docs/style)
+with the following special rules:
+- treat acronymes like numbers in the style guide.
+
 ## Protocol
 
 The API is based on a proprietary protocol over HTTP(S) implemented for findy-agent communication. The protocol is inspired by the early [indy-sdk](https://github.com/hyperledger/indy-sdk) agent communication protocol. Some design decisions are based on legacy functionality that is nowadays obsolete and therefore the protocol is likely to change in the future.

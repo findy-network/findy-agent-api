@@ -1,0 +1,244 @@
+// Copyright 2020 Harri @ OP Techlab.
+//
+
+syntax = "proto3";
+
+option go_package = "github.com/findy-network/findy-common-go/grpc/agency/v1";
+
+// Package agency.v1 is the first version of findy gRPC API. As long as we'll
+// not have changes that aren't backward compatible, we can just update the
+// API.  The gRPC itself will take care off that, like adding a new fields to
+// messages. We just need to follow the gRPC practises and rules.
+//
+// As said, as long as we can maintain backward compatibility, we are working
+// with version 1.0.  The version 2.0 will be introduced when we cannot solve
+// something only with the version 1.0. The 2.0 will include all the current
+// APIs of 1.0 and we support them both together until the decision shall be
+// made to depracate 1.0 totally. The deprecation rules will be specified
+// later.
+package agency.v1;
+
+/*
+ProtocolService runs and monitors DIDComm protocols. The service handles
+protocols as a protocol state machines (PSM). The PSMs are optimized for
+performance and stability on high load. They are presistent and consume
+resources. Please remember to call Release after protocol is (totally) finalized
+i.e. as soon as it's Ready. If state machines aren't released by caller the
+agency will release them by force sooner or later.
+ */
+service ProtocolService {
+  // Run is function to start a protocol and return a stream to listen to
+  // its progress.
+  rpc Run(Protocol) returns (stream ProtocolState) {}
+
+  // Start asks the agency to start a protocol. It immediately returns a
+  // protocol ID that allows to monitor the protocol with Status function.
+  // When Agent service's Listen is in use, we get notifications how protocol
+  // proceeds and when it's ready.
+  rpc Start(Protocol) returns (ProtocolID) {}
+
+  // Status returns a current ProtocolStatus which offers both typed data fields
+  // and combined JSON string.
+  rpc Status(ProtocolID) returns (ProtocolStatus) {}
+
+  // Resume tells the protocol state machine how to proceed when it's waiting
+  // user action e.g. permission to send response to proof request.
+  rpc Resume(ProtocolState) returns (ProtocolID) {}
+
+  // Release releases the protocol state machine from agency. It can be called
+  // only when protocol is in Ready state. After release you can access the
+  // status information of your DIDComm with the others services of your system.
+  rpc Release(ProtocolID) returns (ProtocolID) {}
+}
+
+/*
+Protocol is a interface message for ProtocolService.Start/Run. The protocol
+message complements e.g. Start function to the following pseudo code:
+   ProtocolService.Start(Protocol{TypeId: DIDEXCHANGE, Role: INITIATOR})
+which can be read as:
+   Start DIDEXCHANGE Protocol as INITIATOR
+The DIDComm/Aries protocol is always defined with the protocol's typeID and
+together with the role they define how the protocol will be started. The table
+below lists few examples.
+   Protocol.TypeID        (as)  Role              Meaning
+   ------------------------------------------------------------------------
+   DIDEXCHANGE                   INITIATOR         connect to other agent
+   ISSUE_CREDENTIAL              ADDRESSEE         request credential
+   PRESENT_PROOF                 RESUMER           accept proof request
+   BASIC_MESSAGE                 INITIATOR         send basic message
+
+The rest of the fields in Protocol include prev_threadID and connectionID. The
+StartMsg fields include typeID specific data.
+ */
+message Protocol {
+  // Type is enum type to identify the protocol, we aren't tight to Aries
+  // strings, but protocols are Aries compatible and specific. See more info
+  // from Aries docs.
+  enum Type {
+    NONE = 0;
+    DIDEXCHANGE = 1;
+    ISSUE_CREDENTIAL = 2;
+    PRESENT_PROOF = 3;
+    TRUST_PING = 4;
+    BASIC_MESSAGE = 5;
+  }
+  Type typeID = 1; // Protocol type
+
+  // Role tells in what role we are starting a protocol. See more info from
+  // Protocol message.
+  enum Role {
+    UNKNOWN = 0;
+    INITIATOR = 1;
+    ADDRESSEE = 2;
+    RESUMER = 3; // Tells what to do with a paused protocol, waiting user action
+  }
+  Role role = 2;
+
+  string prev_threadID = 3; // Previous protocol ID if there was any
+  string connectionID = 4; // pairwise ID, this only empty when Type is CONNECT
+
+  // Sub-message types for gathering new types from them
+
+  // IssuingAttributes is a helper type for IssueCredential protocols.
+  message IssuingAttributes {
+    // Attribute is struct to present VC attributes by its name and value.
+    message Attribute {
+      string name = 1;
+      string value = 2;
+    }
+    repeated Attribute attributes = 1; // Attributes is the list itself.
+  }
+  // Protocol specific message type.
+  message DIDExchangeMsg {
+    string label = 1; // The pairwise can be labeled.
+    string invitationJSON = 2; // Invitation JSON string
+  }
+  // Protocol specific message type.
+  message IssueCredentialMsg {
+    string cred_defID = 1;
+    // AttrFmt includes attributes either in JSON (previous API format, and
+    // used by Aries) or in normal array of attributes.
+    oneof AttrFmt {
+      string attributesJSON = 2;
+      IssuingAttributes attributes = 3;
+    }
+  }
+  // Proof is helper type for proof request attribute lists are presented:
+  // with the attribute name and attribute source VC (=cred_defID).
+  message Proof {
+    message Attribute {
+      string name = 1;
+      string cred_defID = 2;
+    }
+    repeated Attribute attributes = 1;
+  }
+  // Protocol specific message type.
+  message PresentProofMsg {
+    // AttrFmt includes attributes either in JSON (previous API format, and
+    // used by Aries) or in normal array of attributes.
+    oneof AttrFmt {
+      string attributesJSON = 1;
+      Proof attributes = 2;
+    }
+  }
+  // Protocol specific message type.
+  message BasicMessageMsg {
+    string content = 1; // Content text.
+  }
+  // Protocol typeID specific data.
+  oneof StartMsg {
+    DIDExchangeMsg DID_exchange = 10;
+    IssueCredentialMsg issue_credential = 11;
+    PresentProofMsg present_proof = 12;
+    BasicMessageMsg basic_message = 13;
+  }
+}
+
+/*
+ProtocolID is a primary minimal identification of the _current_ protocol
+conversation. Protocol is an elementary concept in SSI. With the protocols we
+build the trust over the state of the connection (aka pairwise). That's why the
+connection ID is always the most important thing and we should drive towards
+reuse of the previous connection when ever it's possible. Still, we operate with
+protocols.
+*/
+message ProtocolID {
+  Protocol.Type typeID = 1; // i.e. what is going on
+  Protocol.Role role = 2; // i.e. did we start this or the other end etc.
+  string ID = 3; // UUID of the current protocol, note! not the same as conn-id
+  int64 notification_time = 4; // part of the key (see notification)
+}
+
+// ProtocolState is lightest and simplest way to tell outside what is going on
+// during a protocol run.
+message ProtocolState {
+  ProtocolID protocolID = 1;
+  // State tells protocol machine's state at the API level
+  enum State {
+    RUNNING = 0; // Protocol is just started or it's still running
+    OK = 1; // Protocol is finalized successfully
+    ERR = 2; // Protocol is stopped with an error, Not other end's NACK!
+    WAIT_ACTION = 3; // Protocol is waiting user's action to continue
+
+    ACK = 4; // Input only: currently API caller can tell to proceed
+    NACK = 5; // In&out: we or other agent can decline the protocol execution
+  }
+  State state = 2; // See the State enum, tells whats going on
+  string info = 3; // Extra information, mostly used for debugging
+}
+
+/*
+ProtocolStatus is message to include whole status of the protocol. It's used
+to present protocol state at API level when protocol is already started.
+Aries offers thread and decorator structures as well. We bring API for them when
+we have use case for that.
+*/
+message ProtocolStatus {
+  ProtocolState state = 1; // Protocol state header.
+  int64 timestamp = 2; // Status'es timestamp (UNIX).
+
+  // statusJSON is a protocol status in JSON format from previous API. That's
+  // the reason why the individual status sub-messages don't include JSON
+  // strings
+  string statusJSON = 3; 
+
+  // DIDExchangeStatus is structure telling what's going on with DID exchange
+  // protocol.
+  message DIDExchangeStatus {
+    string ID = 1;
+    string myDID = 2;
+    string theirDID = 3;
+    string their_endpoint = 4;
+    string their_label = 5;
+  }
+  // IssueCredentialStatus is structure telling what's going on with issue
+  // credential protocol.
+  message IssueCredentialStatus {
+    string cred_defID = 1;
+    string schemaID = 2;
+    Protocol.IssuingAttributes attributes = 3;
+  }
+  // PresentProofStatus is structure telling present_proof status.
+  message PresentProofStatus {
+    Protocol.Proof proof = 1; // Protocol.Proof more information
+  }
+  // TrustPingStatus is structure telling its status.
+  message TrustPingStatus {
+    bool replied = 1;
+  }
+  // BasicMessageStatus telling its protocol status.
+  message BasicMessageStatus {
+    string content = 1;
+    bool sent_by_me = 2;
+    bool delivered = 3;
+    int64 sent_timestamp = 4;
+  }
+  // Status is one of these. Protocol.State.TypeID tells which.
+  oneof Status {
+    DIDExchangeStatus DID_exchange = 10;
+    IssueCredentialStatus issue_credential = 11;
+    PresentProofStatus present_proof = 12;
+    TrustPingStatus trust_ping = 13;
+    BasicMessageStatus basic_message = 14;
+  }
+}

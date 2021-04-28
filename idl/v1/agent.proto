@@ -1,0 +1,229 @@
+// Copyright 2020 Harri @ OP Techlab.
+//
+
+syntax = "proto3";
+
+import "protocol.proto";
+
+option go_package = "github.com/findy-network/findy-common-go/grpc/agency/v1";
+
+// Package agency.v1 is the first version of findy gRPC API. As long as we'll
+// not have changes that aren't backward compatible, we can just update the
+// API.  The gRPC itself will take care off that, like adding a new fields to
+// messages. We just need to follow the gRPC practises and rules.
+//
+// As said, as long as we can maintain backward compatibility, we are working
+// with version 1.0.  The version 2.0 will be introduced when we cannot solve
+// something only with the version 1.0. The 2.0 will include all the current
+// APIs of 1.0 and we support them both together until the decision shall be
+// made to depracate 1.0 totally. The deprecation rules will be specified
+// later.
+package agency.v1;
+
+/*
+AgentService is to communicate with your cloud agent. With the cloud agent
+you can Listen your agent's status, Answer to its requests and questions,
+create invitations, manage its running environment, and create schemas and
+credentials.
+ */
+service AgentService {
+  // Listen is bidirectional function to stream AgentStatus. ClientID must be
+  // unique. AgentStatus includes only enough information to access the actual
+  // PSM and DIDComm connection with the ProtocolService.Status function.
+  // Summary: you listen your agent but work with our protocols.
+  rpc Listen(ClientID) returns (stream AgentStatus) {}
+
+  // Wait is bidirectional function to stream service agent Questions. With
+  // Wait you listen your agent and if it's Issuing or Verifying VC it needs
+  // more information and immetiate answers from you. For instance, if a proof
+  // can be validated. Note! if your agent is only casual Holder it doesn't
+  // need to answer any of these questions. Holder communicate goes with
+  // ProtocolService.Resume(). Please see Give for more information.
+  rpc Wait(ClientID) returns (stream Question) {}
+  // Give is function to answer to Questions sent from CA and arived from Wait
+  // function. Questions have ID and clientID which should be used when
+  // answering the questions.
+  rpc Give(Answer) returns (ClientID) {}
+
+  // CreateInvitation returns an invitation according to InvitationBase.
+  rpc CreateInvitation(InvitationBase) returns (Invitation) {}
+
+  // SetImplId sets implementation ID for the clould agent. It should be "grpc".
+  // TODO: REMOVE!! Check Agency implementation first. We still need something
+  // for this. At least the autoaccept mode for now.
+  // TODO: Rename? Rethink logic: SetSAMode(), etc.?
+  rpc SetImplId(SAImplementation) returns (SAImplementation) {}
+
+  // Ping pings the cloud agent.
+  rpc Ping(PingMsg) returns (PingMsg) {}
+
+  // CreateSchema creates a new schema and writes it to ledger.
+  rpc CreateSchema(SchemaCreate) returns (Schema) {}
+  // CreateCredDef creates a new credential definition to wallet and writes it
+  // to the ledger. Note! With current indysdk VC structure the running time is
+  // long, like 10-20 seconds.
+  rpc CreateCredDef(CredDefCreate) returns (CredDef) {}
+
+  // GetSchema returns a schema structure.
+  rpc GetSchema(Schema) returns (SchemaData) {}
+  // GetCredDef returns a credential definition.
+  rpc GetCredDef(CredDef) returns (CredDefData) {}
+}
+
+// SchemaData is structure to fetch schema information from the ledger.
+message SchemaData {
+  string ID = 1; // ID is schema ID
+  string data = 2; // data is a schema JSON string from the ledger.
+}
+
+// CredDefData is structure to fetch credential definition from the ledger.
+message CredDefData {
+  string ID = 1; // ID is CredDef ID.
+  string data = 2; // data is a cred def JSON string from the ledger.
+}
+
+// SchemaCreate is structure for schema creation.
+message SchemaCreate {
+  string name = 1; // name is the name of the schema.
+  string version = 2; // version is the schema version.
+  repeated string attributes = 3; // attributes is JSON array string.
+}
+
+// Schema is structure to transport schema ID.
+message Schema {
+  string ID = 1; // ID is a schema ID.
+}
+
+// CredDefCreate is structure to transport credential definition identity.
+message CredDefCreate {
+  string schemaID = 1; // schemaID is ID of the schema.
+  string tag = 2; // tag is schema tag.
+}
+
+// CredDef is structure to transport credential definition ID.
+message CredDef {
+  string ID = 1;
+}
+
+// PingMsg is structure to indentify ping messages.
+message PingMsg {
+  int32 ID = 1; // ID is ping message ID.
+  bool ping_controller = 2; // Tells if CA's controller should pinged once.
+}
+
+// SAImplementation is structure to specify SA implementation. TODO: refactor.
+message SAImplementation {
+  string ID = 1; // Implementation ID.
+  string endpoint = 2; // For old API, was a web hook address.
+  string key = 3; // For old API, was VerKey, see indy sdk.
+  bool persistent = 4; // Tells if information should be saved to wallet.
+}
+
+// InvitationBase is structure to create actual Aries invitations. See more info
+// from Aries documentation about the fields.
+message InvitationBase {
+  string label = 1; // Gives a human readable name for this end of the pairwise.
+  string ID = 2; // Pairwise ID, must be unique, and no collition w/ previous.
+  int64 expiration = 3; // not implemented yet
+}
+
+// Invitation is structure for ready invitation.
+message Invitation {
+  string JSON = 1; // Actual invitation to be shown to other end.
+  string URL = 2; // Short URL, not implemented yet
+}
+
+/*
+Answer is a message send by Give function of Agent service.
+ */
+message Answer {
+  string ID = 1; // Same as Question ID (UUID)
+  ClientID clientID = 2; // Same as your ClientID when Wait was started
+  bool ack = 3; // Response to the protocol question: true = ACK, false = NACK
+  string info = 4; // General info, mostly used for debugging
+}
+
+// ClientID is UUID. If user has many different client device connected to
+// cloud agent it must identify who is talking to.
+message ClientID {
+  string ID = 1; // UUID of the client
+}
+
+/*
+AgentStatus is a message identifying current agent events returned as
+notifications. It's also a base message for Question.
+ */
+message AgentStatus {
+  ClientID clientID = 1; // UUID of the client listening
+  Notification notification = 3; // The actual Notification message
+}
+
+/*
+Notification is a message used to tell meaningful events outside from cloud
+agent. It includes only header information. If more detailed information about
+the Protocol is needed ProtocolService.Status should be called. Notification is
+a base message for AgentStatus.
+ */
+message Notification {
+  // Type is enum type to tell what happening
+  enum Type {
+    NONE = 0; // This is set when Question is the actual message
+    KEEPALIVE = 1; // To prevent network idle to shut us down
+    STATUS_UPDATE = 2; // General status update where no action is needed
+    PROTOCOL_PAUSED = 3; // Protocol is waiting action with Resume function
+  }
+  Type typeID = 1; // Notification type, see Type
+
+  string ID = 2; // Notification's unique ID
+  string connectionID = 3; // Current pairwise ID between agents
+  string protocolID = 4; // Current protocol ID, see Aries Thread ID
+  string protocol_family = 5; // Text version of the protocol family/namespace
+  int64 timestamp = 6; // timestamp in nano because this is part of the key
+  Protocol.Type protocol_type = 7;
+  Protocol.Role role = 8;
+  string PID = 9;
+}
+
+// Question is a message for questions sent by cloud agent to its controller aka
+// service agent. Current API uses bidirectional streams for immetiate questions
+// araised during the protocol execution.
+message Question {
+  AgentStatus Status = 1;
+  // Type is enum type to tell what happening. xx_WAITS means that the question 
+  // is waiting for an answer and it should be answered ASAP.
+  enum Type {
+    NONE = 0; // This is set when AgentStatus.Notification is set.
+    KEEPALIVE = 1; // To prevent network idle to shut us down, no answer needed
+    PING_WAITS = 2; // You have been pinged and you need to answer it
+    ISSUE_PROPOSE_WAITS = 3; // Issuing is proposed and you need to ACK/NACK
+    PROOF_PROPOSE_WAITS = 4; // Proof is proposed and you need to ACK/NACK
+    PROOF_VERIFY_WAITS = 5; // Proof values need to be verified by you
+  }
+  Type typeID = 2; // Question type, see Type
+
+  // IssueProposeMsg is sent when a Holder wants to alert Issuer to issue a new
+  // credential. The Holder defines the cred_defID and values to VC attributes.
+  message IssueProposeMsg {
+    string cred_defID = 1; // The ID of the credential to issue.
+
+    // valuesJSON is currently used for PreviewCredentialToCodedVales (see
+    // findy-agent) and for that reason the excat format or layot is not clear.
+    // TODO: we refactor this later.
+    string valuesJSON = 2; 
+  }
+  // ProofVerifyMsg is sent 1) when a Holder wants to present a proof before
+  // Verifier is sent a proof request OR 2) when proof values need to be
+  // verified.
+  message ProofVerifyMsg {
+    message Attribute {
+      string value = 1;
+      string name = 2;
+      string cred_defID = 3;
+    }
+    repeated Attribute attributes = 1;
+  }
+  oneof Question {
+    IssueProposeMsg issue_propose = 3;
+    ProofVerifyMsg proof_verify = 4;
+  }
+}
