@@ -73,17 +73,17 @@ service AgentService {
 message ModeCmd {
   // CmdType defines the current type ot the control mode is operated.
   enum CmdType {
-    NONE = 0; // Input cmd (typeID = NONE, input = true) aka query msg
+    NONE = 0; // Reserved for internal use
     ACCEPT_MODE = 1; // Defines the mode how CA conroller interface is working.
   }
   CmdType typeID = 1; // type of the actual type
-  bool is_input = 2; // this is input cmd, if not this is output cmd
+  bool is_input = 2; // this is input cmd, if not this is output aka query cmd
   string info = 3; // additional information for the command.
 
   // AcceptModeCmd is the sub type for the actual cmd. With it we can setup how
   // the CA handles situations where decision is needed. For testing and dev
   // there is an auto accept mode where CA just sends ACKs to to other end
-  // without ascking controller's help for it.
+  // without asking controller's help for it.
   message AcceptModeCmd {
     enum Mode {
       // Default mode is same as grpc mode for now.
