@@ -77,7 +77,7 @@ message ModeCmd {
     ACCEPT_MODE = 1; // Defines the mode how CA conroller interface is working.
   }
   CmdType typeID = 1; // type of the actual type
-  bool input = 2; // this is input cmd, if not this is output cmd
+  bool is_input = 2; // this is input cmd, if not this is output cmd
   string info = 3; // additional information for the command.
 
   // AcceptModeCmd is the sub type for the actual cmd. With it we can setup how
