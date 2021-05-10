@@ -47,13 +47,6 @@ service AgentService {
 
   // CreateInvitation returns an invitation according to InvitationBase.
   rpc CreateInvitation(InvitationBase) returns (Invitation) {}
-
-  // SetImplId sets implementation ID for the clould agent. It should be "grpc".
-  // TODO: REMOVE!! Check Agency implementation first. We still need something
-  // for this. At least the autoaccept mode for now.
-  // TODO: Rename? Rethink logic: SetSAMode(), etc.?
-  rpc SetImplId(SAImplementation) returns (SAImplementation) {}
-
   // Ping pings the cloud agent.
   rpc Ping(PingMsg) returns (PingMsg) {}
 
@@ -68,6 +61,46 @@ service AgentService {
   rpc GetSchema(Schema) returns (SchemaData) {}
   // GetCredDef returns a credential definition.
   rpc GetCredDef(CredDef) returns (CredDefData) {}
+
+  // Enter enters the running mode command to the CA. CA executes the cmd and
+  // returns the result. Command pattern is selected to allow easy extensions.
+  rpc Enter(ModeCmd) returns (ModeCmd) {}
+}
+
+// ModeCmd is cmd to control CA's execution modes. The commands allow easy way
+// to extend current behaviour with the existing interface. In the future we
+// might have new ways to communicate from CA to its conroller.
+message ModeCmd {
+  // CmdType defines the current type ot the control mode is operated.
+  enum CmdType {
+    NONE = 0; // Reserved for internal use
+    ACCEPT_MODE = 1; // Defines the mode how CA conroller interface is working.
+  }
+  CmdType typeID = 1; // type of the actual type
+  bool is_input = 2; // this is input cmd, if not this is output aka query cmd
+  string info = 3; // additional information for the command.
+
+  // AcceptModeCmd is the sub type for the actual cmd. With it we can setup how
+  // the CA handles situations where decision is needed. For testing and dev
+  // there is an auto accept mode where CA just sends ACKs to to other end
+  // without asking controller's help for it.
+  message AcceptModeCmd {
+    enum Mode {
+      // Default mode is same as grpc mode for now.
+      DEFAULT = 0;
+      // AutoAccept automatically acceps and verifies all request without
+      // checking them. Mostly use full for dev and testing.
+      AUTO_ACCEPT = 1;
+      // CA send issuing and verifying related questions to controller with
+      // AgentService.Wait function.
+      GRPC_CONTROL = 2;
+    }
+    Mode mode = 1; // Mode is the mode actual be set or pervious mode
+  }
+  // Specific control cmd is one of these
+  oneof ControlCmd {
+    AcceptModeCmd accept_mode = 4;
+  }
 }
 
 // SchemaData is structure to fetch schema information from the ledger.
