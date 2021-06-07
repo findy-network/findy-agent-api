@@ -1,51 +1,44 @@
-# findy-agent API
+# Findy Agency Service API
 
-This documentation describes the API of how [findy-agent](https://github.com/findy-network/findy-agent) clients i.e. edge agents communicate with findy-agent over the network.
+The gRPC API v1 includes interfaces for:
+- **operation services**: log levels, statistics, health checking, etc.
+- **agency services**: new agent on boarding, data hooks, etc.
+- **clould agent services**: notifications, responses, etc.
+- **protocol services**: starting, running, responses, etc.
 
-**Note! This is the initial beta version of the API and it is likely to change with no backward compatibility in the coming findy-agent versions.**
+More detailed documentation for each of them can be found from `protoc` files in
+`idl` directory. The same documentation is available in the target languages
+compiled from the IDL files.
 
-**Update! We have started to development of a new gRPC API. Please note:**
+## Typical Findy Agency Service Setup
+The current implementation of the Findy Agency has three main services:
+1. `findy-agent` includes the protocol engine which runs Aries compatible agent
+   protocols and cloud agents.
+2. `findy-agent-auth` includes a standard WebAuthn server. The
+   `findy-agent-auth` repo also includes a headless FIDO2 authenticator for CLIs
+   and service agents.
+3. `findy-agent-vault` is a service for wallet data. The current API is in
+   GraphQL. The future versions probably include gRPC API as well.
 
-- The gRPC API is still under development, and **you shouldn't use it before it's released**.
-- Both APIs can be used same time after gRPC API release.
-- We will continue to offer the existing JSON/DIDComm based client API described in this documentation until it's officially deprecated.
-- The gRPC API will be totally new one; we will refactor concepts and conventions according the feedback and experience we have had with the exiting one.
-- By bringing the API here offers an opportunity to review and comment it during the process.
+## Client Stubs And Helpers
+
+Both [findy-common-go](https://github.com/findy-network/findy-common-go) and
+[findy-common-ts](https://github.com/findy-network/findy-common-ts) include 
+client stubs and some convenient helpers for the use of the API.
+
+## Service Implementations
+
+The most of the services are implemented by the findy core agency in
+[`findy-agent`](https://github.com/findy-network/findy-agent). 
+
+## Client Reference Implementations
+
+- [findy-common-go](https://github.com/findy-network/findy-common-go) (golang)
+- [findy-agent-cli](https://github.com/findy-network/findy-agent-cli) (golang)
+- [findy-issuer-tool](https://github.com/findy-network/findy-issuer-tool) (node.js)
 
 ## gRPC Style Guide
 
 We follow [the style guide](https://developers.google.com/protocol-buffers/docs/style)
 with the following special rules:
-- treat acronymes like numbers in the style guide.
-
-## Protocol
-
-The API is based on a proprietary protocol over HTTP(S) implemented for findy-agent communication. The protocol is inspired by the early [indy-sdk](https://github.com/hyperledger/indy-sdk) agent communication protocol. Some design decisions are based on legacy functionality that is nowadays obsolete and therefore the protocol is likely to change in the future.
-
-To utilize the API, clients need to onboard to findy-agent. Onboarding to findy-agent can be done either dynamically with message exchange or exporting the edge wallet with findy-agent tools and importing the wallet file to the edge environment. Edge and cloud agents exchange public keys in the onboarding process, and thereafter API communication is encrypted with these keys.
-
-The encryption is implemented with indy-sdk [anon_crypt](https://github.com/hyperledger/indy-sdk/blob/adfdec0ddaee158060f822c8f0810d8f286ae7ac/libindy/include/indy_crypto.h#L251) functionality and therefore indy-sdk is currently a required dependency for all API clients.
-
-## Description
-
-API requests and message packaging are described as more detailed [here](docs/api.md).
-
-The notifications from findy-agent to edge can be received either with a webhook or a socket. The same message protocol is utilized in the notifications.
-
-## Reference implementations
-
-- findy-api-test (rust)
-- [findy-agent-cli](https://github.com/findy-network/findy-agent-cli) (golang)
-- [findy-issuer-api](https://github.com/findy-network/findy-issuer-api) (node.js)
-- [findy-wallet-ios](https://github.com/findy-network/findy-wallet-ios) (swift)
-
-## Publishing new version
-
-Release script will tag the current version and push the tag to remote. This will trigger e2e-tests in CI automatically and if they succeed, the tag is merged to master.
-
-Release script assumes it is triggered from dev branch. It takes one parameter, the next working version. E.g. if current working version is 0.1.0, following will release version 0.1.0 and update working version to 0.2.0.
-
-```bash
-git checkout dev
-./release 0.2.0
-```
+- treat acronyms like numbers in the style guide.
