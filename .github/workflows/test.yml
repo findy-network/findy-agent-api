@@ -14,5 +14,7 @@ jobs:
         run: git config --global url."https://"${{ secrets.https_prefix }}"github.com/".insteadOf "https://github.com/"
       - name: Install Protoc
         uses: arduino/setup-protoc@v1
+      - name: add go-gen
+        run: go get github.com/golang/protobuf/{proto,protoc-gen-go}
       - name: test
         run: make protoc
