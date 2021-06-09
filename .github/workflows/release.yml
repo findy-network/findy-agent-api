@@ -27,6 +27,8 @@ jobs:
             idl/v1/agent.proto
             idl/v1/protocol.proto
             VERSION
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
   merge:
     needs: e2e
     runs-on: ubuntu-latest
