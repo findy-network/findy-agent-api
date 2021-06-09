@@ -21,11 +21,6 @@ if [ -z "$(git status --porcelain)" ]; then
   git pull origin dev
 
   VERSION=v$VERSION_NBR
-  go mod tidy
-
-  set +e
-  git commit -a -m "Releasing version $VERSION."
-  set -e
   git tag -a $VERSION -m "Version $VERSION"
   git push origin dev --tags
 
