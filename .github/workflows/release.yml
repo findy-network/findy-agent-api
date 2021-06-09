@@ -12,6 +12,8 @@ jobs:
       - name: test
         run: echo "implement e2e tests"
   publish:
+    permissions:
+      contents: write
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -25,8 +27,6 @@ jobs:
             idl/v1/agent.proto
             idl/v1/protocol.proto
             VERSION
-        env:
-          GITHUB_TOKEN: ${{ secrets.REPOSITORY_TOKEN }}
   merge:
     needs: e2e
     runs-on: ubuntu-latest
