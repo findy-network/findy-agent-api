@@ -131,6 +131,9 @@ message Protocol {
       string cred_defID = 2;
       // optional attribute ID
       string ID = 3;
+      // this field holds the attribute value in cases where the proof values
+      // should be verified by the party requesting the proof
+      string value = 4;
     }
     repeated Attribute attributes = 1;
   }
