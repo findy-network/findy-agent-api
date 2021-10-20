@@ -218,11 +218,6 @@ message ProtocolStatus {
   ProtocolState state = 1; // Protocol state header.
   int64 timestamp = 2; // Status'es timestamp (UNIX).
 
-  // statusJSON is a protocol status in JSON format from previous API. That's
-  // the reason why the individual status sub-messages don't include JSON
-  // strings
-  string statusJSON = 3; 
-
   // DIDExchangeStatus is structure telling what's going on with DID exchange
   // protocol.
   message DIDExchangeStatus {
