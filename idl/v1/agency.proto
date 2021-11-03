@@ -35,6 +35,7 @@ service AgencyService {
 // Onboarding is structure for cloud agent (CA) onboarding.
 message Onboarding {
   string email = 1; // email is then name or handle used for pointing the CA.
+  string publicDIDSeed = 2; // public DID seed is used to generate CA's DID (optional)
 }
 
 // OnboardResult is structure to transport Onboarding result.
