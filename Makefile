@@ -2,11 +2,7 @@ SRC_ROOT=$(GOPATH)/src
 IDL_PATH=idl/v1
 OUT_PATH=.grpc-out
 
-deps:
-	go get -t ./...
-
-update-deps:
-	go get -u ./...
+protoc:	protoc_protocol protoc_agency protoc_agent protoc_authn
 
 protoc_protocol:
 	protoc --proto_path=$(IDL_PATH) --go_out=$(OUT_PATH) --go-grpc_out=$(OUT_PATH) protocol.proto
@@ -17,7 +13,8 @@ protoc_agency:
 protoc_agent:
 	protoc --proto_path=$(IDL_PATH) --go_out=$(OUT_PATH) --go-grpc_out=$(OUT_PATH) agent.proto
 
-protoc:	protoc_protocol protoc_agency protoc_agent
+protoc_authn:
+	protoc --proto_path=$(IDL_PATH) --go_out=$(OUT_PATH) --go-grpc_out=$(OUT_PATH) authn.proto
 
 clean:
 	@rm -r $(OUT_PATH)/*
