@@ -1,6 +1,3 @@
-// Copyright 2023 Harri @ OP Techlab.
-//
-
 syntax = "proto3";
 
 option go_package = "github.com/findy-network/findy-common-go/grpc/authn/v1";
