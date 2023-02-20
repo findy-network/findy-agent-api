@@ -22,7 +22,7 @@ The gRPC API v1 includes interfaces for:
 
 - **operation services**: log levels, statistics, health checking, etc.
 - **agency services**: new agent on boarding, data hooks, etc.
-- **clould agent services**: notifications, responses, etc.
+- **cloud agent services**: notifications, responses, etc.
 - **protocol services**: starting, running, responses, etc.
 
 More detailed documentation for each of them can be found from `protoc` files in

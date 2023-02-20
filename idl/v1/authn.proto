@@ -1,0 +1,116 @@
+syntax = "proto3";
+
+option go_package = "github.com/findy-network/findy-common-go/grpc/authn/v1";
+
+// Package authn.v1 is the first version of findy gRPC API. As long as we'll not
+// have changes that aren't backward compatible, we can just update the API.
+// The gRPC itself will take care off that, like adding a new fields to
+// messages. We just need to follow the gRPC practises and rules.
+//
+// As said, as long as we can maintain backward compatibility, we are working
+// with version 1.0.  The version 2.0 will be introduced when we cannot solve
+// something only with the version 1.0. The 2.0 will include all the current
+// APIs of 1.0 and we support them both together until the decision shall be
+// made to depracate 1.0 totally. The deprecation rules will be specified
+// later.
+package authn.v1;
+
+/*
+AuthnService offers for WebAuthn translation service. Translation service allows
+us to use our own secure enclave and communicate with FIDO2 Server. Of course
+this solution can thought as an authentication endpoint for any gRPC client, but
+we think it as an bridge/translator between any secure enclave capable
+authenticator device and FIDO2 server.
+ */
+service AuthnService {
+  // Enter enters authn command: REGISTER or LOGIN.
+  rpc Enter(Cmd) returns (stream CmdStatus) {}
+
+  // EnterSecret enters needed secrets after specific CmdStatus has received.
+  rpc EnterSecret(SecretMsg) returns (SecretResult) {}
+
+}
+
+// SecretMsg tells how proceed after CmdStatus has been received.
+message SecretMsg {
+  int64 cmdID = 1; // UUID to uniquely identify the hook
+	enum Type {
+		ERROR = 0; // Error in processing CmdStatus
+
+		// Enclave lvl status. TODO: should we have IDs for enclaves?
+		NEW_HANDLE = 1; // () -> key handle ID (int64)
+		IS_KEY_HANDLE = 2; // (credID bytes) -> bool
+
+		// Handle lvl status
+		ID = 3; // handle_id -> bytes
+		CBOR_PUB_KEY = 4; // handle_id -> bytes
+		SIGN = 5; // handle_id (bytes) -> bytes
+		VERIFY = 6; // handle_id (bytes, bytes) -> bool
+	}
+	Type type = 2;
+
+	message ErrorMsg {
+		string info = 1;
+	}
+	message EnclaveMsg { 
+		bytes credID = 1;
+	}
+	message HandleMsg {
+		int64 ID = 1;
+		bytes data = 2;
+		bytes sign = 3;
+	}
+	oneof Info {
+		ErrorMsg err = 3;
+		EnclaveMsg enclave = 4;
+		HandleMsg handle = 5;
+	}
+}
+
+// SecretResult is message to return EnterSecret results.
+message SecretResult {
+  bool ok = 1; // result if Loging was successful.
+  string result = 2; // Instance of the OK result.
+}
+
+message Cmd {
+  enum Type {
+    LOGIN = 0;
+    REGISTER = 1;
+  }
+  Type type = 1;
+
+	string userName      = 2;
+	string publicDIDSeed = 3;
+	string URL           = 4;
+	string AAGUID        = 5;
+	uint64 counter       = 7;
+	string JWT           = 8;
+	string origin        = 9;
+
+}
+
+// CmdStatus is structure to return cmd statuses.
+message CmdStatus {
+	int64 cmdID = 1;
+	enum Type {
+		STATUS = 0;
+		READY_OK = 1;
+		READY_ERR = 2;
+	}
+	Type type = 2;
+
+  Cmd.Type cmd_type = 3;
+	SecretMsg.Type sec_type = 4;
+
+  message OKResult {
+    string JWT = 1; // pregenerated JWT token, mostly usefull for development.
+  }
+  oneof Info {
+		SecretMsg.EnclaveMsg enclave = 5;
+		SecretMsg.HandleMsg handle = 6;
+		OKResult ok = 7;
+		string err = 8;
+  }
+}
+
