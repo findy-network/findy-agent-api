@@ -76,5 +76,5 @@ dart pub global activate protoc_plugin
 
 *Note.* Naturally you need to first install `dart` or just `flutter` that
 includes the dart. Installing the Flutter is very easy or very cumperson,
-denpending you OS. Most difficult one has been Linux/ARM64 by far (summer 2023).
+depending on your OS. Most difficult one has been Linux/ARM64 by far (summer 2023).
 
