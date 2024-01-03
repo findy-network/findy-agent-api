@@ -64,3 +64,17 @@ We follow [the style guide](https://developers.google.com/protocol-buffers/docs/
 with the following special rules:
 
 - treat acronyms like numbers in the style guide.
+
+## Dart Support
+
+If you haven't installed `protoc`'s `dart` plugin yet, install it with the
+following command:
+
+```shell
+dart pub global activate protoc_plugin
+```
+
+*Note.* Naturally you need to first install `dart` or just `flutter` that
+includes the dart. Installing the Flutter is very easy or very cumperson,
+depending on your OS. Most difficult one has been Linux/ARM64 by far (summer 2023).
+
