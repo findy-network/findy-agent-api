@@ -5,13 +5,13 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: setup
-        uses: actions/setup-go@v2
+        uses: actions/setup-go@v5
         with:
-          go-version: 1.16.x
+          go-version: 1.21.x
       - name: checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
       - name: Install Protoc
-        uses: arduino/setup-protoc@v1
+        uses: arduino/setup-protoc@v3
       - name: add go-gen
         run: |
           go get github.com/golang/protobuf/{proto,protoc-gen-go}
