@@ -10,7 +10,9 @@ jobs:
           go-version: 1.21.x
       - name: checkout
         uses: actions/checkout@v4
-      - name: install protoc
+      - name: Install Protoc
+        uses: arduino/setup-protoc@v3
+      - name: add go-gen
         run: |
           go install google.golang.org/protobuf/cmd/protoc-gen-go@latest
           go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@latest
